@@ -3,7 +3,7 @@ import repeatIcon from "../../assets/repeat-icon.svg";
 
 export default function DangerZoneSection() {
   return (
-    <section className="flex flex-col bg-[#fff8f0] border border-gray-300 rounded-xl p-8 md:p-16 text-gray-900 shadow-sm">
+    <section className="flex flex-col bg-[#fff8f0] border border-gray-300 rounded-xl p-4 md:p-8 text-gray-900 shadow-sm">
       <h1 className="text-2xl font-semibold mb-0 text-[#7a1f2a]">
         Danger Zone
       </h1>
