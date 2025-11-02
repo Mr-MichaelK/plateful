@@ -4,9 +4,11 @@ import Recipes from "./pages/Recipes";
 import Profile from "./user-profile/Profile";
 import ProfileWrapper from "./user-profile/components/ProfileWrapper";
 import ChangePasswordForm from "./user-profile/components/ChangePasswordForm";
+import RecipeDetails from "./pages/RecipeDetails"; // edited by Noura
+import AddEditRecipe from "./pages/AddEditRecipe"; // edited by Noura
 import "./App.css";
 
-function App() {
+export default function App() {
   return (
     <Router>
       <Routes>
@@ -16,9 +18,11 @@ function App() {
           <Route path="user-info" element={<ProfileWrapper />} />
           <Route path="password" element={<ChangePasswordForm />} />
         </Route>
+        <Route path="/recipe/:id" element={<RecipeDetails />} />{" "}
+        {/* edited by Noura */}
+        <Route path="/add" element={<AddEditRecipe />} />{" "}
+        {/* edited by Noura */}
       </Routes>
     </Router>
   );
 }
-
-export default App;

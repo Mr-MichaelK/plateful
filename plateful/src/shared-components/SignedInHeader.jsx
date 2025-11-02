@@ -19,8 +19,13 @@ export default function SignedInHeader() {
           {[
             { name: "Home", href: "/" },
             { name: "Recipes", href: "/recipes" },
+
+            //edited by Noura (added "Add Recipe" link)
+            { name: "Add Recipe", href: "/add" },
+            
             { name: "Meal Plans", href: "/meal-plans" },
             { name: "Contact", href: "/contact" },
+
           ].map((item) => (
             <li key={item.name}>
               <a
