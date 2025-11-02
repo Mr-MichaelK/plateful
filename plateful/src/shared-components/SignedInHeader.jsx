@@ -1,4 +1,4 @@
-import logo from "../../public/plateful-logo.svg";
+import logo from "../assets/plateful-logo.svg";
 import profilePic from "../assets/profile-placeholder.svg";
 
 // made by Michael Kolanjian and Adam Abdel Karim
@@ -33,7 +33,7 @@ export default function SignedInHeader() {
           ))}
 
           <li className="ml-3">
-            <a href="/user-profile" className="block">
+            <a href="/profile" className="block">
               <img
                 src={profilePic}
                 alt="Your profile"

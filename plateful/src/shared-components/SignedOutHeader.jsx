@@ -1,4 +1,4 @@
-import logo from "../../public/plateful-logo.svg";
+import logo from "../assets/plateful-logo.svg";
 
 // made by Michael Kolanjian and Adam Abdel Karim
 
