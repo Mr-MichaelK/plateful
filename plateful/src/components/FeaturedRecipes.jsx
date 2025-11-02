@@ -13,10 +13,13 @@ const FeaturedRecipes = () => (
     <h2 className="text-2xl font-bold text-[#7a1f2a] mb-8">Featured Recipes</h2>
     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
       {mockRecipes.map((recipe, i) => (
-        <RecipeCard key={i} recipe={recipe} />
+        // edited by Noura 
+        <RecipeCard key={i} recipe={recipe} id={i} />
       ))}
     </div>
   </section>
 );
 
 export default FeaturedRecipes;
+
+
