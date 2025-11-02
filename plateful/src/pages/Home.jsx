@@ -6,10 +6,11 @@ import FeaturedRecipes from "../components/FeaturedRecipes";
 import CategoriesSection from "../components/CategoriesSection";
 import MealPlannerSection from "../components/MealPlannerSection";
 import NewsletterSection from "../components/NewsletterSection";
+import Header from "../shared-components/Header";
 
 const Home = () => (
   <>
-    <Navbar />
+    <Header />
     <HeroSection />
     <FeaturedRecipes />
     <CategoriesSection />
