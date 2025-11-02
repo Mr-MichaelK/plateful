@@ -3,7 +3,7 @@ import DangerZoneSection from "./DangerZoneSection";
 
 export default function ProfileWrapper() {
   return (
-    <section>
+    <section className="flex flex-col gap-8">
       <ProfileInfoForm />
       <DangerZoneSection />
     </section>
