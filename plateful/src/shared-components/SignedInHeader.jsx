@@ -1,0 +1,38 @@
+export default function SignedInHeader() {
+  return (
+    <header className="bg-[#fff8f0] shadow-sm">
+      <nav
+        aria-label="Main navigation"
+        className="py-4 px-6 flex flex-col md:flex-row justify-between items-center"
+      >
+        <a href="/" className="flex items-center space-x-2">
+          <img src="/logo.png" alt="Plateful logo" className="w-10 h-10" />
+          <span className="text-xl font-bold text-[#7a1f2a]">Plateful</span>
+        </a>
+
+        <ul className="flex flex-wrap justify-center md:justify-end mt-3 md:mt-0 space-x-4 text-sm font-medium text-gray-700">
+          <li>
+            <a href="/" className="hover:text-[#7a1f2a]">
+              Home
+            </a>
+          </li>
+          <li>
+            <a href="/recipes" className="hover:text-[#7a1f2a]">
+              Recipes
+            </a>
+          </li>
+          <li>
+            <a href="/meal-plans" className="hover:text-[#7a1f2a]">
+              Meal Plans
+            </a>
+          </li>
+          <li>
+            <a href="/contact" className="hover:text-[#7a1f2a]">
+              Contact
+            </a>
+          </li>
+        </ul>
+      </nav>
+    </header>
+  );
+}
