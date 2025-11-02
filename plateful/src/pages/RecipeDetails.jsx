@@ -27,7 +27,6 @@ function RecipeDetails() {
     );
   }
 
-  // ❤️ Save to favorites (localStorage)
   const handleSave = () => {
     const saved = JSON.parse(localStorage.getItem("favoriteRecipes")) || [];
     const exists = saved.find((r) => r.title === recipe.title);
@@ -51,20 +50,18 @@ function RecipeDetails() {
     }
   };
 
-  // ✏️ Edit → prefill AddEditRecipe
   const handleEdit = () => {
     localStorage.setItem("editRecipe", JSON.stringify(recipe));
     navigate("/add");
   };
 
-  // 📎 Share link
   const handleShare = async () => {
     try {
       await navigator.clipboard.writeText(window.location.href);
       Swal.fire({
         icon: "info",
         title: "Link Copied!",
-        text: "Recipe link copied to clipboard 📋",
+        text: "Recipe link copied to clipboard!",
         confirmButtonColor: "#7a1f2a",
       });
     } catch {
@@ -77,13 +74,12 @@ function RecipeDetails() {
     }
   };
 
-  // 💬 Submit feedback (visual only)
   const handleFeedbackSubmit = () => {
     if (!feedback && rating === 0) {
       Swal.fire({
         icon: "warning",
         title: "Oops!",
-        text: "Please add a rating or comment before submitting 💬",
+        text: "Please add a rating or comment before submitting",
         confirmButtonColor: "#7a1f2a",
       });
       return;
@@ -91,7 +87,7 @@ function RecipeDetails() {
     Swal.fire({
       icon: "success",
       title: "Thank you!",
-      text: "Your feedback has been submitted 🌟",
+      text: "Your feedback has been submitted!",
       confirmButtonColor: "#7a1f2a",
     });
     setRating(0);
@@ -102,31 +98,41 @@ function RecipeDetails() {
     <>
       <Header />
 
-      {/* Hero */}
       <section className="relative h-[70vh] w-full overflow-hidden">
         <img
           src={recipe.image}
           alt={recipe.title}
           className="absolute inset-0 w-full h-full object-cover"
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-[#7a1f2a]/60 via-[#7a1f2a]/30 to-transparent"></div>
+        <div className="absolute inset-0 bg-gradient-to-t from-[#7a1f2a]/70 via-[#7a1f2a]/30 to-transparent"></div>
         <div className="relative z-10 flex flex-col items-center justify-center text-center text-white h-full px-4">
-          <h1 className="text-5xl font-bold drop-shadow-md mb-4">
+          <h1 className="text-5xl font-bold drop-shadow-md mb-2">
             {recipe.title}
           </h1>
-          <p className="text-lg max-w-2xl drop-shadow-sm">{recipe.description}</p>
+
+          {/* Category tag from Adam */}
+          {recipe.category && (
+            <span className="inline-block bg-white/20 text-white backdrop-blur-md px-3 py-1 rounded-full text-sm font-medium mb-4 border border-white/40">
+              {recipe.category}
+            </span>
+          )}
+
+          <p className="text-lg max-w-2xl drop-shadow-sm">
+            {recipe.description}
+          </p>
         </div>
       </section>
 
-      {/* Why love + actions */}
       <section className="bg-[#fffaf6] py-16 px-6">
         <div className="max-w-5xl mx-auto grid md:grid-cols-2 gap-10 items-center">
           <div>
             <h2 className="text-2xl font-bold text-[#7a1f2a] mb-4">
-              Why You’ll Love This Dish
+              Why You will Love This Dish
             </h2>
-            <p className="text-gray-700 leading-relaxed mb-6">{recipe.whyLove}</p>
-            <div className="flex gap-3">
+            <p className="text-gray-700 leading-relaxed mb-6">
+              {recipe.whyLove}
+            </p>
+            <div className="flex flex-wrap gap-3">
               <button
                 onClick={handleSave}
                 className="bg-[#7a1f2a] text-white px-5 py-2 rounded-lg hover:bg-[#a02a3d] transition"
@@ -147,6 +153,7 @@ function RecipeDetails() {
               </button>
             </div>
           </div>
+
           <div>
             <img
               src={recipe.image}
@@ -157,11 +164,12 @@ function RecipeDetails() {
         </div>
       </section>
 
-      {/* Ingredients & Steps */}
       <section className="py-16 px-6 bg-[#fff8f0]">
         <div className="max-w-5xl mx-auto grid md:grid-cols-2 gap-10">
           <div>
-            <h2 className="text-2xl font-bold text-[#7a1f2a] mb-4">Ingredients</h2>
+            <h2 className="text-2xl font-bold text-[#7a1f2a] mb-4">
+              Ingredients
+            </h2>
             <ul className="bg-white shadow rounded-xl p-5 space-y-2 text-gray-700">
               {recipe.ingredients.map((item, i) => (
                 <li key={i}>• {item}</li>
@@ -180,7 +188,6 @@ function RecipeDetails() {
         </div>
       </section>
 
-      {/* Similar */}
       <section className="bg-[#fff] py-16 px-6 text-center">
         <h2 className="text-2xl font-bold text-[#7a1f2a] mb-10">
           Discover Similar Recipes
@@ -192,7 +199,11 @@ function RecipeDetails() {
               onClick={() => navigate(`/recipe/${i}`)}
               className="w-64 rounded-xl overflow-hidden shadow hover:shadow-lg transition hover:scale-105 cursor-pointer"
             >
-              <img src={sim.image} alt={sim.title} className="w-full h-40 object-cover" />
+              <img
+                src={sim.image}
+                alt={sim.title}
+                className="w-full h-40 object-cover"
+              />
               <div className="bg-[#fffaf6] py-3 text-[#7a1f2a] font-medium">
                 {sim.title}
               </div>
@@ -201,11 +212,11 @@ function RecipeDetails() {
         </div>
       </section>
 
-      {/* Community Feedback */}
       <section className="bg-[#fffaf6] py-16 px-6 text-center">
-        <h2 className="text-2xl font-bold text-[#7a1f2a] mb-8">Community Love</h2>
+        <h2 className="text-2xl font-bold text-[#7a1f2a] mb-8">
+          Community Love
+        </h2>
 
-        {/* Existing feedbacks now show 5 stars */}
         <div className="flex flex-wrap justify-center gap-6 mb-10">
           {[
             "So easy to follow — tastes like restaurant-quality!",
@@ -224,13 +235,11 @@ function RecipeDetails() {
           ))}
         </div>
 
-        {/* Add feedback */}
         <div className="max-w-md mx-auto bg-white rounded-2xl shadow-lg p-6 text-left">
           <h3 className="text-lg font-semibold text-[#7a1f2a] mb-4 text-center">
             Share your experience ✍️
           </h3>
 
-          {/* Stars (interactive visual) */}
           <div className="flex justify-center mb-4">
             {[1, 2, 3, 4, 5].map((star) => (
               <span

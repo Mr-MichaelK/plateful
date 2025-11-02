@@ -11,27 +11,39 @@ const AddEditRecipe = () => {
   const [ingredients, setIngredients] = useState("");
   const [steps, setSteps] = useState("");
   const [image, setImage] = useState("");
+  const [category, setCategory] = useState("");
+
+  const categories = [
+    { name: "Breakfast", image: "/categories/breakfast.jpg" },
+    { name: "Lunch", image: "/categories/lunch.jpg" },
+    { name: "Dinner", image: "/categories/dinner.jpg" },
+    { name: "Dessert", image: "/categories/dessert.jpg" },
+    { name: "Smoothies", image: "/categories/smoothie.jpg" },
+  ];
 
   useEffect(() => {
     const editData = JSON.parse(localStorage.getItem("editRecipe"));
     if (editData) {
       setTitle(editData.title || "");
       setDescription(editData.description || "");
-      setIngredients(editData.ingredients ? editData.ingredients.join(", ") : "");
+      setIngredients(
+        editData.ingredients ? editData.ingredients.join(", ") : ""
+      );
       setSteps(editData.steps ? editData.steps.join(". ") : "");
       setImage(editData.image || "");
-      localStorage.removeItem("editRecipe"); 
+      setCategory(editData.category || "");
+      localStorage.removeItem("editRecipe");
     }
   }, []);
 
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    if (!title || !description) {
+    if (!title || !description || !category) {
       Swal.fire({
         icon: "warning",
         title: "Missing Information",
-        text: "Please fill in all required fields!",
+        text: "Please fill in all required fields and select a category!",
         confirmButtonColor: "#7a1f2a",
       });
       return;
@@ -40,7 +52,7 @@ const AddEditRecipe = () => {
     Swal.fire({
       icon: "success",
       title: "Recipe Saved!",
-      text: "Your recipe has been added successfully!",
+      text: `Your ${category} recipe "${title}" has been added successfully!`,
       confirmButtonColor: "#7a1f2a",
     });
 
@@ -49,12 +61,14 @@ const AddEditRecipe = () => {
     setIngredients("");
     setSteps("");
     setImage("");
+    setCategory("");
   };
 
   return (
     <>
       <Header />
 
+      {/* added by Noura */}
       <section className="relative bg-[#fff8f0] py-16 px-6 text-center overflow-hidden">
         <img
           src="/recipes/top-image.jpg"
@@ -67,8 +81,8 @@ const AddEditRecipe = () => {
           </h1>
           <p className="text-gray-700 text-lg">
             {title
-              ? "Update your delicious creation for the Plateful community 🍽️"
-              : "Add your own recipe to inspire the Plateful community 💕"}
+              ? "Update your delicious creation for the Plateful community "
+              : "Add your own recipe to inspire the Plateful community "}
           </p>
         </div>
       </section>
@@ -103,6 +117,25 @@ const AddEditRecipe = () => {
                 onChange={(e) => setDescription(e.target.value)}
                 className="w-full border border-gray-300 rounded-lg px-4 py-2 h-24 resize-none focus:outline-none focus:ring-2 focus:ring-[#7a1f2a]"
               />
+            </div>
+
+            {/* Category Selector by Adam Abdel Karim */}
+            <div>
+              <label className="block font-semibold text-[#7a1f2a] mb-2">
+                Category
+              </label>
+              <select
+                value={category}
+                onChange={(e) => setCategory(e.target.value)}
+                className="w-full border border-gray-300 rounded-lg px-4 py-2 bg-white focus:outline-none focus:ring-2 focus:ring-[#7a1f2a]"
+              >
+                <option value="">Select a category</option>
+                {categories.map((cat, index) => (
+                  <option key={index} value={cat.name}>
+                    {cat.name}
+                  </option>
+                ))}
+              </select>
             </div>
 
             <div>
