@@ -1,5 +1,4 @@
 // made by Noura Hajj Chehade
-
 import React from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
@@ -56,11 +55,17 @@ function RecipeDetails() {
   return (
     <>
       <Header />
+
+      {/* --- Hero Section --- */}
       <section className="bg-[#fff8f0] py-16 px-6 text-center">
         <div className="max-w-4xl mx-auto">
-          <h1 className="text-4xl font-bold text-[#7a1f2a] mb-4">
+          <h1 className="text-4xl font-bold text-[#7a1f2a] mb-2">
             {recipe.title}
           </h1>
+          {/* Category Tag */}
+          <span className="inline-block bg-[#7a1f2a]/10 text-[#7a1f2a] px-3 py-1 rounded-full text-sm font-medium mb-4">
+            {recipe.category}
+          </span>
           <p className="text-gray-700 mb-8 text-lg">{recipe.description}</p>
           <img
             src={recipe.image}
@@ -70,6 +75,7 @@ function RecipeDetails() {
         </div>
       </section>
 
+      {/* --- Why You'll Love --- */}
       <section className="bg-[#fffaf6] py-16 px-6">
         <div className="max-w-5xl mx-auto grid md:grid-cols-2 gap-10 items-center">
           <div>
@@ -104,6 +110,7 @@ function RecipeDetails() {
         </div>
       </section>
 
+      {/* --- Ingredients & Steps --- */}
       <section className="py-16 px-6 bg-[#fff8f0]">
         <div className="max-w-5xl mx-auto grid md:grid-cols-2 gap-10">
           <div>
@@ -128,6 +135,7 @@ function RecipeDetails() {
         </div>
       </section>
 
+      {/* --- Similar Recipes --- */}
       <section className="bg-[#fff] py-16 px-6 text-center">
         <h2 className="text-2xl font-bold text-[#7a1f2a] mb-10">
           Discover Similar Recipes
@@ -136,7 +144,7 @@ function RecipeDetails() {
           {recipe.similar.map((sim, i) => (
             <div
               key={i}
-              onClick={() => navigate(`/recipe/${i}`)} 
+              onClick={() => navigate(`/recipe/${i}`)}
               className="w-64 rounded-xl overflow-hidden shadow hover:shadow-lg transition hover:scale-105 cursor-pointer"
             >
               <img
@@ -152,6 +160,7 @@ function RecipeDetails() {
         </div>
       </section>
 
+      {/* --- Community Love --- */}
       <section className="bg-[#fffaf6] py-16 px-6 text-center">
         <h2 className="text-2xl font-bold text-[#7a1f2a] mb-8">
           Community Love
