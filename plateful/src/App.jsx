@@ -6,7 +6,7 @@ import RecipeDetails from "./pages/RecipeDetails"; // edited by Noura
 import AddEditRecipe from "./pages/AddEditRecipe"; // edited by Noura
 import "./App.css";
 
-function App() {
+export default function App() {
   return (
     <Router>
       <Routes>
