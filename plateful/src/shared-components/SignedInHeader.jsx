@@ -20,9 +20,10 @@ export default function SignedInHeader() {
             { name: "Home", href: "/" },
             { name: "Recipes", href: "/recipes" },
 
-            //edited by Noura (added "Add Recipe" link)
+            //edited by Noura (added "Add Recipe" link and favorites)
             { name: "Add Recipe", href: "/add" },
-            
+            { name: "Favorites", href: "/favorites" }, 
+
             { name: "Meal Plans", href: "/meal-plans" },
             { name: "Contact", href: "/contact" },
 

@@ -4,6 +4,7 @@ import Home from "./pages/Home";
 import Recipes from "./pages/Recipes";
 import RecipeDetails from "./pages/RecipeDetails"; // edited by Noura
 import AddEditRecipe from "./pages/AddEditRecipe"; // edited by Noura
+import FavoriteRecipes from "./pages/FavoriteRecipes"; // edited by Noura
 import "./App.css";
 
 function App() {
@@ -14,6 +15,8 @@ function App() {
         <Route path="/recipes" element={<Recipes />} />
         <Route path="/recipe/:id" element={<RecipeDetails />} /> {/* edited by Noura */}
         <Route path="/add" element={<AddEditRecipe />} /> {/* edited by Noura */}
+        <Route path="/favorites" element={<FavoriteRecipes />} /> {/* edited by Noura */}
+
       </Routes>
     </Router>
   );
