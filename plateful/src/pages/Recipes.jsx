@@ -1,3 +1,4 @@
+// This file is initially done by Adam (Noura edited and copy-paste it)
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 import RecipeCard from "../components/RecipeCard";

@@ -1,9 +1,8 @@
 // made by Noura Hajj Chehade
 
-import React, { useState } from "react";
-import Navbar from "../components/Navbar";
-import Footer from "../components/Footer";
+import React, { useState, useEffect } from "react";
 import Header from "../shared-components/Header";
+import Footer from "../components/Footer";
 import Swal from "sweetalert2";
 
 const AddEditRecipe = () => {
@@ -21,6 +20,21 @@ const AddEditRecipe = () => {
     { name: "Dessert", image: "/categories/dessert.jpg" },
     { name: "Smoothies", image: "/categories/smoothie.jpg" },
   ];
+
+  useEffect(() => {
+    const editData = JSON.parse(localStorage.getItem("editRecipe"));
+    if (editData) {
+      setTitle(editData.title || "");
+      setDescription(editData.description || "");
+      setIngredients(
+        editData.ingredients ? editData.ingredients.join(", ") : ""
+      );
+      setSteps(editData.steps ? editData.steps.join(". ") : "");
+      setImage(editData.image || "");
+      setCategory(editData.category || "");
+      localStorage.removeItem("editRecipe");
+    }
+  }, []);
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -42,7 +56,6 @@ const AddEditRecipe = () => {
       confirmButtonColor: "#7a1f2a",
     });
 
-    // Reset form
     setTitle("");
     setDescription("");
     setIngredients("");
@@ -55,6 +68,7 @@ const AddEditRecipe = () => {
     <>
       <Header />
 
+      {/* added by Noura */}
       <section className="relative bg-[#fff8f0] py-16 px-6 text-center overflow-hidden">
         <img
           src="/recipes/top-image.jpg"
@@ -63,10 +77,12 @@ const AddEditRecipe = () => {
         />
         <div className="relative max-w-3xl mx-auto">
           <h1 className="text-4xl font-bold text-[#7a1f2a] mb-3 drop-shadow-md">
-            Share Your Favorite Recipe
+            {title ? "Edit Your Recipe" : "Share Your Favorite Recipe"}
           </h1>
           <p className="text-gray-700 text-lg">
-            Add your own recipe to inspire the Plateful community
+            {title
+              ? "Update your delicious creation for the Plateful community "
+              : "Add your own recipe to inspire the Plateful community "}
           </p>
         </div>
       </section>
@@ -74,7 +90,7 @@ const AddEditRecipe = () => {
       <section className="py-16 px-6 bg-[#fffaf6]">
         <div className="max-w-3xl mx-auto bg-white rounded-2xl shadow-lg p-8">
           <h2 className="text-2xl font-bold text-[#7a1f2a] mb-8 text-center">
-            Add / Edit Recipe
+            {title ? "Edit Recipe" : "Add Recipe"}
           </h2>
 
           <form onSubmit={handleSubmit} className="space-y-6 text-left">
@@ -103,7 +119,7 @@ const AddEditRecipe = () => {
               />
             </div>
 
-            {/* Category Selector by Adam Abdel Karim*/}
+            {/* Category Selector by Adam Abdel Karim */}
             <div>
               <label className="block font-semibold text-[#7a1f2a] mb-2">
                 Category
@@ -164,7 +180,7 @@ const AddEditRecipe = () => {
                 type="submit"
                 className="bg-[#7a1f2a] text-white px-8 py-3 rounded-lg hover:bg-[#a02a3d] transition font-medium"
               >
-                Save Recipe
+                {title ? "Update Recipe" : "Save Recipe"}
               </button>
             </div>
           </form>
