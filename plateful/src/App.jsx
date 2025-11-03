@@ -12,6 +12,7 @@ import FavoriteRecipes from "./pages/FavoriteRecipes"; // edited by Noura
 import PrivacyPolicy from "./Auth/PrivacyPolicy.jsx";
 import SignUp from "./Auth/SignUp";
 import LogIn from "./Auth/LogIn.jsx";
+import MealPlanner from "./meal-planner/MealPlanner.jsx";
 
 import "./App.css";
 
@@ -36,6 +37,7 @@ export default function App() {
         <Route path="/privacy" element={<PrivacyPolicy />} />
         <Route path="/sign-up" element={<SignUp />} />
         <Route path="/log-in" element={<LogIn />} />
+        <Route path="/meal-plans" element={<MealPlanner />} />
       </Routes>
     </Router>
   );
