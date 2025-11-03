@@ -1,4 +1,4 @@
-// made by Noura Hajj Chehade
+// made by Noura Hajj Chehade, Categories added by Adam 
 
 import React, { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
@@ -98,7 +98,7 @@ function RecipeDetails() {
     <>
       <Header />
 
-      <section className="relative h-[70vh] w-full overflow-hidden">
+      <section className="relative h-[70vh] sm:h-[60vh] w-full overflow-hidden"> 
         <img
           src={recipe.image}
           alt={recipe.title}
@@ -106,33 +106,31 @@ function RecipeDetails() {
         />
         <div className="absolute inset-0 bg-gradient-to-t from-[#7a1f2a]/70 via-[#7a1f2a]/30 to-transparent"></div>
         <div className="relative z-10 flex flex-col items-center justify-center text-center text-white h-full px-4">
-          <h1 className="text-5xl font-bold drop-shadow-md mb-2">
+          <h1 className="text-4xl sm:text-5xl font-bold drop-shadow-md mb-2"> 
             {recipe.title}
           </h1>
 
-          {/* Category tag from Adam */}
+          {/* Category tag */}
           {recipe.category && (
-            <span className="inline-block bg-white/20 text-white backdrop-blur-md px-3 py-1 rounded-full text-sm font-medium mb-4 border border-white/40">
+            <span className="inline-block bg-white/20 text-white backdrop-blur-md px-3 py-1 rounded-full text-xs sm:text-sm font-medium mb-4 border border-white/40">
               {recipe.category}
             </span>
           )}
 
-          <p className="text-lg max-w-2xl drop-shadow-sm">
+          <p className="text-base sm:text-lg max-w-xl sm:max-w-2xl drop-shadow-sm px-2"> 
             {recipe.description}
           </p>
         </div>
       </section>
 
-      <section className="bg-[#fffaf6] py-16 px-6">
-        <div className="max-w-5xl mx-auto grid md:grid-cols-2 gap-10 items-center">
+      <section className="bg-[#fffaf6] py-14 px-4 sm:px-6"> 
+        <div className="max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-10 items-center"> 
           <div>
-            <h2 className="text-2xl font-bold text-[#7a1f2a] mb-4">
-              Why You will Love This Dish
+            <h2 className="text-xl sm:text-2xl font-bold text-[#7a1f2a] mb-4">
+              Why You’ll Love This Dish
             </h2>
-            <p className="text-gray-700 leading-relaxed mb-6">
-              {recipe.whyLove}
-            </p>
-            <div className="flex flex-wrap gap-3">
+            <p className="text-gray-700 leading-relaxed mb-6">{recipe.whyLove}</p>
+            <div className="flex flex-wrap justify-center md:justify-start gap-3"> 
               <button
                 onClick={handleSave}
                 className="bg-[#7a1f2a] text-white px-5 py-2 rounded-lg hover:bg-[#a02a3d] transition"
@@ -164,13 +162,11 @@ function RecipeDetails() {
         </div>
       </section>
 
-      <section className="py-16 px-6 bg-[#fff8f0]">
-        <div className="max-w-5xl mx-auto grid md:grid-cols-2 gap-10">
+      <section className="py-14 px-4 sm:px-6 bg-[#fff8f0]">
+        <div className="max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-10">
           <div>
-            <h2 className="text-2xl font-bold text-[#7a1f2a] mb-4">
-              Ingredients
-            </h2>
-            <ul className="bg-white shadow rounded-xl p-5 space-y-2 text-gray-700">
+            <h2 className="text-xl sm:text-2xl font-bold text-[#7a1f2a] mb-4">Ingredients</h2>
+            <ul className="bg-white shadow rounded-xl p-5 space-y-2 text-gray-700 text-sm sm:text-base"> {/* responsive font */}
               {recipe.ingredients.map((item, i) => (
                 <li key={i}>• {item}</li>
               ))}
@@ -178,8 +174,8 @@ function RecipeDetails() {
           </div>
 
           <div>
-            <h2 className="text-2xl font-bold text-[#7a1f2a] mb-4">Steps</h2>
-            <ol className="bg-white shadow rounded-xl p-5 space-y-2 text-gray-700 list-decimal list-inside">
+            <h2 className="text-xl sm:text-2xl font-bold text-[#7a1f2a] mb-4">Steps</h2>
+            <ol className="bg-white shadow rounded-xl p-5 space-y-2 text-gray-700 list-decimal list-inside text-sm sm:text-base"> {/* responsive font */}
               {recipe.steps.map((step, i) => (
                 <li key={i}>{step}</li>
               ))}
@@ -188,16 +184,14 @@ function RecipeDetails() {
         </div>
       </section>
 
-      <section className="bg-[#fff] py-16 px-6 text-center">
-        <h2 className="text-2xl font-bold text-[#7a1f2a] mb-10">
-          Discover Similar Recipes
-        </h2>
+      <section className="bg-[#fff] py-14 px-4 sm:px-6 text-center">
+        <h2 className="text-xl sm:text-2xl font-bold text-[#7a1f2a] mb-10">Discover Similar Recipes</h2>
         <div className="flex flex-wrap justify-center gap-6">
           {recipe.similar.map((sim, i) => (
             <div
               key={i}
               onClick={() => navigate(`/recipe/${i}`)}
-              className="w-64 rounded-xl overflow-hidden shadow hover:shadow-lg transition hover:scale-105 cursor-pointer"
+              className="w-60 sm:w-64 rounded-xl overflow-hidden shadow hover:shadow-lg transition hover:scale-105 cursor-pointer"
             >
               <img
                 src={sim.image}
@@ -212,10 +206,8 @@ function RecipeDetails() {
         </div>
       </section>
 
-      <section className="bg-[#fffaf6] py-16 px-6 text-center">
-        <h2 className="text-2xl font-bold text-[#7a1f2a] mb-8">
-          Community Love
-        </h2>
+      <section className="bg-[#fffaf6] py-14 px-4 sm:px-6 text-center">
+        <h2 className="text-xl sm:text-2xl font-bold text-[#7a1f2a] mb-8">Community Love</h2>
 
         <div className="flex flex-wrap justify-center gap-6 mb-10">
           {[
@@ -225,9 +217,9 @@ function RecipeDetails() {
           ].map((text, index) => (
             <div
               key={index}
-              className="bg-white shadow rounded-xl max-w-sm p-6 text-gray-700"
+              className="bg-white shadow rounded-xl max-w-xs sm:max-w-sm p-6 text-gray-700 text-sm sm:text-base" // responsive width and font
             >
-              <div className="flex justify-center mb-2 text-[#FFD700] text-xl">
+              <div className="flex justify-center mb-2 text-[#FFD700] text-lg sm:text-xl">
                 {"★★★★★"}
               </div>
               <p className="italic">“{text}”</p>
@@ -236,7 +228,7 @@ function RecipeDetails() {
         </div>
 
         <div className="max-w-md mx-auto bg-white rounded-2xl shadow-lg p-6 text-left">
-          <h3 className="text-lg font-semibold text-[#7a1f2a] mb-4 text-center">
+          <h3 className="text-base sm:text-lg font-semibold text-[#7a1f2a] mb-4 text-center">
             Share your experience ✍️
           </h3>
 
@@ -245,7 +237,7 @@ function RecipeDetails() {
               <span
                 key={star}
                 onClick={() => setRating(star)}
-                className={`cursor-pointer text-3xl ${
+                className={`cursor-pointer text-2xl sm:text-3xl ${
                   star <= rating ? "text-[#FFD700]" : "text-gray-300"
                 } transition`}
               >
@@ -258,13 +250,13 @@ function RecipeDetails() {
             placeholder="Write your feedback here..."
             value={feedback}
             onChange={(e) => setFeedback(e.target.value)}
-            className="w-full border border-gray-300 rounded-lg px-4 py-2 h-24 resize-none focus:outline-none focus:ring-2 focus:ring-[#7a1f2a]"
+            className="w-full border border-gray-300 rounded-lg px-4 py-2 h-24 resize-none focus:outline-none focus:ring-2 focus:ring-[#7a1f2a] text-sm sm:text-base"
           />
 
           <div className="text-center mt-5">
             <button
               onClick={handleFeedbackSubmit}
-              className="bg-[#7a1f2a] text-white px-6 py-2 rounded-lg hover:bg-[#a02a3d] transition"
+              className="bg-[#7a1f2a] text-white px-6 py-2 rounded-lg hover:bg-[#a02a3d] transition text-sm sm:text-base"
             >
               Submit Feedback
             </button>
