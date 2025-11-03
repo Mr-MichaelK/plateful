@@ -1,6 +1,6 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
-import cookingVideo from "../assets/cooking1.mp4"; // ✅ correct relative path
+import cookingVideo from "../assets/cooking1.mp4";
 
 const HeroSection = () => {
   const navigate = useNavigate();
