@@ -6,6 +6,8 @@ import Swal from "sweetalert2";
 import Header from "../shared-components/Header";
 import Footer from "../components/Footer";
 import { mockRecipes } from "../pages/Recipes";
+import { featuredRecipes } from "../components/FeaturedRecipes";
+
 
 function RecipeDetails() {
   const { id } = useParams();
@@ -16,26 +18,26 @@ function RecipeDetails() {
   const [rating, setRating] = useState(0);
   const [feedback, setFeedback] = useState("");
 
-  useEffect(() => {
-    let found = location.state?.recipe;
+useEffect(() => {
+  let found = location.state?.recipe;
 
+  if (!found) {
+    const decodedId = decodeURIComponent(id);
+    found =
+      mockRecipes.find((r) => r.title === decodedId) ||
+      featuredRecipes.find((r) => r.title === decodedId); // ✅ also check featured
     if (!found) {
-      const decodedId = decodeURIComponent(id);
-      found = mockRecipes.find((r) => r.title === decodedId);
-
-      if (!found) {
-        const favorites = JSON.parse(localStorage.getItem("favoriteRecipes")) || [];
-        found =
-          favorites.find(
-            (r) =>
-              r.title === decodedId ||
-              r.id === decodedId
-          ) || null;
-      }
+      const favorites = JSON.parse(localStorage.getItem("favoriteRecipes")) || [];
+      found =
+        favorites.find(
+          (r) => r.title === decodedId || r.id === decodedId
+        ) || null;
     }
+  }
 
-    setRecipe(found);
-  }, [id, location.state]);
+  setRecipe(found);
+}, [id, location.state]);
+
 
   if (!recipe) {
     return (
