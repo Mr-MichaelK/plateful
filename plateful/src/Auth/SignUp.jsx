@@ -14,9 +14,9 @@ import Footer from "../components/Footer.jsx";
 
 // for code reusability, components were created in the ./Auth/components folder for signup & login
 
-// there exists no backend/db to confirm whether a user already has an account or needs to sign up
-// for now, any user can sign up 
-// real sign up behavior will be implemented in the backend phase of the project
+// for now, any user can sign up, except one: the user Mohammad Farhat
+// if the email "mohammadfarhat@lau.edu.lb" is entered (with ANY name/password),
+// he is notified that he already has an account, and needs to login instead
 
 // all fields are required
 export default function SignUp() {
@@ -26,6 +26,9 @@ export default function SignUp() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [agree, setAgree] = useState(false);
+  const [error, setError] = useState("");
+
+  const blockedEmail = "mohammadfarhat@lau.edu.lb";
 
   return (
     <div className="min-h-screen bg-[#fff8f0] flex flex-col">
@@ -41,7 +44,21 @@ export default function SignUp() {
           className="w-full"
           onSubmit={(e) => {
             e.preventDefault();
-            if (!agree) return; // users cannot sign up before they check the agree terms of use and privacy policy box
+
+            if (!agree) return; // new users cannot sign up before they check the agree terms of use and privacy policy box
+
+            if (!name.trim() || !email.trim() || !password) {
+              setError("All fields are required.");
+              return;
+            }
+
+            // block this specific email, regardless of name/password
+            if (email.trim().toLowerCase() === blockedEmail) {
+              setError("You already have an account. Please log in instead.");
+              return;
+            }
+
+            setError("");
             navigate("/home");
           }}
         >
@@ -69,11 +86,17 @@ export default function SignUp() {
             onChange={(e) => setPassword(e.target.value)}
           />
 
+          {error && (
+            <p className="text-red-600 text-sm mt-2" aria-live="polite">
+              {error}
+            </p>
+          )}
+
           <Checkbox checked={agree} onChange={setAgree} />
 
           <PrimaryButton
             text="Sign up for free"
-            disabled={!agree}
+            disabled={!agree || !name.trim() || !email.trim() || !password}
             type="submit"
           />
 
