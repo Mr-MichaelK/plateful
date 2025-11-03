@@ -1,17 +1,17 @@
-// This file is initially done by Adam (Noura edited and copy-paste it)
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 import RecipeCard from "../components/RecipeCard";
 import Header from "../shared-components/Header";
-import React, { useState, useEffect } from "react"; // added useEffect
-import { useLocation, useNavigate } from "react-router-dom"; // added
+import React, { useState, useEffect } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
+import { Search } from "lucide-react"; // Added search icon
 
 const mockRecipes = [
   {
     title: "Berry Cobbler",
     description: "A sweet dessert with fresh berries.",
     image: "/recipes/berry-cobbler.jpg",
-    category: "Dessert", // added category
+    category: "Dessert",
     whyLove:
       "Bursting with fresh berries and topped with a golden crisp — perfect for cozy evenings.",
     ingredients: ["Mixed berries", "Flour", "Sugar", "Butter"],
@@ -25,7 +25,7 @@ const mockRecipes = [
     title: "Chickpea Veggie Patties",
     description: "Crispy and protein-packed patties.",
     image: "/recipes/chickpea-patties.jpg",
-    category: "Lunch", // added category
+    category: "Lunch",
     whyLove:
       "Crunchy outside, soft inside, and full of flavor — a perfect healthy burger replacement.",
     ingredients: ["Chickpeas", "Onion", "Garlic", "Spices"],
@@ -100,6 +100,7 @@ const Recipes = () => {
   const categoryFromURL = queryParams.get("category");
 
   const [selectedCategory, setSelectedCategory] = useState("All");
+  const [searchTerm, setSearchTerm] = useState(""); //  Added search term state
 
   useEffect(() => {
     if (categoryFromURL) {
@@ -118,10 +119,15 @@ const Recipes = () => {
     }
   };
 
-  const filteredRecipes =
-    selectedCategory === "All"
-      ? mockRecipes
-      : mockRecipes.filter((r) => r.category === selectedCategory);
+  // Combined filtering logic: category + search term
+  const filteredRecipes = mockRecipes.filter((recipe) => {
+    const matchesCategory =
+      selectedCategory === "All" || recipe.category === selectedCategory;
+    const matchesSearch = recipe.title
+      .toLowerCase()
+      .includes(searchTerm.toLowerCase());
+    return matchesCategory && matchesSearch;
+  });
 
   return (
     <>
@@ -129,6 +135,21 @@ const Recipes = () => {
       <section className="px-6 py-12 text-center">
         <h2 className="text-3xl font-bold text-[#7a1f2a] mb-10">All Recipes</h2>
 
+        {/* ✅ Search bar */}
+        <div className="flex justify-center mb-6">
+          <div className="relative w-full max-w-sm">
+            <Search className="absolute left-3 top-2.5 text-gray-500 w-5 h-5" />
+            <input
+              type="text"
+              placeholder="Search recipes..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="w-full pl-10 pr-4 py-2 border rounded-full border-[#7a1f2a] focus:outline-none focus:ring-2 focus:ring-[#7a1f2a]"
+            />
+          </div>
+        </div>
+
+        {/* Category filters */}
         <div className="flex flex-wrap justify-center gap-3 mb-10">
           {["All", "Breakfast", "Lunch", "Dinner", "Dessert", "Smoothies"].map((cat) => (
             <button
@@ -145,15 +166,22 @@ const Recipes = () => {
           ))}
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-          {filteredRecipes.map((recipe) => (
-            <RecipeCard
-              key={recipe.title}
-              recipe={recipe}
-              id={encodeURIComponent(recipe.title)} 
-            />
-          ))}
-        </div>
+        {/* Recipe grid */}
+        {filteredRecipes.length > 0 ? (
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+            {filteredRecipes.map((recipe) => (
+              <RecipeCard
+                key={recipe.title}
+                recipe={recipe}
+                id={encodeURIComponent(recipe.title)}
+              />
+            ))}
+          </div>
+        ) : (
+          <p className="text-gray-500 text-lg mt-8">
+            No recipes found matching your search.
+          </p>
+        )}
       </section>
       <Footer />
     </>
