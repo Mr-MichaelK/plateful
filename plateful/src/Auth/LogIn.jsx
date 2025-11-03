@@ -13,9 +13,10 @@ import Footer from "../components/Footer.jsx";
 
 // for code reusability, components were created in the ./Auth/components folder for signup & login
 
-// there exists no backend/db to confirm that user already has an account
-// any user can log in for now
-// real log in behavior will be implemented in the backend phase of the project
+// local data was used to simulate login, only the following user is allowed to login
+// email: mohammadfarhat@lau.edu.lb
+// password: cookies123
+// else, an error message is thrown
 
 // both fields are required
 export default function LogIn() {
@@ -23,6 +24,10 @@ export default function LogIn() {
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+
+  const validEmail = "mohammadfarhat@lau.edu.lb";
+  const validPassword = "cookies123";
 
   return (
     <div className="min-h-screen bg-[#fff8f0] flex flex-col">
@@ -38,7 +43,17 @@ export default function LogIn() {
           className="w-full"
           onSubmit={(e) => {
             e.preventDefault();
-            navigate("/home");
+
+            const ok =
+              email.trim().toLowerCase() === validEmail &&
+              password === validPassword;
+
+            if (ok) {
+              setError("");
+              navigate("/home");
+            } else {
+              setError("Invalid email or password.");
+            }
           }}
         >
           <InputField
@@ -56,6 +71,12 @@ export default function LogIn() {
             value={password}
             onChange={(e) => setPassword(e.target.value)}
           />
+
+          {error && (
+            <p className="text-red-600 text-sm mt-2" aria-live="polite">
+              {error}
+            </p>
+          )}
 
           <PrimaryButton
             text="Log in"
