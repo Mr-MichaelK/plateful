@@ -35,7 +35,7 @@ export default function SignedOutHeader() {
 
           <ul className="hidden md:flex flex-wrap justify-center md:justify-end mt-3 md:mt-0 space-x-4 text-sm font-medium text-gray-700">
             {[
-              { name: "Home", href: "/" },
+              { name: "Home", href: "/home" },
               { name: "Recipes", href: "/recipes" },
               { name: "Meal Plans", href: "/meal-plans" },
               { name: "Contact", href: "/contact" },
