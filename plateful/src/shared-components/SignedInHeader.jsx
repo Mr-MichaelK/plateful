@@ -16,7 +16,7 @@ export default function SignedInHeader({ userProfilePicUrl }) {
   };
 
   const links = [
-    { name: "Home", href: "/" },
+    { name: "Home", href: "/home" },
     { name: "Recipes", href: "/recipes" },
     { name: "Add Recipe", href: "/add" },
     { name: "Favorites", href: "/favorites" },
