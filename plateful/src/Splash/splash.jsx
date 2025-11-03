@@ -21,6 +21,7 @@ export default function Splash() {
     };
   }, [navigate]);
 
+  // white background and centering logo
   return (
     <div className="flex items-center justify-center h-screen bg-white">
       <img
