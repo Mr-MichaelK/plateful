@@ -1,4 +1,6 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+
+import Splash from "./Splash/splash.jsx";
 import Home from "./pages/Home";
 import Recipes from "./pages/Recipes";
 import Profile from "./user-profile/Profile";
@@ -7,14 +9,18 @@ import ChangePasswordForm from "./user-profile/components/ChangePasswordForm";
 import RecipeDetails from "./pages/RecipeDetails"; // edited by Noura
 import AddEditRecipe from "./pages/AddEditRecipe"; // edited by Noura
 import FavoriteRecipes from "./pages/FavoriteRecipes"; // edited by Noura
-import Splash from "./Splash/splash.jsx"; // splash screen
+import PrivacyPolicy from "./Auth/PrivacyPolicy.jsx";
+import SignUp from "./Auth/SignUp";
+import LogIn from "./Auth/LogIn.jsx";
+
 import "./App.css";
 
 export default function App() {
   return (
     <Router>
       <Routes>
-        <Route path="/" element={<Splash />} />
+        <Route path="/" element={<Splash />} />{" "}
+        {/* nour: made splash the root so that it opens first*/}
         <Route path="/home" element={<Home />} />
         <Route path="/recipes" element={<Recipes />} />
         <Route path="/profile" element={<Profile />}>
@@ -27,6 +33,9 @@ export default function App() {
         {/* edited by Noura */}
         <Route path="/favorites" element={<FavoriteRecipes />} />{" "}
         {/* edited by Noura */}
+        <Route path="/privacy" element={<PrivacyPolicy />} />
+        <Route path="/sign-up" element={<SignUp />} />
+        <Route path="/log-in" element={<LogIn />} />
       </Routes>
     </Router>
   );

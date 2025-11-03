@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
+// made by nour diab
+
 const platefulLogo = new URL("/plateful-logo.svg", import.meta.url).href;
 
 export default function Splash() {
@@ -8,22 +10,14 @@ export default function Splash() {
   const navigate = useNavigate();
 
   useEffect(() => {
-
-    // make the logo the favicon
-    const favicon = document.createElement("link");
-    favicon.rel = "icon";
-    favicon.type = "image/svg+xml";
-    favicon.href = platefulLogo;
-    document.head.appendChild(favicon);
-
-    // fade effect for splash
     const fadeIn = setTimeout(() => setFade("opacity-100"), 100);
-    const redirect = setTimeout(() => (navigate("/home")), 2500);
+
+    // go to sign-up
+    const redirect = setTimeout(() => navigate("/sign-up"), 2500);
 
     return () => {
       clearTimeout(fadeIn);
       clearTimeout(redirect);
-      if (document.head.contains(favicon)) document.head.removeChild(favicon);
     };
   }, [navigate]);
 
