@@ -4,9 +4,11 @@ import React, { useState, useEffect } from "react";
 import Header from "../shared-components/Header";
 import Footer from "../components/Footer";
 import Swal from "sweetalert2";
+import { useNavigate } from "react-router-dom";
 
 function FavoriteRecipes() {
   const [favorites, setFavorites] = useState([]);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const saved = JSON.parse(localStorage.getItem("favoriteRecipes")) || [];
@@ -25,6 +27,11 @@ function FavoriteRecipes() {
     });
   };
 
+  const handleCardClick = (recipe) => {
+    // Pass the recipe data or ID when navigating
+    navigate(`/recipe/${recipe.id || recipe.title}`, { state: { recipe } });
+  };
+
   return (
     <>
       <Header />
@@ -40,12 +47,13 @@ function FavoriteRecipes() {
             {favorites.map((recipe, i) => (
               <div
                 key={i}
-                className="bg-white rounded-xl shadow hover:shadow-lg transition overflow-hidden relative"
+                onClick={() => handleCardClick(recipe)}
+                className="bg-white rounded-xl shadow hover:shadow-lg transition overflow-hidden relative cursor-pointer group"
               >
                 <img
                   src={recipe.image}
                   alt={recipe.title}
-                  className="w-full h-40 object-cover"
+                  className="w-full h-40 object-cover group-hover:opacity-90 transition"
                 />
                 <div className="p-4">
                   <h3 className="text-lg font-semibold text-[#7a1f2a] mb-2">
@@ -56,7 +64,10 @@ function FavoriteRecipes() {
                   </p>
 
                   <button
-                    onClick={() => handleDelete(recipe.title)}
+                    onClick={(e) => {
+                      e.stopPropagation(); 
+                      handleDelete(recipe.title);
+                    }}
                     className="bg-[#7a1f2a] text-white text-sm px-4 py-1 rounded-lg hover:bg-[#a02a3d] transition"
                   >
                     Remove
