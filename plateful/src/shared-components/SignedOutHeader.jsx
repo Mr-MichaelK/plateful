@@ -1,6 +1,6 @@
 import React, { useState } from "react"; // added by Noura
 import { Menu, X } from "lucide-react"; // added by Noura
-import logo from "../../public/plateful-logo.svg";
+import logo from "../assets/plateful-logo.svg";
 
 // made by Michael Kolanjian and Adam Abdel Karim
 // mobile menu and responsiveness added by Noura Hajj Chehade
@@ -10,7 +10,9 @@ export default function SignedOutHeader() {
 
   return (
     <>
-      <header className="bg-[#fff8f0] shadow-sm fixed top-0 left-0 w-full z-50"> {/* added fixed position by Noura */}
+      <header className="bg-[#fff8f0] shadow-sm fixed top-0 left-0 w-full z-50">
+        {" "}
+        {/* added fixed position by Noura */}
         <nav
           aria-label="Main navigation"
           className="py-4 px-6 flex flex-col md:flex-row justify-between items-center"
@@ -58,7 +60,6 @@ export default function SignedOutHeader() {
             </li>
           </ul>
         </nav>
-
         {/* added by Noura: mobile dropdown menu */}
         {menuOpen && (
           <div className="md:hidden bg-[#fff8f0] shadow-inner flex flex-col items-center text-[#7a1f2a] py-4 space-y-4 text-base font-medium">
