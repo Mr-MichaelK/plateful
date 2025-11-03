@@ -6,6 +6,8 @@ import Swal from "sweetalert2";
 import Header from "../shared-components/Header";
 import Footer from "../components/Footer";
 import { mockRecipes } from "../pages/Recipes";
+import { featuredRecipes } from "../components/FeaturedRecipes";
+
 
 function RecipeDetails() {
   const { id } = useParams();
@@ -16,25 +18,26 @@ function RecipeDetails() {
   const [rating, setRating] = useState(0);
   const [feedback, setFeedback] = useState("");
 
-  useEffect(() => {
-    let found = location.state?.recipe; 
+useEffect(() => {
+  let found = location.state?.recipe;
 
+  if (!found) {
+    const decodedId = decodeURIComponent(id);
+    found =
+      mockRecipes.find((r) => r.title === decodedId) ||
+      featuredRecipes.find((r) => r.title === decodedId); // ✅ also check featured
     if (!found) {
-      found = mockRecipes[id];
-
-      if (!found) {
-        const favorites = JSON.parse(localStorage.getItem("favoriteRecipes")) || [];
-        found =
-          favorites.find(
-            (r) =>
-              r.title === decodeURIComponent(id) ||
-              r.id === id
-          ) || null;
-      }
+      const favorites = JSON.parse(localStorage.getItem("favoriteRecipes")) || [];
+      found =
+        favorites.find(
+          (r) => r.title === decodedId || r.id === decodedId
+        ) || null;
     }
+  }
 
-    setRecipe(found);
-  }, [id, location.state]);
+  setRecipe(found);
+}, [id, location.state]);
+
 
   if (!recipe) {
     return (
@@ -131,7 +134,6 @@ function RecipeDetails() {
             {recipe.title}
           </h1>
 
-          {/* Category tag */}
           {recipe.category && (
             <span className="inline-block bg-white/20 text-white backdrop-blur-md px-3 py-1 rounded-full text-xs sm:text-sm font-medium mb-4 border border-white/40">
               {recipe.category}
@@ -211,7 +213,7 @@ function RecipeDetails() {
           {recipe.similar?.map((sim, i) => (
             <div
               key={i}
-              onClick={() => navigate(`/recipe/${i}`, { state: { recipe: sim } })}
+              onClick={() => navigate(`/recipe/${encodeURIComponent(sim.title)}`, { state: { recipe: sim } })}
               className="w-60 sm:w-64 rounded-xl overflow-hidden shadow hover:shadow-lg transition hover:scale-105 cursor-pointer"
             >
               <img
