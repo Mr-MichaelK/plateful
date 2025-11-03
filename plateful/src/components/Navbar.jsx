@@ -8,7 +8,7 @@ const Navbar = () => (
     </div>
 
     <ul className="flex flex-wrap justify-center md:justify-end mt-3 md:mt-0 space-x-4 text-sm font-medium text-gray-700">
-      <li><a href="/" className="hover:text-[#7a1f2a]">Home</a></li>
+      <li><a href="/home" className="hover:text-[#7a1f2a]">Home</a></li>
       <li><a href="/recipes" className="hover:text-[#7a1f2a]">Recipes</a></li>
       <li><a href="#" className="hover:text-[#7a1f2a]">Meal Plans</a></li>
       <li><a href="#" className="hover:text-[#7a1f2a]">Contact</a></li>
