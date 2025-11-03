@@ -17,18 +17,19 @@ function RecipeDetails() {
   const [feedback, setFeedback] = useState("");
 
   useEffect(() => {
-    let found = location.state?.recipe; 
+    let found = location.state?.recipe;
 
     if (!found) {
-      found = mockRecipes[id];
+      const decodedId = decodeURIComponent(id);
+      found = mockRecipes.find((r) => r.title === decodedId);
 
       if (!found) {
         const favorites = JSON.parse(localStorage.getItem("favoriteRecipes")) || [];
         found =
           favorites.find(
             (r) =>
-              r.title === decodeURIComponent(id) ||
-              r.id === id
+              r.title === decodedId ||
+              r.id === decodedId
           ) || null;
       }
     }
@@ -131,7 +132,6 @@ function RecipeDetails() {
             {recipe.title}
           </h1>
 
-          {/* Category tag */}
           {recipe.category && (
             <span className="inline-block bg-white/20 text-white backdrop-blur-md px-3 py-1 rounded-full text-xs sm:text-sm font-medium mb-4 border border-white/40">
               {recipe.category}
@@ -211,7 +211,7 @@ function RecipeDetails() {
           {recipe.similar?.map((sim, i) => (
             <div
               key={i}
-              onClick={() => navigate(`/recipe/${i}`, { state: { recipe: sim } })}
+              onClick={() => navigate(`/recipe/${encodeURIComponent(sim.title)}`, { state: { recipe: sim } })}
               className="w-60 sm:w-64 rounded-xl overflow-hidden shadow hover:shadow-lg transition hover:scale-105 cursor-pointer"
             >
               <img
