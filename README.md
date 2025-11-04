@@ -16,6 +16,7 @@ Recipe Collector/Meal Planner
 * Meal Plans
 
 ## Link to the Deployed Application
+https://plateful-three.vercel.app/
 
 ## Detailed Setup Instructions for Running the Frontend Locally
 1.	Install npm
