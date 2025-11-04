@@ -160,13 +160,16 @@ const Recipes = () => {
   });
 
   // Generate auto-suggestions from recipe titles
-  const suggestions = mockRecipes
-    .filter(
-      (r) =>
-        r.title.toLowerCase().includes(searchTerm.toLowerCase()) &&
-        searchTerm.length > 0
-    )
-    .slice(0, 5); // limit to 5 suggestions
+const suggestions = mockRecipes
+  .filter((r) => {
+    const matchesSearch =
+      r.title.toLowerCase().includes(searchTerm.toLowerCase()) &&
+      searchTerm.length > 0;
+    const matchesCategory =
+      selectedCategory === "All" || r.category === selectedCategory;
+    return matchesSearch && matchesCategory;
+  })
+  .slice(0, 5);
 
   const handleSuggestionClick = (suggestion) => {
     setSearchTerm(suggestion);
