@@ -1,3 +1,4 @@
+//Made by Michael Kolanjian
 import React, { useState } from "react";
 import WeekNavigator from "./components/WeekNavigator";
 import MealTable from "./components/MealTable";

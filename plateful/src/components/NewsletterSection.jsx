@@ -1,3 +1,4 @@
+//Made by Adam Abdel Karim
 import React from "react";
 
 const NewsletterSection = () => (

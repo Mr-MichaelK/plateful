@@ -1,3 +1,4 @@
+//Made by Michael Kolanjian
 import React from "react";
 
 export default function QuoteSection() {

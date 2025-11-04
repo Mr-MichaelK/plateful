@@ -1,3 +1,4 @@
+//Made by Michael Kolanjian
 import trashIcon from "../../assets/trash-icon.svg";
 import repeatIcon from "../../assets/repeat-icon.svg";
 

@@ -1,3 +1,4 @@
+//Made by Michael Kolanjian
 import React, { useState, useEffect } from "react";
 import { Trash2 } from "lucide-react";
 import RecipeSelectorModal from "./RecipeSelectorModal";
