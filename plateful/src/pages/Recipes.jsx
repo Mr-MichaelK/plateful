@@ -1,3 +1,4 @@
+//Made by Adam Abdel Karim
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 import RecipeCard from "../components/RecipeCard";
@@ -135,7 +136,7 @@ const Recipes = () => {
       <section className="px-6 py-12 text-center">
         <h2 className="text-3xl font-bold text-[#7a1f2a] mb-10">All Recipes</h2>
 
-        {/* ✅ Search bar */}
+        {/* Search bar */}
         <div className="flex justify-center mb-6">
           <div className="relative w-full max-w-sm">
             <Search className="absolute left-3 top-2.5 text-gray-500 w-5 h-5" />

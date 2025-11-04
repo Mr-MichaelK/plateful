@@ -1,3 +1,4 @@
+//Made by Michael Kolanjian
 import { useRef, useState } from "react";
 import profileIcon from "../../assets/profile-icon.svg";
 import uploadIcon from "../../assets/upload-icon.svg";

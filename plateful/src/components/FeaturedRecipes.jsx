@@ -1,4 +1,4 @@
-// FeaturedRecipes.jsx
+// FeaturedRecipes.jsx made by Adam Abdel Karim
 import React from "react";
 import RecipeCard from "./RecipeCard";
 

@@ -1,3 +1,4 @@
+//Made by Michael Kolanjian
 const ProfileIcon = () => (
   <svg
     width="30px"

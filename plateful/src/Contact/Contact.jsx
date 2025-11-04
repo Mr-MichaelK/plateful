@@ -1,10 +1,14 @@
+//Made by Nour Diab
 import React from "react";
 import Title from "../Auth/components/Title.jsx";
 import Box from "../Auth/components/Box.jsx";
 import Footer from "../components/Footer.jsx";
+import Header from "../shared-components/Header.jsx"
 
 export default function Contact() {
   return (
+    <>
+        <Header />
     <div className="min-h-screen bg-[#fff8f0] flex flex-col pt-10 md:pt-14">
       <Title
         heading="Contact Us"
@@ -36,5 +40,6 @@ export default function Contact() {
 
       <Footer />
     </div>
+    </>
   );
 }
