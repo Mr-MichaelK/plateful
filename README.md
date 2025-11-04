@@ -29,13 +29,13 @@ Recipe Collector/Meal Planner
 9.	Explore the app!
 
 ## Screenshots Showcasing Key Features
-*SignUp Page:*
+### SignUp Page:
 <img width="1867" height="881" alt="image" src="https://github.com/user-attachments/assets/3bbdeb0f-0631-48cd-925a-04181d75c8a2" />
 
-*LogIn Page:*
+### LogIn Page:
 <img width="1798" height="788" alt="image" src="https://github.com/user-attachments/assets/3dea2202-6c1c-4c53-ac75-199f790afadb" />
 
-*Home Page:*
+### Home Page:
 <img width="1914" height="885" alt="image" src="https://github.com/user-attachments/assets/d582cb70-a368-40cf-b4a4-d84db18c556f" />
 
 <img width="1894" height="861" alt="image" src="https://github.com/user-attachments/assets/f272e57f-da19-4b63-9dd1-b7ad97259285" />
@@ -44,12 +44,12 @@ Recipe Collector/Meal Planner
 
 <img width="1873" height="710" alt="image" src="https://github.com/user-attachments/assets/8682ec3d-35a8-4df0-81fa-29ea86934e65" />
 
-*Recipes Page:*
+### Recipes Page:
 <img width="1888" height="881" alt="image" src="https://github.com/user-attachments/assets/f55ef1db-d7de-4c06-b154-1b5c57e5c4b6" />
 
 <img width="1882" height="862" alt="image" src="https://github.com/user-attachments/assets/6c39ee10-1ac7-4b32-8b72-1d2cd5017d7a" />
 
-*RecipeDetails Page:*
+### RecipeDetails Page:
 <img width="1874" height="877" alt="image" src="https://github.com/user-attachments/assets/e0225172-b2da-4694-9c03-8516b9238995" />
 
 <img width="1862" height="895" alt="image" src="https://github.com/user-attachments/assets/121829db-762c-4fb9-8a67-7e28185c5613" />
@@ -58,17 +58,17 @@ Recipe Collector/Meal Planner
 
 <img width="1883" height="870" alt="image" src="https://github.com/user-attachments/assets/f1f80fb9-3219-4031-a57c-207cd4c3f807" />
 
-*AddEditRecipe Page:*
+### AddEditRecipe Page:
 <img width="1881" height="873" alt="image" src="https://github.com/user-attachments/assets/950bc2d3-9417-4749-97dc-f6bf016943f6" />
 
 <img width="1884" height="877" alt="image" src="https://github.com/user-attachments/assets/d3a2985f-4208-4a65-8b97-0bb4a341a0a6" />
 
 <img width="1855" height="869" alt="image" src="https://github.com/user-attachments/assets/721a3a8c-f36d-4588-8e19-3973863a9fea" />
 
-*FavoriteRecipes Page:*
+### FavoriteRecipes Page:
 <img width="1879" height="869" alt="image" src="https://github.com/user-attachments/assets/e5eff479-4d4b-405e-b5c9-c9d5b7628773" />
 
-*MealPlans Page:*
+### MealPlans Page:
 <img width="1867" height="880" alt="image" src="https://github.com/user-attachments/assets/32c898fb-378d-4ea3-8535-8ee950b60104" />
 
 <img width="1815" height="854" alt="image" src="https://github.com/user-attachments/assets/6e1e3168-94e3-4ce0-a655-2b5e72caaeb6" />
@@ -79,7 +79,7 @@ Recipe Collector/Meal Planner
 
 <img width="1861" height="870" alt="image" src="https://github.com/user-attachments/assets/ab6c5bfd-daec-4e15-9a6f-3acdc382d2f0" />
 
-*Profile Page:*
+### Profile Page:
 <img width="850" height="264" alt="image" src="https://github.com/user-attachments/assets/fd16a045-1f59-4087-9455-28291cb54cd8" />
 
 <img width="1857" height="882" alt="image" src="https://github.com/user-attachments/assets/112b46d4-c30a-4834-b7f3-801e59558c62" />
