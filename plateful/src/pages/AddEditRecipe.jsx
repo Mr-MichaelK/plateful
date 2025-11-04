@@ -1,0 +1,195 @@
+// made by Noura Hajj Chehade
+
+import React, { useState, useEffect } from "react";
+import Header from "../shared-components/Header";
+import Footer from "../components/Footer";
+import Swal from "sweetalert2";
+
+const AddEditRecipe = () => {
+  const [title, setTitle] = useState("");
+  const [description, setDescription] = useState("");
+  const [ingredients, setIngredients] = useState("");
+  const [steps, setSteps] = useState("");
+  const [image, setImage] = useState("");
+  const [category, setCategory] = useState("");
+
+  const categories = [
+    { name: "Breakfast", image: "/categories/breakfast.jpg" },
+    { name: "Lunch", image: "/categories/lunch.jpg" },
+    { name: "Dinner", image: "/categories/dinner.jpg" },
+    { name: "Dessert", image: "/categories/dessert.jpg" },
+    { name: "Smoothies", image: "/categories/smoothie.jpg" },
+  ];
+
+  useEffect(() => {
+    const editData = JSON.parse(localStorage.getItem("editRecipe"));
+    if (editData) {
+      setTitle(editData.title || "");
+      setDescription(editData.description || "");
+      setIngredients(
+        editData.ingredients ? editData.ingredients.join(", ") : ""
+      );
+      setSteps(editData.steps ? editData.steps.join(". ") : "");
+      setImage(editData.image || "");
+      setCategory(editData.category || "");
+      localStorage.removeItem("editRecipe");
+    }
+  }, []);
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+
+    if (!title || !description || !category) {
+      Swal.fire({
+        icon: "warning",
+        title: "Missing Information",
+        text: "Please fill in all required fields and select a category!",
+        confirmButtonColor: "#7a1f2a",
+      });
+      return;
+    }
+
+    Swal.fire({
+      icon: "success",
+      title: "Recipe Saved!",
+      text: `Your ${category} recipe "${title}" has been added successfully!`,
+      confirmButtonColor: "#7a1f2a",
+    });
+
+    setTitle("");
+    setDescription("");
+    setIngredients("");
+    setSteps("");
+    setImage("");
+    setCategory("");
+  };
+
+  return (
+    <>
+      <Header />
+
+      {/* added by Noura */}
+      <section className="relative bg-[#fff8f0] py-16 px-6 text-center overflow-hidden">
+        <img
+          src="/recipes/top-image.jpg"
+          alt="Add Recipe Background"
+          className="absolute inset-0 w-full h-full object-cover opacity-35"
+        />
+        <div className="relative max-w-3xl mx-auto">
+          <h1 className="text-4xl font-bold text-[#7a1f2a] mb-3 drop-shadow-md">
+            {title ? "Edit Your Recipe" : "Share Your Favorite Recipe"}
+          </h1>
+          <p className="text-gray-700 text-lg">
+            {title
+              ? "Update your delicious creation for the Plateful community "
+              : "Add your own recipe to inspire the Plateful community "}
+          </p>
+        </div>
+      </section>
+
+      <section className="py-16 px-6 bg-[#fffaf6]">
+        <div className="max-w-3xl mx-auto bg-white rounded-2xl shadow-lg p-8">
+          <h2 className="text-2xl font-bold text-[#7a1f2a] mb-8 text-center">
+            {title ? "Edit Recipe" : "Add Recipe"}
+          </h2>
+
+          <form onSubmit={handleSubmit} className="space-y-6 text-left">
+            <div>
+              <label className="block font-semibold text-[#7a1f2a] mb-2">
+                Recipe Title
+              </label>
+              <input
+                type="text"
+                placeholder="Enter recipe title"
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}
+                className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-[#7a1f2a]"
+              />
+            </div>
+
+            <div>
+              <label className="block font-semibold text-[#7a1f2a] mb-2">
+                Description
+              </label>
+              <textarea
+                placeholder="Short description of your recipe"
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
+                className="w-full border border-gray-300 rounded-lg px-4 py-2 h-24 resize-none focus:outline-none focus:ring-2 focus:ring-[#7a1f2a]"
+              />
+            </div>
+
+            {/* Category Selector by Adam Abdel Karim */}
+            <div>
+              <label className="block font-semibold text-[#7a1f2a] mb-2">
+                Category
+              </label>
+              <select
+                value={category}
+                onChange={(e) => setCategory(e.target.value)}
+                className="w-full border border-gray-300 rounded-lg px-4 py-2 bg-white focus:outline-none focus:ring-2 focus:ring-[#7a1f2a]"
+              >
+                <option value="">Select a category</option>
+                {categories.map((cat, index) => (
+                  <option key={index} value={cat.name}>
+                    {cat.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <div>
+              <label className="block font-semibold text-[#7a1f2a] mb-2">
+                Ingredients
+              </label>
+              <textarea
+                placeholder="List ingredients (comma-separated)"
+                value={ingredients}
+                onChange={(e) => setIngredients(e.target.value)}
+                className="w-full border border-gray-300 rounded-lg px-4 py-2 h-24 resize-none focus:outline-none focus:ring-2 focus:ring-[#7a1f2a]"
+              />
+            </div>
+
+            <div>
+              <label className="block font-semibold text-[#7a1f2a] mb-2">
+                Steps
+              </label>
+              <textarea
+                placeholder="Write preparation steps"
+                value={steps}
+                onChange={(e) => setSteps(e.target.value)}
+                className="w-full border border-gray-300 rounded-lg px-4 py-2 h-32 resize-none focus:outline-none focus:ring-2 focus:ring-[#7a1f2a]"
+              />
+            </div>
+
+            <div>
+              <label className="block font-semibold text-[#7a1f2a] mb-2">
+                Image URL
+              </label>
+              <input
+                type="text"
+                placeholder="Paste an image URL (optional)"
+                value={image}
+                onChange={(e) => setImage(e.target.value)}
+                className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-[#7a1f2a]"
+              />
+            </div>
+
+            <div className="text-center">
+              <button
+                type="submit"
+                className="bg-[#7a1f2a] text-white px-8 py-3 rounded-lg hover:bg-[#a02a3d] transition font-medium"
+              >
+                {title ? "Update Recipe" : "Save Recipe"}
+              </button>
+            </div>
+          </form>
+        </div>
+      </section>
+
+      <Footer />
+    </>
+  );
+};
+
+export default AddEditRecipe;
