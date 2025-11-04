@@ -18,6 +18,15 @@ Recipe Collector/Meal Planner
 ## Link to the Deployed Application
 
 ## Detailed Setup Instructions for Running the Frontend Locally
+1.	Install npm
+2.	Install Git
+3.	Download the Plateful folder and open it in Visual Studio Code
+4.	Make sure you’re on the main branch
+5.	In the terminal, navigate to the project folder by running 'cd plateful'
+6.	Run 'npm install' to install all dependencies
+7.	Run 'npm run dev' to start the development server
+8.	Open the URL shown in the terminal (usually 'http://localhost:5173/') in your browser
+9.	Explore the app!
 
 ## Screenshots Showcasing Key Features
 
