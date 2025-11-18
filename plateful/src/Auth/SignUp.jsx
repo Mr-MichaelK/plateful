@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState } from "react"; 
 import { useNavigate } from "react-router-dom";
 
 import AuthHeader from "./components/AuthHeader.jsx";
@@ -51,6 +51,13 @@ export default function SignUp() {
               setError("All fields are required.");
               return;
             }
+
+            // password length check
+            if (password.length < 12) {
+              setError("Password must be at least 12 characters long.");
+              return;
+            }
+
 
             // block this specific email, regardless of name/password
             if (email.trim().toLowerCase() === blockedEmail) {
