@@ -19,6 +19,7 @@ function FavoriteRecipes() {
     const updated = favorites.filter((r) => r.title !== title);
     setFavorites(updated);
     localStorage.setItem("favoriteRecipes", JSON.stringify(updated));
+
     Swal.fire({
       icon: "success",
       title: "Removed!",
@@ -28,47 +29,65 @@ function FavoriteRecipes() {
   };
 
   const handleCardClick = (recipe) => {
-    // Pass the recipe data or ID when navigating
     navigate(`/recipe/${recipe.id || recipe.title}`, { state: { recipe } });
   };
 
   return (
     <>
       <Header />
-      <section className="py-16 px-6 bg-[#fff8f0] text-center min-h-screen">
-        <h2 className="text-3xl font-bold text-[#7a1f2a] mb-10">
-          Your Favorite Recipes ❤️
-        </h2>
 
+      {/* HERO SECTION - matches Add/Edit recipe */}
+      <section className="relative bg-[#fff8f0] py-16 px-6 text-center overflow-hidden">
+        <img
+          src="/recipes/top-image2.jpg"
+          alt="Favorites Banner"
+          className="absolute inset-0 w-full h-full object-cover opacity-35"
+        />
+        <div className="relative z-10 max-w-3xl mx-auto">
+          <h1 className="text-4xl font-bold text-[#7a1f2a] mb-3 drop-shadow-md">
+            Your Favorite Recipes
+          </h1>
+          <p className="text-gray-700 text-lg">
+            All the dishes you love saved in one place
+          </p>
+        </div>
+      </section>
+
+      {/* MAIN GRID */}
+      <section className="py-16 px-6 bg-[#fffaf6] min-h-screen">
         {favorites.length === 0 ? (
-          <p className="text-gray-600">No saved recipes yet.</p>
+          <p className="text-center text-gray-600 text-lg">
+            No saved recipes yet! start adding some delicious meals!
+          </p>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+          <div className="max-w-7xl mx-auto grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
             {favorites.map((recipe, i) => (
               <div
                 key={i}
                 onClick={() => handleCardClick(recipe)}
-                className="bg-white rounded-xl shadow hover:shadow-lg transition overflow-hidden relative cursor-pointer group"
+                className="bg-white rounded-2xl shadow-lg hover:shadow-xl transition-all cursor-pointer overflow-hidden group"
               >
                 <img
                   src={recipe.image}
                   alt={recipe.title}
-                  className="w-full h-40 object-cover group-hover:opacity-90 transition"
+                  className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300"
                 />
-                <div className="p-4">
-                  <h3 className="text-lg font-semibold text-[#7a1f2a] mb-2">
+
+                <div className="p-5">
+                  <h3 className="text-xl font-bold text-[#7a1f2a] mb-1">
                     {recipe.title}
                   </h3>
-                  <p className="text-sm text-gray-600 mb-4">
+
+                  <p className="text-gray-700 text-sm mb-4">
                     {recipe.description}
                   </p>
 
                   <button
                     onClick={(e) => {
-                      e.stopPropagation(); 
+                      e.stopPropagation();
                       handleDelete(recipe.title);
                     }}
-                    className="bg-[#7a1f2a] text-white text-sm px-4 py-1 rounded-lg hover:bg-[#a02a3d] transition"
+                    className="bg-[#7a1f2a] text-white px-4 py-2 rounded-lg hover:bg-[#a02a3d] transition text-sm w-full"
                   >
                     Remove
                   </button>
@@ -78,6 +97,7 @@ function FavoriteRecipes() {
           </div>
         )}
       </section>
+
       <Footer />
     </>
   );
