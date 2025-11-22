@@ -246,10 +246,22 @@ const Recipes = () => {
         {/* Category Filters */}
         <div className="flex flex-wrap justify-center gap-3 mb-10">
           {["All", "Breakfast", "Lunch", "Dinner", "Dessert", "Smoothies"].map((cat) => (
-            <button
+           <button
               key={cat}
               onClick={() => handleCategorySelect(cat)}
-              className="px-4 py-2 rounded-full text-sm font-medium border"
+              className="
+                px-4
+                py-2
+                rounded-full
+                text-sm
+                font-medium
+                border
+                cursor-pointer
+                transform
+                transition-all
+                duration-200
+                hover:scale-105
+              "
               style={{
                 backgroundColor:
                   selectedCategory === cat
