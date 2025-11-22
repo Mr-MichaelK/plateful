@@ -1,5 +1,4 @@
 // Made by Michael Kolanjian
-// Made by Michael Kolanjian
 import React, { useState, useEffect } from "react";
 import { Trash2 } from "lucide-react";
 import RecipeSelectorModal from "./RecipeSelectorModal";
@@ -9,14 +8,14 @@ const meals = ["Breakfast", "Lunch", "Dinner"];
 
 const getWeekKey = (date) => {
   const startOfWeek = new Date(date);
-  startOfWeek.setDate(date.getDate() - date.getDay() + 1); // Monday as start
+  startOfWeek.setDate(date.getDate() - date.getDay() + 1);
   return `meals-${startOfWeek.toISOString().split("T")[0]}`;
 };
 
 export default function MealTable({ currentDate }) {
   const { theme } = useTheme();
 
-  // Defensive check for currentDate
+  // Defensive check
   if (!currentDate || !(currentDate instanceof Date)) {
     return (
       <div className="p-4 text-center text-red-500">
@@ -37,12 +36,10 @@ export default function MealTable({ currentDate }) {
   const [modalOpen, setModalOpen] = useState(false);
   const [selectedSlot, setSelectedSlot] = useState({ day: null, meal: null });
 
-  // Initialize with placeholders
   const initialMealData = Array(meals.length)
     .fill(0)
     .map(() => Array(7).fill("-"));
 
-  // mealData now stores the recipe object OR the string "-"
   const [mealData, setMealData] = useState(initialMealData);
 
   useEffect(() => {
@@ -61,12 +58,10 @@ export default function MealTable({ currentDate }) {
     localStorage.setItem(key, JSON.stringify(newData));
   };
 
-  // Helper to check if the cell is empty (either "-" or null/undefined)
   const isCellEmpty = (data) =>
     data === "-" || data === null || data === undefined;
 
   const handleCellClick = (dayIdx, mealIdx) => {
-    // Check if the cell is currently empty
     if (isCellEmpty(mealData[mealIdx][dayIdx])) {
       setSelectedSlot({ day: dayIdx, meal: mealIdx });
       setModalOpen(true);
@@ -74,7 +69,6 @@ export default function MealTable({ currentDate }) {
   };
 
   const handleSelectRecipe = (recipe) => {
-    // Save the entire recipe object so we can access the image URL
     const newMealData = [...mealData];
     newMealData[selectedSlot.meal][selectedSlot.day] = recipe;
     saveMealData(newMealData);
@@ -83,17 +77,29 @@ export default function MealTable({ currentDate }) {
 
   const handleDelete = (dayIdx, mealIdx) => {
     const newMealData = [...mealData];
-    newMealData[mealIdx][dayIdx] = "-"; // Reset to placeholder
+    newMealData[mealIdx][dayIdx] = "-";
     saveMealData(newMealData);
   };
 
-  // Dark/light mode colors
+  // 🌙 THEME COLORS
   const tableBg = theme === "dark" ? "#1a1a1a" : "#ffffff";
   const headerBg = theme === "dark" ? "#2a2a2a" : "#fff0e5";
   const headerText = theme === "dark" ? "#f9c8c8" : "#7a1f2a";
-  const cellText = theme === "dark" ? "#e0dcd5" : "#555555";
-  const cellHover = theme === "dark" ? "#333333" : "#fff8f0";
   const borderColor = theme === "dark" ? "#444" : "#ccc";
+
+  // text colors
+  const emptyText = theme === "dark" ? "#777" : "#999";
+  const filledText = theme === "dark" ? "#f9f9f9" : "#000";
+
+  // hover bg
+  const hoverBg = theme === "dark" ? "#2d2d2d" : "#fff8f0";
+
+  // meal backgrounds
+  const mealBg = [
+    theme === "dark" ? "#4a3b1f" : "#fff5d6", // breakfast
+    theme === "dark" ? "#1f3d2e" : "#e8ffe8", // lunch
+    theme === "dark" ? "#1f2f4a" : "#e8f0ff", // dinner
+  ];
 
   return (
     <div className="overflow-x-auto">
@@ -116,54 +122,46 @@ export default function MealTable({ currentDate }) {
             ))}
           </tr>
         </thead>
+
         <tbody>
           {meals.map((meal, mealIdx) => (
-            <tr key={meal} className="border-t border-gray-200">
-              <td className="p-3 font-medium">{meal}</td>
+            <tr key={meal} className="border-t" style={{ borderColor }}>
+              <td className="p-3 font-medium" style={{ color: headerText }}>
+                {meal}
+              </td>
+
               {days.map((_, dayIdx) => {
                 const cellData = mealData[mealIdx][dayIdx];
-                // Determine if the cell contains a saved recipe object
                 const isRecipe =
                   !isCellEmpty(cellData) &&
                   typeof cellData === "object" &&
                   cellData.name;
 
-                // Get display name and image URL
                 const recipeName = isRecipe ? cellData.name : cellData;
                 const recipeImageUrl = isRecipe ? cellData.imageUrl : null;
-
-                // 💡 NEW LOGIC: Determine classes based on content
-                let cellColorClass = "text-gray-400"; // Default for empty cell
-
-                if (isRecipe) {
-                  // Change text to black for filled cells
-                  cellColorClass = "text-black";
-
-                  // Assign a background color based on the meal type (mealIdx 0, 1, or 2)
-                  switch (mealIdx) {
-                    case 0: // Breakfast
-                      cellColorClass += " bg-amber-50"; // Light Yellow/Orange
-                      break;
-                    case 1: // Lunch
-                      cellColorClass += " bg-green-50"; // Light Green
-                      break;
-                    case 2: // Dinner
-                      cellColorClass += " bg-blue-50"; // Light Blue
-                      break;
-                    default:
-                      cellColorClass += " bg-gray-50";
-                  }
-                }
 
                 return (
                   <td
                     key={dayIdx}
-                    // 💡 UPDATED CLASS: Combine static and dynamic classes
-                    className={`p-3 text-center cursor-pointer relative transition group
-                                hover:bg-[#fff8f0] ${cellColorClass}`}
+                    className="p-3 text-center cursor-pointer relative transition group"
                     onClick={() => handleCellClick(dayIdx, mealIdx)}
+                    style={{
+                      backgroundColor: isRecipe
+                        ? mealBg[mealIdx]
+                        : "transparent",
+                      color: isRecipe ? filledText : emptyText,
+                    }}
+                    onMouseEnter={(e) =>
+                      (e.currentTarget.style.backgroundColor = isRecipe
+                        ? mealBg[mealIdx]
+                        : hoverBg)
+                    }
+                    onMouseLeave={(e) =>
+                      (e.currentTarget.style.backgroundColor = isRecipe
+                        ? mealBg[mealIdx]
+                        : "transparent")
+                    }
                   >
-                    {/* Delete button */}
                     {isRecipe && (
                       <button
                         className="absolute top-1 right-1 text-red-500 opacity-0 group-hover:opacity-100 transition"
@@ -176,13 +174,12 @@ export default function MealTable({ currentDate }) {
                       </button>
                     )}
 
-                    {/* Image and Text Display */}
                     <div className="flex items-center justify-center space-x-2">
                       {isRecipe && recipeImageUrl && (
                         <img
                           src={recipeImageUrl}
                           alt={recipeName}
-                          className="w-6 h-6 object-cover rounded-md" // Small square image
+                          className="w-6 h-6 object-cover rounded-md"
                         />
                       )}
                       <span>{recipeName}</span>
