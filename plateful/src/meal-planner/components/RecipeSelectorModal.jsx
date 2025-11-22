@@ -1,5 +1,6 @@
-//Made by Michael Kolanjian
+// Made by Michael Kolanjian
 import React, { useState } from "react";
+import { useTheme } from "../../context/ThemeContext";
 import { Image as ImageIcon } from "lucide-react";
 
 const IMAGE_URL = "/recipes/dish1.jpg";
@@ -11,6 +12,7 @@ export default function RecipeSelectorModal({
   day,
   meal,
 }) {
+  const { theme } = useTheme();
   const [searchTerm, setSearchTerm] = useState("");
 
   if (!isOpen) return null;
@@ -29,6 +31,14 @@ export default function RecipeSelectorModal({
     recipe.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
+  // Section-specific colors
+  const modalBg = theme === "dark" ? "#1a1a1a" : "#fff";
+  const headingColor = theme === "dark" ? "#f9c8c8" : "#7a1f2a";
+  const textColor = theme === "dark" ? "#e0dcd5" : "#555";
+  const inputBg = theme === "dark" ? "#2a2a2a" : "#fff";
+  const inputBorder = theme === "dark" ? "#555" : "#ccc";
+  const listHoverBg = theme === "dark" ? "#343434" : "#fff0e5";
+
   return (
     // Blurred + slightly darkened background
     <div
@@ -38,12 +48,16 @@ export default function RecipeSelectorModal({
       {/* Modal */}
       <div className="bg-white rounded-xl shadow-lg p-6 w-11/12 max-w-md relative z-50">
         <div className="flex justify-between items-center mb-4">
-          <h2 className="text-xl font-semibold text-[#7a1f2a]">
+          <h2
+            className="text-xl font-semibold transition-colors duration-300"
+            style={{ color: headingColor }}
+          >
             Select Recipe for {meal} ({day})
           </h2>
           <button
             onClick={onClose}
-            className="text-gray-400 hover:text-gray-600 font-bold text-xl"
+            className="font-bold text-xl transition-colors duration-300"
+            style={{ color: textColor }}
           >
             &times;
           </button>

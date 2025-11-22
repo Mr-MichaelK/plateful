@@ -1,7 +1,9 @@
 // Made by Michael Kolanjian
+// Made by Michael Kolanjian
 import React, { useState, useEffect } from "react";
 import { Trash2 } from "lucide-react";
 import RecipeSelectorModal from "./RecipeSelectorModal";
+import { useTheme } from "../../context/ThemeContext";
 
 const meals = ["Breakfast", "Lunch", "Dinner"];
 
@@ -12,6 +14,8 @@ const getWeekKey = (date) => {
 };
 
 export default function MealTable({ currentDate }) {
+  const { theme } = useTheme();
+
   // Defensive check for currentDate
   if (!currentDate || !(currentDate instanceof Date)) {
     return (
@@ -83,11 +87,27 @@ export default function MealTable({ currentDate }) {
     saveMealData(newMealData);
   };
 
+  // Dark/light mode colors
+  const tableBg = theme === "dark" ? "#1a1a1a" : "#ffffff";
+  const headerBg = theme === "dark" ? "#2a2a2a" : "#fff0e5";
+  const headerText = theme === "dark" ? "#f9c8c8" : "#7a1f2a";
+  const cellText = theme === "dark" ? "#e0dcd5" : "#555555";
+  const cellHover = theme === "dark" ? "#333333" : "#fff8f0";
+  const borderColor = theme === "dark" ? "#444" : "#ccc";
+
   return (
     <div className="overflow-x-auto">
-      <table className="min-w-full border border-gray-300 rounded-xl bg-white shadow-sm">
+      <table
+        className="min-w-full rounded-xl shadow-sm"
+        style={{
+          backgroundColor: tableBg,
+          borderColor: borderColor,
+          borderCollapse: "separate",
+          borderSpacing: 0,
+        }}
+      >
         <thead>
-          <tr className="bg-[#fff0e5] text-[#7a1f2a]">
+          <tr style={{ backgroundColor: headerBg, color: headerText }}>
             <th className="p-3 text-left">Meal</th>
             {days.map((day, idx) => (
               <th key={idx} className="p-3 text-center font-semibold">
