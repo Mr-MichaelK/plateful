@@ -1,6 +1,9 @@
 // Made by Michael Kolanjian
 import React, { useState } from "react";
 import { useTheme } from "../../context/ThemeContext";
+import { Image as ImageIcon } from "lucide-react";
+
+const IMAGE_URL = "/recipes/dish1.jpg";
 
 export default function RecipeSelectorModal({
   isOpen,
@@ -14,16 +17,18 @@ export default function RecipeSelectorModal({
 
   if (!isOpen) return null;
 
-  const recipes = [
-    "Spaghetti Bolognese",
-    "Chicken Salad",
-    "Pancakes",
-    "Grilled Salmon",
-    "Veggie Stir Fry",
+  const mockRecipes = [
+    { name: "Spaghetti Bolognese", imageUrl: IMAGE_URL },
+    { name: "Chicken Salad", imageUrl: IMAGE_URL },
+    { name: "Pancakes", imageUrl: IMAGE_URL },
+    { name: "Grilled Salmon", imageUrl: IMAGE_URL },
+    { name: "Veggie Stir Fry", imageUrl: IMAGE_URL },
+    { name: "Beef Shawarma", imageUrl: IMAGE_URL },
+    { name: "Chicken Shawarma", imageUrl: IMAGE_URL },
   ];
 
-  const filteredRecipes = recipes.filter((recipe) =>
-    recipe.toLowerCase().includes(searchTerm.toLowerCase())
+  const filteredRecipes = mockRecipes.filter((recipe) =>
+    recipe.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   // Section-specific colors
@@ -35,11 +40,13 @@ export default function RecipeSelectorModal({
   const listHoverBg = theme === "dark" ? "#343434" : "#fff0e5";
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
-      <div
-        className="rounded-xl shadow-lg p-6 w-11/12 max-w-md transition-colors duration-300"
-        style={{ backgroundColor: modalBg }}
-      >
+    // Blurred + slightly darkened background
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center 
+                    bg-black/20 backdrop-blur-sm"
+    >
+      {/* Modal */}
+      <div className="bg-white rounded-xl shadow-lg p-6 w-11/12 max-w-md relative z-50">
         <div className="flex justify-between items-center mb-4">
           <h2
             className="text-xl font-semibold transition-colors duration-300"
@@ -61,30 +68,30 @@ export default function RecipeSelectorModal({
           placeholder="Search recipes..."
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
-          className="w-full mb-4 px-4 py-2 rounded-md focus:outline-none transition-colors duration-300"
-          style={{
-            backgroundColor: inputBg,
-            borderColor: inputBorder,
-            color: textColor,
-          }}
+          className="w-full mb-4 px-4 py-2 border border-gray-300 rounded-md 
+                     focus:outline-none focus:ring-2 focus:ring-[#7a1f2a]"
         />
 
         <ul className="space-y-2 max-h-64 overflow-y-auto">
           {filteredRecipes.length > 0 ? (
             filteredRecipes.map((recipe) => (
               <li
-                key={recipe}
+                key={recipe.name}
                 onClick={() => onSelectRecipe(recipe)}
-                className="cursor-pointer px-4 py-2 rounded-md transition-colors duration-300"
-                style={{ color: headingColor }}
-                onMouseEnter={(e) =>
-                  (e.currentTarget.style.backgroundColor = listHoverBg)
-                }
-                onMouseLeave={(e) =>
-                  (e.currentTarget.style.backgroundColor = "transparent")
-                }
+                className="cursor-pointer px-4 py-2 rounded-md hover:bg-[#fff0e5] 
+                           text-[#7a1f2a] transition flex items-center space-x-3"
               >
-                {recipe}
+                {recipe.imageUrl ? (
+                  <img
+                    src={recipe.imageUrl}
+                    alt={recipe.name}
+                    className="w-6 h-6 object-cover rounded-md"
+                  />
+                ) : (
+                  <ImageIcon size={18} className="text-gray-500" />
+                )}
+
+                <span>{recipe.name}</span>
               </li>
             ))
           ) : (
@@ -94,19 +101,8 @@ export default function RecipeSelectorModal({
 
         <button
           onClick={onClose}
-          className="mt-4 w-full py-2 rounded-md transition-colors duration-300"
-          style={{
-            backgroundColor: theme === "dark" ? "#7a1f2a" : "#7a1f2a",
-            color: theme === "dark" ? "#fff" : "#fff",
-          }}
-          onMouseEnter={(e) =>
-            (e.currentTarget.style.backgroundColor =
-              theme === "dark" ? "#a02a3d" : "#a02a3d")
-          }
-          onMouseLeave={(e) =>
-            (e.currentTarget.style.backgroundColor =
-              theme === "dark" ? "#7a1f2a" : "#7a1f2a")
-          }
+          className="mt-4 w-full bg-[#7a1f2a] text-white py-2 rounded-md 
+                     hover:bg-[#a02a3d] transition"
         >
           Cancel
         </button>
