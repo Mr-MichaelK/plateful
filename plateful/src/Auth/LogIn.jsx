@@ -10,18 +10,11 @@ import PrimaryButton from "./components/PrimaryButton.jsx";
 import BottomText from "./components/BottomText.jsx";
 import Footer from "../components/Footer.jsx";
 
-
 // made by nour diab
 
 // for code reusability, components were created in the ./Auth/components folder for signup & login
 
-// local data was used to simulate login, only the following user is allowed to login
-// email: mohammadfarhat@lau.edu.lb
-// password: cookies123
-// else, an error message is thrown
-
 // both fields are required
-
 export default function LogIn() {
   const navigate = useNavigate();
   const { theme } = useTheme();
@@ -30,10 +23,6 @@ export default function LogIn() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
 
-  const validEmail = "mohammadfarhat@lau.edu.lb";
-  const validPassword = "cookies123";
-
-  // Theme-based background
   const bgColor = theme === "dark" ? "#2a2a2a" : "#fff8f0";
 
   return (
@@ -51,16 +40,13 @@ export default function LogIn() {
           onSubmit={(e) => {
             e.preventDefault();
 
-            const ok =
-              email.trim().toLowerCase() === validEmail &&
-              password === validPassword;
-
-            if (ok) {
-              setError("");
-              navigate("/home");
-            } else {
-              setError("Invalid email or password.");
+            if (!email.trim() || !password) {
+              setError("Both fields are required.");
+              return;
             }
+
+            setError("");
+            navigate("/home");
           }}
         >
           <InputField
