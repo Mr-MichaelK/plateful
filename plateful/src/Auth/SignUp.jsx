@@ -1,4 +1,4 @@
-import React, { useState } from "react"; 
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 import AuthHeader from "./components/AuthHeader.jsx";
@@ -9,7 +9,7 @@ import Checkbox from "./components/Checkbox.jsx";
 import PrimaryButton from "./components/PrimaryButton.jsx";
 import BottomText from "./components/BottomText.jsx";
 import Footer from "../components/Footer.jsx";
-
+import { useTheme } from "../context/ThemeContext";
 // made by nour diab
 
 // for code reusability, components were created in the ./Auth/components folder for signup & login
@@ -19,8 +19,10 @@ import Footer from "../components/Footer.jsx";
 // he is notified that he already has an account, and needs to login instead
 
 // all fields are required
+
 export default function SignUp() {
   const navigate = useNavigate();
+  const { theme } = useTheme();
 
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -30,8 +32,11 @@ export default function SignUp() {
 
   const blockedEmail = "mohammadfarhat@lau.edu.lb";
 
+  const bgColor = theme === "dark" ? "#1e1e1e" : "#fff8f0";
+  const textColor = theme === "dark" ? "#ddd" : "#444";
+
   return (
-    <div className="min-h-screen bg-[#fff8f0] flex flex-col">
+    <div className="min-h-screen flex flex-col" style={{ backgroundColor: bgColor, color: textColor }}>
       <AuthHeader active="signup" />
 
       <Title
@@ -45,21 +50,18 @@ export default function SignUp() {
           onSubmit={(e) => {
             e.preventDefault();
 
-            if (!agree) return; // new users cannot sign up before they check the agree terms of use and privacy policy box
+            if (!agree) return;
 
             if (!name.trim() || !email.trim() || !password) {
               setError("All fields are required.");
               return;
             }
 
-            // password length check
             if (password.length < 12) {
               setError("Password must be at least 12 characters long.");
               return;
             }
 
-
-            // block this specific email, regardless of name/password
             if (email.trim().toLowerCase() === blockedEmail) {
               setError("You already have an account. Please log in instead.");
               return;
@@ -115,7 +117,7 @@ export default function SignUp() {
         </form>
       </Box>
 
-      <Footer />
+      <Footer theme={theme} />
     </div>
   );
 }

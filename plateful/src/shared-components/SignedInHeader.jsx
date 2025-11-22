@@ -1,19 +1,18 @@
-import React, { useState } from "react"; // added by Noura
-import { Menu, X } from "lucide-react"; // added by Noura
+import React, { useState } from "react";
+import { Menu, X, Sun, Moon } from "lucide-react";
+import { useTheme } from "../context/ThemeContext";
 import logo from "../../public/plateful-logo.svg";
 import profilePic from "../assets/profile-placeholder.svg";
 
 // made by Michael Kolanjian and Adam Abdel Karim
 // mobile menu and responsiveness added by Noura Hajj Chehade
-
 export default function SignedInHeader({ userProfilePicUrl }) {
   const [menuOpen, setMenuOpen] = useState(false);
   const [isDropdownOpen, setDropdownOpen] = useState(false);
+  const { theme, toggleTheme } = useTheme();
 
   const toggleDropdown = () => setDropdownOpen((prev) => !prev);
-  const handleSignOut = () => {
-    console.log("Sign out logic here");
-  };
+  const handleSignOut = () => console.log("Sign out logic here");
 
   const links = [
     { name: "Home", href: "/home" },
@@ -24,63 +23,93 @@ export default function SignedInHeader({ userProfilePicUrl }) {
     { name: "Contact", href: "/contact" },
   ];
 
+  // subtle dark colors
+  const bgColor = theme === "dark" ? "#e6e1dd" : "#fff8f0"; // slightly darker beige
+  const textColor = theme === "dark" ? "#5a191f" : "#7a1f2a"; // slightly darker brown
+  const borderColor = theme === "dark" ? "#5a191f" : "#7a1f2a";
+  const hoverBg = theme === "dark" ? "#d9d5d0" : "#f5eee4"; // subtle hover
+  const dropdownBg = theme === "dark" ? "#dcd6cf" : "#fff0e5"; // dropdown
+
   return (
     <>
-      <header className="bg-[#fff8f0] shadow-sm fixed top-0 left-0 w-full z-50 text-[#7a1f2a]">
+      <header
+        className={`fixed top-0 left-0 w-full z-50 shadow-sm transition-colors duration-300`}
+        style={{ backgroundColor: bgColor, color: textColor }}
+      >
         <nav className="py-4 px-6 flex flex-col md:flex-row justify-between items-center">
+          {/* Logo + Mobile Menu */}
           <div className="flex items-center justify-between w-full md:w-auto">
             <a href="/" className="flex items-center gap-2">
               <img src={logo} alt="Plateful logo" className="w-10 h-10" />
               <span className="text-xl font-semibold">Plateful</span>
             </a>
-            <button
-              onClick={() => setMenuOpen(!menuOpen)}
-              className="md:hidden"
-            >
-              {menuOpen ? <X size={26} /> : <Menu size={26} />}
-            </button>
+
+            <div className="flex items-center gap-3">
+              {/* Theme Toggle */}
+              <button
+                onClick={toggleTheme}
+                className="p-2 rounded-full transition hover:bg-gray-200 dark:hover:bg-gray-300"
+              >
+                {theme === "light" ? (
+                  <Moon className="w-6 h-6" />
+                ) : (
+                  <Sun className="w-6 h-6 text-yellow-400" />
+                )}
+              </button>
+
+              {/* Mobile Menu Button */}
+              <button onClick={() => setMenuOpen(!menuOpen)} className="md:hidden">
+                {menuOpen ? <X size={26} /> : <Menu size={26} />}
+              </button>
+            </div>
           </div>
 
+          {/* Desktop Navigation */}
           <ul className="hidden md:flex items-center space-x-4 mt-3 md:mt-0 text-sm font-medium">
             {links.map((link) => (
               <li key={link.name}>
                 <a
                   href={link.href}
-                  className="relative px-1 py-0.5 hover:text-[#7a1f2a] after:content-[''] after:absolute after:left-0 after:-bottom-1 after:w-0 after:h-[2px] after:bg-[#7a1f2a] after:transition-all after:duration-200 hover:after:w-full whitespace-nowrap"
+                  className="relative px-1 py-0.5 hover:opacity-80 transition-opacity duration-200"
+                  style={{ color: textColor }}
                 >
                   {link.name}
+                  <span
+                    className="absolute left-0 -bottom-1 w-0 h-[2px] transition-all duration-200"
+                    style={{ backgroundColor: borderColor }}
+                  />
                 </a>
               </li>
             ))}
 
+            {/* Profile + Dropdown */}
             <li className="relative">
-              <button
-                onClick={toggleDropdown}
-                className="p-0 bg-transparent border-none cursor-pointer"
-              >
+              <button onClick={toggleDropdown} className="p-0">
                 <img
                   src={userProfilePicUrl || profilePic}
                   alt="Profile"
                   width={40}
                   height={40}
-                  className="rounded-full object-cover border-2 border-[#7a1f2a] hover:scale-105 transition-transform duration-200"
-                  onError={(e) => {
-                    e.currentTarget.src = profilePic;
-                  }}
+                  className="rounded-full object-cover border-2 hover:scale-105 transition-transform duration-200"
+                  style={{ borderColor }}
+                  onError={(e) => (e.currentTarget.src = profilePic)}
                 />
               </button>
 
               {isDropdownOpen && (
-                <div className="absolute top-full right-0 mt-2 bg-[#fff0e5] rounded-lg shadow-lg p-4 flex flex-col gap-3 min-w-[150px] z-50">
+                <div
+                  className="absolute top-full right-0 mt-2 rounded-lg shadow-lg p-4 flex flex-col gap-3 min-w-[150px] z-50 transition-colors duration-300"
+                  style={{ backgroundColor: dropdownBg, color: textColor }}
+                >
                   <a
                     href="/profile/user-info"
-                    className="text-[#7a1f2a] text-base font-medium hover:text-[#b34747] whitespace-nowrap cursor-pointer"
+                    className="text-base font-medium hover:opacity-80 transition-opacity duration-200"
                   >
                     Profile
                   </a>
                   <button
                     onClick={handleSignOut}
-                    className="text-[#7a1f2a] text-base font-medium hover:text-[#b34747] text-left whitespace-nowrap cursor-pointer"
+                    className="text-base font-medium hover:opacity-80 transition-opacity duration-200 text-left"
                   >
                     Sign Out
                   </button>
@@ -90,14 +119,18 @@ export default function SignedInHeader({ userProfilePicUrl }) {
           </ul>
         </nav>
 
+        {/* Mobile Dropdown */}
         {menuOpen && (
-          <div className="md:hidden bg-[#fff8f0] shadow-inner flex flex-col items-center text-[#7a1f2a] py-4 space-y-4 text-base font-medium">
+          <div
+            className="md:hidden shadow-inner flex flex-col items-center py-4 space-y-4 text-base font-medium transition-colors duration-300"
+            style={{ backgroundColor: bgColor, color: textColor }}
+          >
             {links.map((link) => (
               <a
                 key={link.name}
                 href={link.href}
                 onClick={() => setMenuOpen(false)}
-                className="hover:text-[#a02a3d] transition"
+                className="hover:opacity-80 transition-opacity duration-200"
               >
                 {link.name}
               </a>
@@ -106,12 +139,14 @@ export default function SignedInHeader({ userProfilePicUrl }) {
             <a
               href="/profile/user-info"
               onClick={() => setMenuOpen(false)}
-              className="flex items-center space-x-2 border border-[#7a1f2a] px-3 py-1.5 rounded-lg hover:bg-[#7a1f2a] hover:text-white transition"
+              className="flex items-center space-x-2 border px-3 py-1.5 rounded-lg hover:opacity-80 transition-opacity duration-200"
+              style={{ borderColor }}
             >
               <img
                 src={userProfilePicUrl || profilePic}
                 alt="Your profile"
-                className="w-7 h-7 rounded-full border border-[#7a1f2a]"
+                className="w-7 h-7 rounded-full"
+                style={{ borderColor }}
               />
               <span>Profile</span>
             </a>
@@ -119,6 +154,7 @@ export default function SignedInHeader({ userProfilePicUrl }) {
         )}
       </header>
 
+      {/* Spacer */}
       <div className="h-[70px] md:h-[76px]"></div>
     </>
   );

@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useTheme } from "../context/ThemeContext";
 
 import AuthHeader from "./components/AuthHeader.jsx";
 import Title from "./components/Title.jsx";
@@ -8,6 +9,7 @@ import InputField from "./components/InputField.jsx";
 import PrimaryButton from "./components/PrimaryButton.jsx";
 import BottomText from "./components/BottomText.jsx";
 import Footer from "../components/Footer.jsx";
+
 
 // made by nour diab
 
@@ -19,8 +21,10 @@ import Footer from "../components/Footer.jsx";
 // else, an error message is thrown
 
 // both fields are required
+
 export default function LogIn() {
   const navigate = useNavigate();
+  const { theme } = useTheme();
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -29,8 +33,11 @@ export default function LogIn() {
   const validEmail = "mohammadfarhat@lau.edu.lb";
   const validPassword = "cookies123";
 
+  // Theme-based background
+  const bgColor = theme === "dark" ? "#2a2a2a" : "#fff8f0";
+
   return (
-    <div className="min-h-screen bg-[#fff8f0] flex flex-col">
+    <div className="min-h-screen flex flex-col" style={{ backgroundColor: bgColor }}>
       <AuthHeader active="login" />
 
       <Title
@@ -38,7 +45,7 @@ export default function LogIn() {
         subheading="Log in to access your saved recipes, meal plans, and favorite dishes."
       />
 
-      <Box>
+      <Box theme={theme}>
         <form
           className="w-full"
           onSubmit={(e) => {
@@ -62,6 +69,7 @@ export default function LogIn() {
             placeholder="you@example.com"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
+            theme={theme}
           />
 
           <InputField
@@ -70,10 +78,14 @@ export default function LogIn() {
             placeholder="••••••••"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
+            theme={theme}
           />
 
           {error && (
-            <p className="text-red-600 text-sm mt-2" aria-live="polite">
+            <p
+              className="text-red-600 text-sm mt-2"
+              aria-live="polite"
+            >
               {error}
             </p>
           )}
@@ -82,17 +94,19 @@ export default function LogIn() {
             text="Log in"
             type="submit"
             disabled={!email || !password}
+            theme={theme}
           />
 
           <BottomText
             textBefore="Don’t have an account?"
             linkHref="/sign-up"
             linkText="Sign up"
+            theme={theme}
           />
         </form>
       </Box>
 
-      <Footer />
+      <Footer theme={theme} />
     </div>
   );
 }

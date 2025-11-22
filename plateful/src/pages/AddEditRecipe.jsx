@@ -1,11 +1,13 @@
 // made by Noura Hajj Chehade
-
 import React, { useState, useEffect } from "react";
 import Header from "../shared-components/Header";
 import Footer from "../components/Footer";
 import Swal from "sweetalert2";
+import { useTheme } from "../context/ThemeContext";
 
 const AddEditRecipe = () => {
+  const { theme } = useTheme();
+
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [ingredients, setIngredients] = useState("");
@@ -64,22 +66,32 @@ const AddEditRecipe = () => {
     setCategory("");
   };
 
+  // Dark mode colors for sections and inputs
+  const sectionBg = theme === "dark" ? "#1a1a1a" : "#fff8f0";
+  const sectionText = theme === "dark" ? "#f9c8c8" : "#7a1f2a";
+  const cardBg = theme === "dark" ? "#2a2a2a" : "#ffffff";
+  const inputBg = theme === "dark" ? "#2a2a2a" : "#ffffff";
+  const inputText = theme === "dark" ? "#f2d8d8" : "#444";
+  const inputBorder = theme === "dark" ? "#5a191f" : "#ccc";
+
   return (
     <>
       <Header />
 
-      {/* added by Noura */}
-      <section className="relative bg-[#fff8f0] py-16 px-6 text-center overflow-hidden">
+      <section
+        className="relative py-16 px-6 text-center overflow-hidden transition-colors duration-300"
+        style={{ backgroundColor: sectionBg, color: sectionText }}
+      >
         <img
           src="/recipes/top-image.jpg"
           alt="Add Recipe Background"
           className="absolute inset-0 w-full h-full object-cover opacity-35"
         />
         <div className="relative max-w-3xl mx-auto">
-          <h1 className="text-4xl font-bold text-[#7a1f2a] mb-3 drop-shadow-md">
+          <h1 className="text-4xl font-bold mb-3 drop-shadow-md">
             {title ? "Edit Your Recipe" : "Share Your Favorite Recipe"}
           </h1>
-          <p className="text-gray-700 text-lg">
+          <p className="text-lg">
             {title
               ? "Update your delicious creation for the Plateful community "
               : "Add your own recipe to inspire the Plateful community "}
@@ -87,15 +99,24 @@ const AddEditRecipe = () => {
         </div>
       </section>
 
-      <section className="py-16 px-6 bg-[#fffaf6]">
-        <div className="max-w-3xl mx-auto bg-white rounded-2xl shadow-lg p-8">
-          <h2 className="text-2xl font-bold text-[#7a1f2a] mb-8 text-center">
+      <section
+        className="py-16 px-6 transition-colors duration-300"
+        style={{ backgroundColor: sectionBg }}
+      >
+        <div
+          className="max-w-3xl mx-auto rounded-2xl shadow-lg p-8"
+          style={{ backgroundColor: cardBg }}
+        >
+          <h2
+            className="text-2xl font-bold mb-8 text-center"
+            style={{ color: sectionText }}
+          >
             {title ? "Edit Recipe" : "Add Recipe"}
           </h2>
 
           <form onSubmit={handleSubmit} className="space-y-6 text-left">
             <div>
-              <label className="block font-semibold text-[#7a1f2a] mb-2">
+              <label className="block font-semibold mb-2" style={{ color: sectionText }}>
                 Recipe Title
               </label>
               <input
@@ -103,31 +124,48 @@ const AddEditRecipe = () => {
                 placeholder="Enter recipe title"
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
-                className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-[#7a1f2a]"
+                className="w-full rounded-lg px-4 py-2 focus:outline-none"
+                style={{
+                  backgroundColor: inputBg,
+                  color: inputText,
+                  borderColor: inputBorder,
+                  borderWidth: "1px",
+                }}
               />
             </div>
 
             <div>
-              <label className="block font-semibold text-[#7a1f2a] mb-2">
+              <label className="block font-semibold mb-2" style={{ color: sectionText }}>
                 Description
               </label>
               <textarea
                 placeholder="Short description of your recipe"
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
-                className="w-full border border-gray-300 rounded-lg px-4 py-2 h-24 resize-none focus:outline-none focus:ring-2 focus:ring-[#7a1f2a]"
+                className="w-full rounded-lg px-4 py-2 h-24 resize-none focus:outline-none"
+                style={{
+                  backgroundColor: inputBg,
+                  color: inputText,
+                  borderColor: inputBorder,
+                  borderWidth: "1px",
+                }}
               />
             </div>
 
-            {/* Category Selector by Adam Abdel Karim */}
             <div>
-              <label className="block font-semibold text-[#7a1f2a] mb-2">
+              <label className="block font-semibold mb-2" style={{ color: sectionText }}>
                 Category
               </label>
               <select
                 value={category}
                 onChange={(e) => setCategory(e.target.value)}
-                className="w-full border border-gray-300 rounded-lg px-4 py-2 bg-white focus:outline-none focus:ring-2 focus:ring-[#7a1f2a]"
+                className="w-full rounded-lg px-4 py-2 focus:outline-none"
+                style={{
+                  backgroundColor: inputBg,
+                  color: inputText,
+                  borderColor: inputBorder,
+                  borderWidth: "1px",
+                }}
               >
                 <option value="">Select a category</option>
                 {categories.map((cat, index) => (
@@ -139,31 +177,43 @@ const AddEditRecipe = () => {
             </div>
 
             <div>
-              <label className="block font-semibold text-[#7a1f2a] mb-2">
+              <label className="block font-semibold mb-2" style={{ color: sectionText }}>
                 Ingredients
               </label>
               <textarea
                 placeholder="List ingredients (comma-separated)"
                 value={ingredients}
                 onChange={(e) => setIngredients(e.target.value)}
-                className="w-full border border-gray-300 rounded-lg px-4 py-2 h-24 resize-none focus:outline-none focus:ring-2 focus:ring-[#7a1f2a]"
+                className="w-full rounded-lg px-4 py-2 h-24 resize-none focus:outline-none"
+                style={{
+                  backgroundColor: inputBg,
+                  color: inputText,
+                  borderColor: inputBorder,
+                  borderWidth: "1px",
+                }}
               />
             </div>
 
             <div>
-              <label className="block font-semibold text-[#7a1f2a] mb-2">
+              <label className="block font-semibold mb-2" style={{ color: sectionText }}>
                 Steps
               </label>
               <textarea
                 placeholder="Write preparation steps"
                 value={steps}
                 onChange={(e) => setSteps(e.target.value)}
-                className="w-full border border-gray-300 rounded-lg px-4 py-2 h-32 resize-none focus:outline-none focus:ring-2 focus:ring-[#7a1f2a]"
+                className="w-full rounded-lg px-4 py-2 h-32 resize-none focus:outline-none"
+                style={{
+                  backgroundColor: inputBg,
+                  color: inputText,
+                  borderColor: inputBorder,
+                  borderWidth: "1px",
+                }}
               />
             </div>
 
             <div>
-              <label className="block font-semibold text-[#7a1f2a] mb-2">
+              <label className="block font-semibold mb-2" style={{ color: sectionText }}>
                 Image URL
               </label>
               <input
@@ -171,14 +221,24 @@ const AddEditRecipe = () => {
                 placeholder="Paste an image URL (optional)"
                 value={image}
                 onChange={(e) => setImage(e.target.value)}
-                className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-[#7a1f2a]"
+                className="w-full rounded-lg px-4 py-2 focus:outline-none"
+                style={{
+                  backgroundColor: inputBg,
+                  color: inputText,
+                  borderColor: inputBorder,
+                  borderWidth: "1px",
+                }}
               />
             </div>
 
             <div className="text-center">
               <button
                 type="submit"
-                className="bg-[#7a1f2a] text-white px-8 py-3 rounded-lg hover:bg-[#a02a3d] transition font-medium"
+                className="px-8 py-3 rounded-lg font-medium transition"
+                style={{
+                  backgroundColor: sectionText,
+                  color: theme === "dark" ? "#1a1a1a" : "#fff",
+                }}
               >
                 {title ? "Update Recipe" : "Save Recipe"}
               </button>

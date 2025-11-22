@@ -1,7 +1,8 @@
-//Made by Michael Kolanjian
+// Made by Michael Kolanjian
 import React, { useState, useEffect } from "react";
 import { Trash2 } from "lucide-react";
 import RecipeSelectorModal from "./RecipeSelectorModal";
+import { useTheme } from "../../context/ThemeContext";
 
 const meals = ["Breakfast", "Lunch", "Dinner"];
 
@@ -12,6 +13,8 @@ const getWeekKey = (date) => {
 };
 
 export default function MealTable({ currentDate }) {
+  const { theme } = useTheme();
+
   const startOfWeek = new Date(currentDate);
   startOfWeek.setDate(currentDate.getDate() - currentDate.getDay() + 1);
 
@@ -70,11 +73,22 @@ export default function MealTable({ currentDate }) {
     saveMealData(newMealData);
   };
 
+  // Dark/light mode colors
+  const tableBg = theme === "dark" ? "#1a1a1a" : "#ffffff";
+  const headerBg = theme === "dark" ? "#2a2a2a" : "#fff0e5";
+  const headerText = theme === "dark" ? "#f9c8c8" : "#7a1f2a";
+  const cellText = theme === "dark" ? "#e0dcd5" : "#555555";
+  const cellHover = theme === "dark" ? "#333333" : "#fff8f0";
+  const borderColor = theme === "dark" ? "#444" : "#ccc";
+
   return (
     <div className="overflow-x-auto">
-      <table className="min-w-full border border-gray-300 rounded-xl bg-white shadow-sm">
+      <table
+        className="min-w-full rounded-xl shadow-sm"
+        style={{ backgroundColor: tableBg, borderColor: borderColor, borderCollapse: "separate", borderSpacing: 0 }}
+      >
         <thead>
-          <tr className="bg-[#fff0e5] text-[#7a1f2a]">
+          <tr style={{ backgroundColor: headerBg, color: headerText }}>
             <th className="p-3 text-left">Meal</th>
             {days.map((day, idx) => (
               <th key={idx} className="p-3 text-center font-semibold">
@@ -85,13 +99,18 @@ export default function MealTable({ currentDate }) {
         </thead>
         <tbody>
           {meals.map((meal, mealIdx) => (
-            <tr key={meal} className="border-t border-gray-200">
-              <td className="p-3 font-medium">{meal}</td>
+            <tr key={meal} style={{ borderTop: `1px solid ${borderColor}` }}>
+              <td className="p-3 font-medium" style={{ color: cellText }}>
+                {meal}
+              </td>
               {days.map((_, dayIdx) => (
                 <td
                   key={dayIdx}
-                  className="p-3 text-center text-gray-500 cursor-pointer relative hover:bg-[#fff8f0] transition group"
+                  className="p-3 text-center cursor-pointer relative transition group"
+                  style={{ color: cellText }}
                   onClick={() => handleCellClick(dayIdx, mealIdx)}
+                  onMouseOver={(e) => e.currentTarget.style.backgroundColor = cellHover}
+                  onMouseOut={(e) => e.currentTarget.style.backgroundColor = tableBg}
                 >
                   {mealData[mealIdx][dayIdx] !== "-" && (
                     <button
@@ -118,9 +137,7 @@ export default function MealTable({ currentDate }) {
         onSelectRecipe={handleSelectRecipe}
         day={
           selectedSlot.day !== null
-            ? days[selectedSlot.day].toLocaleDateString("en-US", {
-                weekday: "short",
-              })
+            ? days[selectedSlot.day].toLocaleDateString("en-US", { weekday: "short" })
             : ""
         }
         meal={selectedSlot.meal !== null ? meals[selectedSlot.meal] : ""}
