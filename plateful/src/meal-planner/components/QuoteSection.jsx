@@ -6,7 +6,7 @@ export default function QuoteSection() {
   const { theme } = useTheme();
 
   // Section-specific colors
-  const sectionBg = theme === "dark" ? "#1a1a1a" : "#fff0e5"; // dark gray vs light cream
+  const sectionBg = theme === "dark" ? "#222121ff" : "#fff0e5"; // dark gray vs light cream
   const headingColor = theme === "dark" ? "#f9c8c8" : "#7a1f2a"; // light pink vs brown
   const textColor = theme === "dark" ? "#e0dcd5" : "#555555"; // light gray vs dark gray
 
