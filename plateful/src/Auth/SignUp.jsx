@@ -14,12 +14,7 @@ import { useTheme } from "../context/ThemeContext";
 
 // for code reusability, components were created in the ./Auth/components folder for signup & login
 
-// for now, any user can sign up, except one: the user Mohammad Farhat
-// if the email "mohammadfarhat@lau.edu.lb" is entered (with ANY name/password),
-// he is notified that he already has an account, and needs to login instead
-
 // all fields are required
-
 export default function SignUp() {
   const navigate = useNavigate();
   const { theme } = useTheme();
@@ -30,13 +25,14 @@ export default function SignUp() {
   const [agree, setAgree] = useState(false);
   const [error, setError] = useState("");
 
-  const blockedEmail = "mohammadfarhat@lau.edu.lb";
-
   const bgColor = theme === "dark" ? "#1e1e1e" : "#fff8f0";
   const textColor = theme === "dark" ? "#ddd" : "#444";
 
   return (
-    <div className="min-h-screen flex flex-col" style={{ backgroundColor: bgColor, color: textColor }}>
+    <div
+      className="min-h-screen flex flex-col"
+      style={{ backgroundColor: bgColor, color: textColor }}
+    >
       <AuthHeader active="signup" />
 
       <Title
@@ -59,11 +55,6 @@ export default function SignUp() {
 
             if (password.length < 12) {
               setError("Password must be at least 12 characters long.");
-              return;
-            }
-
-            if (email.trim().toLowerCase() === blockedEmail) {
-              setError("You already have an account. Please log in instead.");
               return;
             }
 

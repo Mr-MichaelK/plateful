@@ -14,7 +14,7 @@ export default function Splash() {
     const fadeIn = setTimeout(() => setFade("opacity-100"), 100);
 
     // go to sign-up after 2.5s
-    const redirect = setTimeout(() => navigate("/sign-up"), 2500);
+    const redirect = setTimeout(() => navigate("/home"), 2500);
 
     return () => {
       clearTimeout(fadeIn);
