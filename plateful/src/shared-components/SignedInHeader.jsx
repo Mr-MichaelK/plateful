@@ -24,11 +24,13 @@ export default function SignedInHeader({ userProfilePicUrl }) {
   ];
 
   // subtle dark colors
-  const bgColor = theme === "dark" ? "#e6e1dd" : "#fff8f0"; // slightly darker beige
-  const textColor = theme === "dark" ? "#5a191f" : "#7a1f2a"; // slightly darker brown
-  const borderColor = theme === "dark" ? "#5a191f" : "#7a1f2a";
-  const hoverBg = theme === "dark" ? "#d9d5d0" : "#f5eee4"; // subtle hover
-  const dropdownBg = theme === "dark" ? "#dcd6cf" : "#fff0e5"; // dropdown
+// dark mode colors (Darker!)
+const bgColor = theme === "dark" ? "#1a1a1a" : "#fff8f0"; 
+const textColor = theme === "dark" ? "#f2d8d8" : "#7a1f2a";
+const borderColor = theme === "dark" ? "#7a1f2a" : "#7a1f2a"; // consistent brand
+const hoverBg = theme === "dark" ? "#2a2a2a" : "#f5eee4";
+const dropdownBg = theme === "dark" ? "#1f1f1f" : "#fff0e5";
+
 
   return (
     <>
