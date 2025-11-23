@@ -10,11 +10,9 @@ import PrimaryButton from "./components/PrimaryButton.jsx";
 import BottomText from "./components/BottomText.jsx";
 import Footer from "../components/Footer.jsx";
 import { useTheme } from "../context/ThemeContext";
+
 // made by nour diab
 
-// for code reusability, components were created in the ./Auth/components folder for signup & login
-
-// all fields are required
 export default function SignUp() {
   const navigate = useNavigate();
   const { theme } = useTheme();
@@ -22,17 +20,68 @@ export default function SignUp() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [agree, setAgree] = useState(false);
+  const [agree, setAgree] = useState(false); 
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const bgColor = theme === "dark" ? "#1e1e1e" : "#fff8f0";
   const textColor = theme === "dark" ? "#ddd" : "#444";
+
+  const handleSubmit = async (e) => {
+    e.preventDefault(); // stop the page from refreshing
+
+    // front-end validation before talking to the backend
+    if (!agree) return; // user has to accept the checkbox
+
+    if (!name.trim() || !email.trim() || !password) {
+      setError("All fields are required.");
+      return;
+    }
+
+    // same password rule as the backend: at least 12 chars
+    if (password.length < 12) {
+      setError("Password must be at least 12 characters long.");
+      return;
+    }
+
+    try {
+      setLoading(true);
+      setError("");
+
+      // send signup request to backend
+      const res = await fetch("http://localhost:5000/signup", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name, email, password }),
+      });
+
+      const data = await res.json();
+
+      // if backend returns an error (ex: email already in use), show it under the form
+      if (!res.ok) {
+        setError(data.error || "Something went wrong during sign up.");
+        return;
+      }
+
+      // everything is good: user is created in the database
+      // added a simple browser popup to confirm, then send them to the home page
+      window.alert("Account created successfully!");
+      navigate("/home");
+    } catch (err) {
+      console.error(err);
+      // fallback message if the server is down or not reachable
+      setError("Could not connect to the server. Please try again.");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <div
       className="min-h-screen flex flex-col"
       style={{ backgroundColor: bgColor, color: textColor }}
     >
+
       <AuthHeader active="signup" />
 
       <Title
@@ -41,27 +90,7 @@ export default function SignUp() {
       />
 
       <Box>
-        <form
-          className="w-full"
-          onSubmit={(e) => {
-            e.preventDefault();
-
-            if (!agree) return;
-
-            if (!name.trim() || !email.trim() || !password) {
-              setError("All fields are required.");
-              return;
-            }
-
-            if (password.length < 12) {
-              setError("Password must be at least 12 characters long.");
-              return;
-            }
-
-            setError("");
-            navigate("/home");
-          }}
-        >
+        <form className="w-full" onSubmit={handleSubmit}>
           <InputField
             label="Name"
             type="text"
@@ -86,6 +115,7 @@ export default function SignUp() {
             onChange={(e) => setPassword(e.target.value)}
           />
 
+          {/* show any error message coming from validation or backend */}
           {error && (
             <p className="text-red-600 text-sm mt-2" aria-live="polite">
               {error}
@@ -94,9 +124,16 @@ export default function SignUp() {
 
           <Checkbox checked={agree} onChange={setAgree} />
 
+          {/* main submit button. disabled when form is not ready or when request is in progress */}
           <PrimaryButton
-            text="Sign up for free"
-            disabled={!agree || !name.trim() || !email.trim() || !password}
+            text={loading ? "Signing up..." : "Sign up for free"}
+            disabled={
+              loading ||
+              !agree ||
+              !name.trim() ||
+              !email.trim() ||
+              !password
+            }
             type="submit"
           />
 
