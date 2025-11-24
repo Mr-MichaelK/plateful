@@ -8,139 +8,41 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { Search } from "lucide-react";
 import { useTheme } from "../context/ThemeContext";
 
-const mockRecipes = [
-  {
-    title: "Berry Cobbler",
-    description: "A sweet dessert with fresh berries.",
-    image: "/recipes/berry-cobbler.jpg",
-    category: "Dessert",
-    whyLove:
-      "Bursting with fresh berries and topped with a golden crisp — perfect for cozy evenings.",
-    ingredients: ["Mixed berries", "Flour", "Sugar", "Butter"],
-    steps: ["Mix berries with sugar.", "Make crumb topping.", "Bake until golden."],
-    similar: [
-      { title: "Blueberry Smoothie", image: "/recipes/blueberry-smoothie.jpg" },
-      { title: "Apple Salad", image: "/recipes/apple-salad.jpg" }
-    ],
-    extraImages: [
-      "/recipes/berry-extra1.jpg",
-      "/recipes/berry-extra2.jpg"
-    ]
-  },
-
-  {
-    title: "Chickpea Veggie Patties",
-    description: "Crispy and protein-packed patties.",
-    image: "/recipes/chickpea-patties.jpg",
-    category: "Lunch",
-    whyLove:
-      "Crunchy outside, soft inside, and full of flavor — a perfect healthy burger replacement.",
-    ingredients: ["Chickpeas", "Onion", "Garlic", "Spices"],
-    steps: ["Mash with veg.", "Form patties and fry.", "Serve with sauce."],
-    similar: [
-      { title: "Stew Beans", image: "/recipes/stew-beans.jpg" },
-      { title: "Sweet Potato Hash", image: "/recipes/sweet-potato-hash.jpg" }
-    ],
-    extraImages: [
-      "/recipes/chickpea-extra1.jpg",
-      "/recipes/chickpea-extra2.jpg"
-    ]
-  },
-
-  {
-    title: "Sweet Potato Hash",
-    description: "Perfect for a colorful breakfast.",
-    image: "/recipes/sweet-potato-hash.jpg",
-    category: "Breakfast",
-    whyLove:
-      "Vibrant, comforting, and nourishing — ideal for lazy mornings or brunch.",
-    ingredients: ["Sweet potatoes", "Onion", "Peppers", "Eggs"],
-    steps: ["Dice & sauté veg.", "Season.", "Top with eggs."],
-    similar: [
-      { title: "Berry Cobbler", image: "/recipes/berry-cobbler.jpg" },
-      { title: "Chickpea Patties", image: "/recipes/chickpea-patties.jpg" }
-    ],
-    extraImages: [
-      "/recipes/potato-extra1.jpg",
-      "/recipes/potato-extra2.jpg"
-    ]
-  },
-
-  {
-    title: "Blueberry Smoothie",
-    description: "Healthy and refreshing smoothie.",
-    image: "/recipes/blueberry-smoothie.jpg",
-    category: "Smoothies",
-    whyLove:
-      "A refreshing blend of sweet and tangy, giving you a burst of energy anytime.",
-    ingredients: ["Blueberries", "Banana", "Yogurt", "Honey"],
-    steps: ["Blend all.", "Adjust sweetness.", "Serve chilled."],
-    similar: [
-      { title: "Berry Cobbler", image: "/recipes/berry-cobbler.jpg" },
-      { title: "Sweet Potato Hash", image: "/recipes/sweet-potato-hash.jpg" }
-    ],
-    extraImages: [
-      "/recipes/blueberry-extra1.jpg",
-      "/recipes/blueberry-extra2.jpg"
-    ]
-  },
-
-  {
-    title: "Spiced Apple Salad",
-    description: "Crunchy and full of flavor.",
-    image: "/recipes/apple-salad.jpg",
-    category: "Lunch",
-    whyLove:
-      "A refreshing fall-inspired salad packed with apple crunch and warm spices.",
-    ingredients: ["Apples", "Walnuts", "Spinach", "Cinnamon Dressing"],
-    steps: ["Chop apples.", "Toss with dressing.", "Serve fresh."],
-    similar: [
-      { title: "Berry Cobbler", image: "/recipes/berry-cobbler.jpg" },
-      { title: "Blueberry Smoothie", image: "/recipes/blueberry-smoothie.jpg" }
-    ],
-    extraImages: [
-      "/recipes/apple-extra1.jpg",
-      "/recipes/apple-extra2.jpg"
-    ]
-  },
-
-  {
-    title: "Brown Stew Beans",
-    description: "Hearty and rich in taste.",
-    image: "/recipes/stew-beans.jpg",
-    category: "Dinner",
-    whyLove:
-      "A Caribbean-inspired dish that’s hearty, flavorful, and full of protein.",
-    ingredients: ["Kidney beans", "Garlic", "Thyme", "Coconut milk"],
-    steps: ["Soak beans.", "Simmer with spices.", "Serve warm."],
-    similar: [
-      { title: "Chickpea Veggie Patties", image: "/recipes/chickpea-patties.jpg" },
-      { title: "Sweet Potato Hash", image: "/recipes/sweet-potato-hash.jpg" }
-    ],
-    extraImages: [
-      "/recipes/beans-extra1.jpg",
-      "/recipes/beans-extra2.jpg"
-    ]
-  }
-];
-
 const Recipes = () => {
   const location = useLocation();
   const navigate = useNavigate();
-  const { theme } = useTheme(); // Use ThemeContext
+  const { theme } = useTheme(); // Theme context
   const queryParams = new URLSearchParams(location.search);
   const categoryFromURL = queryParams.get("category");
 
+  const [recipes, setRecipes] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState("All");
   const [searchTerm, setSearchTerm] = useState("");
   const [showSuggestions, setShowSuggestions] = useState(false);
   const searchRef = useRef(null);
 
+  // Fetch recipes from backend
+  useEffect(() => {
+    async function fetchRecipes() {
+      try {
+        const response = await fetch("http://localhost:5001/api/recipes"); // replace with your backend URL
+        const data = await response.json();
+        setRecipes(data);
+      } catch (err) {
+        console.error("Failed to fetch recipes:", err);
+        setRecipes([]); // fallback empty
+      }
+    }
+    fetchRecipes();
+  }, []);
+
+  // Handle category from URL
   useEffect(() => {
     if (categoryFromURL) setSelectedCategory(categoryFromURL);
     else setSelectedCategory("All");
   }, [categoryFromURL]);
 
+  // Close suggestions on outside click
   useEffect(() => {
     const handleClickOutside = (e) => {
       if (searchRef.current && !searchRef.current.contains(e.target)) {
@@ -151,20 +53,23 @@ const Recipes = () => {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
+  // Category selection
   const handleCategorySelect = (cat) => {
     setSelectedCategory(cat);
     if (cat === "All") navigate("/recipes");
     else navigate(`/recipes?category=${cat}`);
   };
 
-  const filteredRecipes = mockRecipes.filter((recipe) => {
+  // Filter recipes by search + category
+  const filteredRecipes = recipes.filter((recipe) => {
     const matchesCategory =
       selectedCategory === "All" || recipe.category === selectedCategory;
     const matchesSearch = recipe.title.toLowerCase().includes(searchTerm.toLowerCase());
     return matchesCategory && matchesSearch;
   });
 
-  const suggestions = mockRecipes
+  // Suggestions
+  const suggestions = recipes
     .filter((r) => {
       const matchesSearch =
         r.title.toLowerCase().includes(searchTerm.toLowerCase()) &&
@@ -291,7 +196,7 @@ const Recipes = () => {
                 key={recipe.title}
                 recipe={recipe}
                 id={encodeURIComponent(recipe.title)}
-                theme={theme} // pass theme to card
+                theme={theme} 
               />
             ))}
           </div>
@@ -306,5 +211,4 @@ const Recipes = () => {
   );
 };
 
-export { mockRecipes };
 export default Recipes;
