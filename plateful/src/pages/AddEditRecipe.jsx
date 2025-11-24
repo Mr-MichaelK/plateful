@@ -1,72 +1,183 @@
-// made by Noura Hajj Chehade
+// made by Noura Hajj Chehade — Backend Integrated Version
 import React, { useState, useEffect } from "react";
 import Header from "../shared-components/Header";
 import Footer from "../components/Footer";
 import Swal from "sweetalert2";
 import { useTheme } from "../context/ThemeContext";
+import { useLocation, useNavigate } from "react-router-dom";
+import { API_BASE_URL } from "../apiConfig";
 
 const AddEditRecipe = () => {
   const { theme } = useTheme();
+  const location = useLocation();
+  const navigate = useNavigate();
+  const searchParams = new URLSearchParams(location.search);
 
+  const editingTitle = searchParams.get("title");
+
+  // ---------------------- STATES ----------------------
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
+  const [whyLove, setWhyLove] = useState("");  
   const [ingredients, setIngredients] = useState("");
   const [steps, setSteps] = useState("");
-  const [image, setImage] = useState("");
   const [category, setCategory] = useState("");
 
+  const [image1, setImage1] = useState("");
+  const [image2, setImage2] = useState("");
+  const [image3, setImage3] = useState("");
+
   const categories = [
-    { name: "Breakfast", image: "/categories/breakfast.jpg" },
-    { name: "Lunch", image: "/categories/lunch.jpg" },
-    { name: "Dinner", image: "/categories/dinner.jpg" },
-    { name: "Dessert", image: "/categories/dessert.jpg" },
-    { name: "Smoothies", image: "/categories/smoothie.jpg" },
+    { name: "Breakfast" },
+    { name: "Lunch" },
+    { name: "Dinner" },
+    { name: "Dessert" },
+    { name: "Smoothies" },
   ];
 
+  // ---------------------- LOAD RECIPE TO EDIT ----------------------
   useEffect(() => {
-    const editData = JSON.parse(localStorage.getItem("editRecipe"));
-    if (editData) {
-      setTitle(editData.title || "");
-      setDescription(editData.description || "");
-      setIngredients(
-        editData.ingredients ? editData.ingredients.join(", ") : ""
-      );
-      setSteps(editData.steps ? editData.steps.join(". ") : "");
-      setImage(editData.image || "");
-      setCategory(editData.category || "");
-      localStorage.removeItem("editRecipe");
-    }
-  }, []);
+    const loadRecipe = async () => {
+      if (!editingTitle) return;
 
-  const handleSubmit = (e) => {
+      try {
+        const res = await fetch(
+          `${API_BASE_URL}/recipes/${encodeURIComponent(editingTitle)}`
+        );
+        if (!res.ok) return;
+
+        const data = await res.json();
+
+        setTitle(data.title || "");
+        setDescription(data.description || "");
+        setWhyLove(data.whyLove || ""); 
+
+        setIngredients(
+          Array.isArray(data.ingredients)
+            ? data.ingredients.join(", ")
+            : ""
+        );
+        setSteps(
+          Array.isArray(data.steps)
+            ? data.steps.join(". ")
+            : ""
+        );
+        setCategory(data.category || "");
+
+        if (Array.isArray(data.images)) {
+          setImage1(data.images[0] || "");
+          setImage2(data.images[1] || "");
+          setImage3(data.images[2] || "");
+        }
+      } catch (err) {
+        console.error("Error loading recipe to edit:", err);
+      }
+    };
+
+    loadRecipe();
+  }, [editingTitle]);
+
+  // ---------------------- SUBMIT ----------------------
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (!title || !description || !category) {
+    if (!title || !description || !category || !whyLove) {   
       Swal.fire({
         icon: "warning",
         title: "Missing Information",
-        text: "Please fill in all required fields and select a category!",
+        text: "Please fill in title, description, why you love it, category & images.",
         confirmButtonColor: "#7a1f2a",
       });
       return;
     }
 
-    Swal.fire({
-      icon: "success",
-      title: "Recipe Saved!",
-      text: `Your ${category} recipe "${title}" has been added successfully!`,
-      confirmButtonColor: "#7a1f2a",
-    });
+    const ingredientsArray = ingredients
+      .split(",")
+      .map((s) => s.trim())
+      .filter(Boolean);
 
-    setTitle("");
-    setDescription("");
-    setIngredients("");
-    setSteps("");
-    setImage("");
-    setCategory("");
+    const stepsArray = steps
+      .split(".")
+      .map((s) => s.trim())
+      .filter(Boolean);
+
+    const imagesArray = [image1, image2, image3].filter(Boolean);
+
+    if (imagesArray.length < 3) {
+      Swal.fire({
+        icon: "warning",
+        title: "Images Missing",
+        text: "Please enter all 3 image URLs.",
+        confirmButtonColor: "#7a1f2a",
+      });
+      return;
+    }
+
+    const payload = {
+      title,
+      description,
+      whyLove,              
+      category,
+      image: imagesArray[0],
+      images: imagesArray,
+      ingredients: ingredientsArray,
+      steps: stepsArray,
+    };
+
+    try {
+      let res;
+
+      if (editingTitle) {
+        res = await fetch(
+          `${API_BASE_URL}/recipes/${encodeURIComponent(editingTitle)}`,
+          {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload),
+          }
+        );
+      } else {
+        res = await fetch(`${API_BASE_URL}/recipes`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+        });
+      }
+
+      if (!res.ok) throw new Error("Failed to save recipe");
+
+      Swal.fire({
+        icon: "success",
+        title: "Recipe Saved!",
+        text: `Your ${category} recipe "${title}" has been saved successfully!`,
+        confirmButtonColor: "#7a1f2a",
+      });
+
+      if (!editingTitle) {
+        setTitle("");
+        setDescription("");
+        setWhyLove("");
+        setIngredients("");
+        setSteps("");
+        setCategory("");
+        setImage1("");
+        setImage2("");
+        setImage3("");
+      }
+
+      navigate("/recipes");
+    } catch (err) {
+      console.error(err);
+      Swal.fire({
+        icon: "error",
+        title: "Oops!",
+        text: "Could not save recipe. Please try again.",
+        confirmButtonColor: "#7a1f2a",
+      });
+    }
   };
 
-  // Dark mode colors for sections and inputs
+  // ---------------------- COLORS ----------------------
   const sectionBg = theme === "dark" ? "#1a1a1a" : "#fff8f0";
   const sectionText = theme === "dark" ? "#f9c8c8" : "#7a1f2a";
   const cardBg = theme === "dark" ? "#2a2a2a" : "#ffffff";
@@ -89,12 +200,12 @@ const AddEditRecipe = () => {
         />
         <div className="relative max-w-3xl mx-auto">
           <h1 className="text-4xl font-bold mb-3 drop-shadow-md">
-            {title ? "Edit Your Recipe" : "Share Your Favorite Recipe"}
+            {editingTitle ? "Edit Your Recipe" : "Share Your Favorite Recipe"}
           </h1>
           <p className="text-lg">
-            {title
-              ? "Update your delicious creation for the Plateful community "
-              : "Add your own recipe to inspire the Plateful community "}
+            {editingTitle
+              ? "Update your delicious creation"
+              : "Add your own recipe to inspire everyone!"}
           </p>
         </div>
       </section>
@@ -111,10 +222,12 @@ const AddEditRecipe = () => {
             className="text-2xl font-bold mb-8 text-center"
             style={{ color: sectionText }}
           >
-            {title ? "Edit Recipe" : "Add Recipe"}
+            {editingTitle ? "Edit Recipe" : "Add Recipe"}
           </h2>
 
           <form onSubmit={handleSubmit} className="space-y-6 text-left">
+
+            {/* TITLE */}
             <div>
               <label className="block font-semibold mb-2" style={{ color: sectionText }}>
                 Recipe Title
@@ -134,12 +247,13 @@ const AddEditRecipe = () => {
               />
             </div>
 
+            {/* DESCRIPTION */}
             <div>
               <label className="block font-semibold mb-2" style={{ color: sectionText }}>
-                Description
+                Description 
               </label>
               <textarea
-                placeholder="Short description of your recipe"
+                placeholder="Short description shown under the recipe title"
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
                 className="w-full rounded-lg px-4 py-2 h-24 resize-none focus:outline-none"
@@ -152,6 +266,26 @@ const AddEditRecipe = () => {
               />
             </div>
 
+            {/* WHY LOVE */}
+            <div>
+              <label className="block font-semibold mb-2" style={{ color: sectionText }}>
+                Why You'll Love This Dish 
+              </label>
+              <textarea
+                placeholder="Explain why this dish is special!"
+                value={whyLove}
+                onChange={(e) => setWhyLove(e.target.value)}
+                className="w-full rounded-lg px-4 py-2 h-24 resize-none focus:outline-none"
+                style={{
+                  backgroundColor: inputBg,
+                  color: inputText,
+                  borderColor: inputBorder,
+                  borderWidth: "1px",
+                }}
+              />
+            </div>
+
+            {/* CATEGORY */}
             <div>
               <label className="block font-semibold mb-2" style={{ color: sectionText }}>
                 Category
@@ -159,7 +293,7 @@ const AddEditRecipe = () => {
               <select
                 value={category}
                 onChange={(e) => setCategory(e.target.value)}
-                className="w-full rounded-lg px-4 py-2 focus:outline-none"
+                className="w-full rounded-lg px-4 py-2"
                 style={{
                   backgroundColor: inputBg,
                   color: inputText,
@@ -176,6 +310,7 @@ const AddEditRecipe = () => {
               </select>
             </div>
 
+            {/* INGREDIENTS */}
             <div>
               <label className="block font-semibold mb-2" style={{ color: sectionText }}>
                 Ingredients
@@ -194,6 +329,7 @@ const AddEditRecipe = () => {
               />
             </div>
 
+            {/* STEPS */}
             <div>
               <label className="block font-semibold mb-2" style={{ color: sectionText }}>
                 Steps
@@ -212,15 +348,47 @@ const AddEditRecipe = () => {
               />
             </div>
 
+            {/* IMAGES */}
             <div>
               <label className="block font-semibold mb-2" style={{ color: sectionText }}>
-                Image URL
+                Image URL 1 (Main Image)
               </label>
               <input
                 type="text"
-                placeholder="Paste an image URL (optional)"
-                value={image}
-                onChange={(e) => setImage(e.target.value)}
+                value={image1}
+                onChange={(e) => setImage1(e.target.value)}
+                className="w-full rounded-lg px-4 py-2 mb-4 focus:outline-none"
+                style={{
+                  backgroundColor: inputBg,
+                  color: inputText,
+                  borderColor: inputBorder,
+                  borderWidth: "1px",
+                }}
+              />
+
+              <label className="block font-semibold mb-2" style={{ color: sectionText }}>
+                Image URL 2
+              </label>
+              <input
+                type="text"
+                value={image2}
+                onChange={(e) => setImage2(e.target.value)}
+                className="w-full rounded-lg px-4 py-2 mb-4 focus:outline-none"
+                style={{
+                  backgroundColor: inputBg,
+                  color: inputText,
+                  borderColor: inputBorder,
+                  borderWidth: "1px",
+                }}
+              />
+
+              <label className="block font-semibold mb-2" style={{ color: sectionText }}>
+                Image URL 3
+              </label>
+              <input
+                type="text"
+                value={image3}
+                onChange={(e) => setImage3(e.target.value)}
                 className="w-full rounded-lg px-4 py-2 focus:outline-none"
                 style={{
                   backgroundColor: inputBg,
@@ -240,7 +408,7 @@ const AddEditRecipe = () => {
                   color: theme === "dark" ? "#1a1a1a" : "#fff",
                 }}
               >
-                {title ? "Update Recipe" : "Save Recipe"}
+                {editingTitle ? "Update Recipe" : "Save Recipe"}
               </button>
             </div>
           </form>
