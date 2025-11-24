@@ -1,33 +1,61 @@
-// FeaturedRecipes.jsx made by Adam Abdel Karim
-import React from "react";
+// FeaturedRecipes.jsx — made by Adam Abdel Karim, backend-connected version
+import React, { useEffect, useState } from "react";
 import RecipeCard from "./RecipeCard";
 import { useTheme } from "../context/ThemeContext";
 
-export const featuredRecipes = [
-  { title: "Berry Cobbler", description: "A sweet dessert with fresh berries.", image: "/recipes/berry-cobbler.jpg" },
-  { title: "Chickpea Veggie Patties", description: "Crispy and protein-packed patties.", image: "/recipes/chickpea-patties.jpg" },
-  { title: "Sweet Potato Hash", description: "Perfect for a colorful breakfast.", image: "/recipes/sweet-potato-hash.jpg" },
-  { title: "Blueberry Smoothie", description: "Healthy and refreshing smoothie.", image: "/recipes/blueberry-smoothie.jpg" },
-];
-
 const FeaturedRecipes = () => {
   const { theme } = useTheme();
+  const [featuredRecipes, setFeaturedRecipes] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-  // Custom section-specific colors
-  const sectionBg = theme === "dark" ? "#1a1a1a" : "#fffdf9"; // slightly dark gray vs off-white
-  const sectionText = theme === "dark" ? "#f9c8c8" : "#7a1f2a"; // light pink vs brown
-  const cardBg = theme === "dark" ? "#262626" : "#fff0e5"; // card background
-  const cardHover = theme === "dark" ? "#2f2f2f" : "#f5e8de"; // hover background
+  // Colors
+  const sectionBg = theme === "dark" ? "#1a1a1a" : "#fffdf9"; 
+  const sectionText = theme === "dark" ? "#f9c8c8" : "#7a1f2a"; 
+  const cardBg = theme === "dark" ? "#262626" : "#fff0e5"; 
+  const cardHover = theme === "dark" ? "#2f2f2f" : "#f5e8de";
+
+  // Fetch featured recipes from backend
+  useEffect(() => {
+    async function fetchFeatured() {
+      try {
+        const res = await fetch("http://localhost:5001/api/recipes/featured");
+        const data = await res.json();
+        setFeaturedRecipes(data);
+      } catch (err) {
+        console.error("Failed to fetch featured recipes:", err);
+        setFeaturedRecipes([]);
+      } finally {
+        setLoading(false);
+      }
+    }
+    fetchFeatured();
+  }, []);
+
+  if (loading) {
+    return (
+      <section className="py-14 px-6 text-center" style={{ backgroundColor: sectionBg }}>
+        <h2 className="text-2xl font-bold mb-8" style={{ color: sectionText }}>
+          Featured Recipes
+        </h2>
+        <p style={{ color: sectionText }}>Loading...</p>
+      </section>
+    );
+  }
+
+  if (!featuredRecipes.length) {
+    return (
+      <section className="py-14 px-6 text-center" style={{ backgroundColor: sectionBg }}>
+        <h2 className="text-2xl font-bold mb-8" style={{ color: sectionText }}>
+          Featured Recipes
+        </h2>
+        <p style={{ color: sectionText }}>No featured recipes available.</p>
+      </section>
+    );
+  }
 
   return (
-    <section
-      className="py-14 px-6 text-center transition-colors duration-300"
-      style={{ backgroundColor: sectionBg }}
-    >
-      <h2
-        className="text-2xl font-bold mb-8 transition-colors duration-300"
-        style={{ color: sectionText }}
-      >
+    <section className="py-14 px-6 text-center" style={{ backgroundColor: sectionBg }}>
+      <h2 className="text-2xl font-bold mb-8" style={{ color: sectionText }}>
         Featured Recipes
       </h2>
 
@@ -38,7 +66,7 @@ const FeaturedRecipes = () => {
             style={{ backgroundColor: cardBg }}
             className="rounded-lg shadow cursor-pointer transition duration-300 hover:shadow-lg"
           >
-            <RecipeCard recipe={recipe} id={encodeURIComponent(recipe.title)} theme={theme} />
+            <RecipeCard recipe={recipe} theme={theme} />
           </div>
         ))}
       </div>
