@@ -1,9 +1,11 @@
 //Made by Michael Kolanjian
 import { useRef, useState } from "react";
+import { useTheme } from "../../context/ThemeContext";
 import profileIcon from "../../assets/profile-icon.svg";
 import uploadIcon from "../../assets/upload-icon.svg";
 
 export default function ProfileInfoForm({ name, email, aboutMe, pfpLink }) {
+  const { theme } = useTheme();
   const fileInputRef = useRef(null);
   const [profileImageUrl, setProfileImageUrl] = useState(
     pfpLink || profileIcon
@@ -24,17 +26,26 @@ export default function ProfileInfoForm({ name, email, aboutMe, pfpLink }) {
     }
   };
 
+  // Theme-based styles
+  const bgColor = theme === "dark" ? "#2a2a2a" : "#fef6ef";
+  const inputBg = theme === "dark" ? "#3a3a3a" : "#f3f3f3";
+  const textColor = theme === "dark" ? "#e5e5e5" : "#444";
+  const borderColor = theme === "dark" ? "#555" : "#ccc";
+  const btnBg = theme === "dark" ? "#7a1f2a" : "#7a1f2a";
+  const btnHover = theme === "dark" ? "#5c161f" : "#5c161f";
+
   return (
-    <form className="flex flex-col text-gray-900">
-      <h1 className="text-2xl font-semibold mb-0">Profile</h1>
-      <p className="text-gray-600 text-base mb-3">
+    <form className="flex flex-col transition-colors" style={{ color: textColor }}>
+      <h1 className="text-2xl font-semibold mb-0" style={{ color: "#7a1f2a" }}>Profile</h1>
+      <p className="text-base mb-3" style={{ color: theme === "dark" ? "#aaa" : "#666" }}>
         Profile information will be displayed on your dashboard.
       </p>
 
+      {/* Profile Picture */}
       <div className="mb-4">
         <label
           htmlFor="imgSelector"
-          className="block text-gray-700 font-semibold text-lg mb-4"
+          className="block font-semibold text-lg mb-4"
         >
           Profile Picture
         </label>
@@ -52,7 +63,7 @@ export default function ProfileInfoForm({ name, email, aboutMe, pfpLink }) {
             <img
               src={uploadIcon}
               alt="Upload Icon"
-              className="w-6 h-6 text-gray-900"
+              className="w-6 h-6"
             />
           </button>
           <input
@@ -66,53 +77,54 @@ export default function ProfileInfoForm({ name, email, aboutMe, pfpLink }) {
         </div>
       </div>
 
+      {/* Username */}
       <div className="mt-5">
-        <label
-          htmlFor="username"
-          className="block text-gray-700 font-semibold text-lg mb-4"
-        >
+        <label htmlFor="username" className="block font-semibold text-lg mb-4">
           Username
         </label>
         <input
           type="text"
           id="username"
           defaultValue={name}
-          className="w-full px-3 py-2 rounded-md bg-gray-100 text-gray-900 text-base focus:outline-none focus:border-[#7a1f2a] border border-gray-300"
+          className="w-full px-3 py-2 rounded-md text-base focus:outline-none"
+          style={{ backgroundColor: inputBg, color: textColor, border: `1px solid ${borderColor}` }}
         />
       </div>
 
+      {/* Email */}
       <div className="mt-5">
-        <label
-          htmlFor="email"
-          className="block text-gray-700 font-semibold text-lg mb-4"
-        >
+        <label htmlFor="email" className="block font-semibold text-lg mb-4">
           Email
         </label>
         <input
           type="email"
           id="email"
           defaultValue={email}
-          className="w-full px-3 py-2 rounded-md bg-gray-100 text-gray-900 text-base focus:outline-none focus:border-[#7a1f2a] border border-gray-300"
+          className="w-full px-3 py-2 rounded-md text-base focus:outline-none"
+          style={{ backgroundColor: inputBg, color: textColor, border: `1px solid ${borderColor}` }}
         />
       </div>
 
+      {/* About Me */}
       <div className="mt-5">
-        <label
-          htmlFor="aboutMe"
-          className="block text-gray-700 font-semibold text-lg mb-4"
-        >
+        <label htmlFor="aboutMe" className="block font-semibold text-lg mb-4">
           About Me
         </label>
         <textarea
           id="aboutMe"
           defaultValue={aboutMe || ""}
-          className="w-full px-3 py-2 rounded-md bg-gray-100 text-gray-900 text-base focus:outline-none focus:border-[#7a1f2a] min-h-[100px] resize-y border border-gray-300"
+          className="w-full px-3 py-2 rounded-md text-base focus:outline-none min-h-[100px] resize-y"
+          style={{ backgroundColor: inputBg, color: textColor, border: `1px solid ${borderColor}` }}
         />
       </div>
 
+      {/* Save Button */}
       <button
         type="submit"
-        className="mt-8 self-end px-6 py-2 rounded-md bg-[#7a1f2a] hover:bg-[#5c161f] text-white font-medium text-lg transition-colors"
+        className="mt-8 self-end px-6 py-2 rounded-md text-white font-medium text-lg transition-colors"
+        style={{ backgroundColor: btnBg }}
+        onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = btnHover)}
+        onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = btnBg)}
       >
         Save
       </button>

@@ -1,17 +1,29 @@
-//Made by Michael Kolanjian
+// Made by Michael Kolanjian
 import React, { useState, useEffect } from "react";
 import { Trash2 } from "lucide-react";
 import RecipeSelectorModal from "./RecipeSelectorModal";
+import { useTheme } from "../../context/ThemeContext";
 
 const meals = ["Breakfast", "Lunch", "Dinner"];
 
 const getWeekKey = (date) => {
   const startOfWeek = new Date(date);
-  startOfWeek.setDate(date.getDate() - date.getDay() + 1); // Monday as start
+  startOfWeek.setDate(date.getDate() - date.getDay() + 1);
   return `meals-${startOfWeek.toISOString().split("T")[0]}`;
 };
 
 export default function MealTable({ currentDate }) {
+  const { theme } = useTheme();
+
+  // Defensive check
+  if (!currentDate || !(currentDate instanceof Date)) {
+    return (
+      <div className="p-4 text-center text-red-500">
+        Error: Please provide a valid date object to the table.
+      </div>
+    );
+  }
+
   const startOfWeek = new Date(currentDate);
   startOfWeek.setDate(currentDate.getDate() - currentDate.getDay() + 1);
 
@@ -24,11 +36,11 @@ export default function MealTable({ currentDate }) {
   const [modalOpen, setModalOpen] = useState(false);
   const [selectedSlot, setSelectedSlot] = useState({ day: null, meal: null });
 
-  const [mealData, setMealData] = useState(
-    Array(meals.length)
-      .fill(0)
-      .map(() => Array(7).fill("-"))
-  );
+  const initialMealData = Array(meals.length)
+    .fill(0)
+    .map(() => Array(7).fill("-"));
+
+  const [mealData, setMealData] = useState(initialMealData);
 
   useEffect(() => {
     const key = getWeekKey(currentDate);
@@ -36,11 +48,7 @@ export default function MealTable({ currentDate }) {
     if (saved) {
       setMealData(JSON.parse(saved));
     } else {
-      setMealData(
-        Array(meals.length)
-          .fill(0)
-          .map(() => Array(7).fill("-"))
-      );
+      setMealData(initialMealData);
     }
   }, [currentDate]);
 
@@ -50,8 +58,11 @@ export default function MealTable({ currentDate }) {
     localStorage.setItem(key, JSON.stringify(newData));
   };
 
+  const isCellEmpty = (data) =>
+    data === "-" || data === null || data === undefined;
+
   const handleCellClick = (dayIdx, mealIdx) => {
-    if (mealData[mealIdx][dayIdx] === "-") {
+    if (isCellEmpty(mealData[mealIdx][dayIdx])) {
       setSelectedSlot({ day: dayIdx, meal: mealIdx });
       setModalOpen(true);
     }
@@ -70,11 +81,39 @@ export default function MealTable({ currentDate }) {
     saveMealData(newMealData);
   };
 
+  // 🌙 THEME COLORS
+  const tableBg = theme === "dark" ? "#1a1a1a" : "#ffffff";
+  const headerBg = theme === "dark" ? "#2a2a2a" : "#fff0e5";
+  const headerText = theme === "dark" ? "#f9c8c8" : "#7a1f2a";
+  const borderColor = theme === "dark" ? "#444" : "#ccc";
+
+  // text colors
+  const emptyText = theme === "dark" ? "#777" : "#999";
+  const filledText = theme === "dark" ? "#f9f9f9" : "#000";
+
+  // hover bg
+  const hoverBg = theme === "dark" ? "#2d2d2d" : "#fff8f0";
+
+  // meal backgrounds
+  const mealBg = [
+    theme === "dark" ? "#4a3b1f" : "#fff5d6", // breakfast
+    theme === "dark" ? "#1f3d2e" : "#e8ffe8", // lunch
+    theme === "dark" ? "#1f2f4a" : "#e8f0ff", // dinner
+  ];
+
   return (
     <div className="overflow-x-auto">
-      <table className="min-w-full border border-gray-300 rounded-xl bg-white shadow-sm">
+      <table
+        className="min-w-full rounded-xl shadow-sm"
+        style={{
+          backgroundColor: tableBg,
+          borderColor: borderColor,
+          borderCollapse: "separate",
+          borderSpacing: 0,
+        }}
+      >
         <thead>
-          <tr className="bg-[#fff0e5] text-[#7a1f2a]">
+          <tr style={{ backgroundColor: headerBg, color: headerText }}>
             <th className="p-3 text-left">Meal</th>
             {days.map((day, idx) => (
               <th key={idx} className="p-3 text-center font-semibold">
@@ -83,30 +122,71 @@ export default function MealTable({ currentDate }) {
             ))}
           </tr>
         </thead>
+
         <tbody>
           {meals.map((meal, mealIdx) => (
-            <tr key={meal} className="border-t border-gray-200">
-              <td className="p-3 font-medium">{meal}</td>
-              {days.map((_, dayIdx) => (
-                <td
-                  key={dayIdx}
-                  className="p-3 text-center text-gray-500 cursor-pointer relative hover:bg-[#fff8f0] transition group"
-                  onClick={() => handleCellClick(dayIdx, mealIdx)}
-                >
-                  {mealData[mealIdx][dayIdx] !== "-" && (
-                    <button
-                      className="absolute top-1 right-1 text-red-500 opacity-0 group-hover:opacity-100 transition"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleDelete(dayIdx, mealIdx);
-                      }}
-                    >
-                      <Trash2 size={16} />
-                    </button>
-                  )}
-                  {mealData[mealIdx][dayIdx]}
-                </td>
-              ))}
+            <tr key={meal} className="border-t" style={{ borderColor }}>
+              <td className="p-3 font-medium" style={{ color: headerText }}>
+                {meal}
+              </td>
+
+              {days.map((_, dayIdx) => {
+                const cellData = mealData[mealIdx][dayIdx];
+                const isRecipe =
+                  !isCellEmpty(cellData) &&
+                  typeof cellData === "object" &&
+                  cellData.name;
+
+                const recipeName = isRecipe ? cellData.name : cellData;
+                const recipeImageUrl = isRecipe ? cellData.imageUrl : null;
+
+                return (
+                  <td
+                    key={dayIdx}
+                    className="p-3 text-center cursor-pointer relative transition group"
+                    onClick={() => handleCellClick(dayIdx, mealIdx)}
+                    style={{
+                      backgroundColor: isRecipe
+                        ? mealBg[mealIdx]
+                        : "transparent",
+                      color: isRecipe ? filledText : emptyText,
+                    }}
+                    onMouseEnter={(e) =>
+                      (e.currentTarget.style.backgroundColor = isRecipe
+                        ? mealBg[mealIdx]
+                        : hoverBg)
+                    }
+                    onMouseLeave={(e) =>
+                      (e.currentTarget.style.backgroundColor = isRecipe
+                        ? mealBg[mealIdx]
+                        : "transparent")
+                    }
+                  >
+                    {isRecipe && (
+                      <button
+                        className="absolute top-1 right-1 text-red-500 opacity-0 group-hover:opacity-100 transition"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleDelete(dayIdx, mealIdx);
+                        }}
+                      >
+                        <Trash2 size={16} />
+                      </button>
+                    )}
+
+                    <div className="flex items-center justify-center space-x-2">
+                      {isRecipe && recipeImageUrl && (
+                        <img
+                          src={recipeImageUrl}
+                          alt={recipeName}
+                          className="w-6 h-6 object-cover rounded-md"
+                        />
+                      )}
+                      <span>{recipeName}</span>
+                    </div>
+                  </td>
+                );
+              })}
             </tr>
           ))}
         </tbody>

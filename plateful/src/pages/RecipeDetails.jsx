@@ -1,82 +1,156 @@
-// made by Noura Hajj Chehade, Categories added by Adam 
-
+// made by Noura Hajj Chehade, backend integration
 import React, { useState, useEffect } from "react";
-import { useParams, useNavigate, useLocation } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
 import Header from "../shared-components/Header";
 import Footer from "../components/Footer";
-import { mockRecipes } from "../pages/Recipes";
-import { featuredRecipes } from "../components/FeaturedRecipes";
-
+import { useTheme } from "../context/ThemeContext";
+import { API_BASE_URL } from "../apiConfig";
 
 function RecipeDetails() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const location = useLocation();
+  const { theme } = useTheme();
 
   const [recipe, setRecipe] = useState(null);
+  const [allRecipes, setAllRecipes] = useState([]);
+  const [comments, setComments] = useState([]);
+  const [showAllComments, setShowAllComments] = useState(false);
+
   const [rating, setRating] = useState(0);
   const [feedback, setFeedback] = useState("");
+  const [loading, setLoading] = useState(true);
 
-useEffect(() => {
-  let found = location.state?.recipe;
+  // Remove /api from root to load images
+  const API_ROOT = API_BASE_URL.replace(/\/api$/, "");
 
-  if (!found) {
-    const decodedId = decodeURIComponent(id);
-    found =
-      mockRecipes.find((r) => r.title === decodedId) ||
-      featuredRecipes.find((r) => r.title === decodedId); // ✅ also check featured
-    if (!found) {
-      const favorites = JSON.parse(localStorage.getItem("favoriteRecipes")) || [];
-      found =
-        favorites.find(
-          (r) => r.title === decodedId || r.id === decodedId
-        ) || null;
-    }
-  }
+  const buildImageUrl = (imgPath) => {
+    if (!imgPath) return "";
+    if (imgPath.startsWith("http")) return imgPath;
+    return `${API_ROOT}${imgPath}`;
+  };
 
-  setRecipe(found);
-}, [id, location.state]);
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        setLoading(true);
+        const decodedId = decodeURIComponent(id);
 
+        // ----- SINGLE RECIPE -----
+        const resRecipe = await fetch(
+          `${API_BASE_URL}/recipes/${encodeURIComponent(decodedId)}`
+        );
+        if (resRecipe.ok) {
+          const data = await resRecipe.json();
+          setRecipe(data);
+        }
 
-  if (!recipe) {
+        // ----- ALL RECIPES (SIMILAR) -----
+        const resAll = await fetch(`${API_BASE_URL}/recipes`);
+        if (resAll.ok) {
+          const all = await resAll.json();
+          setAllRecipes(all);
+        }
+
+        // ----- COMMENTS -----
+        const resComments = await fetch(
+          `${API_BASE_URL}/comments/${encodeURIComponent(decodedId)}`
+        );
+        if (resComments.ok) {
+          const cmts = await resComments.json();
+          setComments(cmts);
+        }
+      } catch (err) {
+        console.error("ERROR:", err);
+      } finally {
+        setLoading(false);
+        window.scrollTo(0, 0);
+      }
+    };
+
+    fetchData();
+  }, [id]);
+
+  // ----------- LOADING -------------
+  if (loading) {
     return (
       <>
         <Header />
-        <section className="py-20 text-center bg-[#fff8f0] min-h-screen">
-          <h2 className="text-2xl font-bold text-[#7a1f2a]">Recipe not found</h2>
+        <section className="py-20 text-center min-h-screen flex items-center justify-center">
+          <h2 className="text-2xl font-bold">Loading recipe…</h2>
         </section>
         <Footer />
       </>
     );
   }
 
-  const handleSave = () => {
-    const saved = JSON.parse(localStorage.getItem("favoriteRecipes")) || [];
-    const exists = saved.find((r) => r.title === recipe.title);
-    if (!exists) {
-      saved.push(recipe);
-      localStorage.setItem("favoriteRecipes", JSON.stringify(saved));
+  if (!recipe) {
+    return (
+      <>
+        <Header />
+        <section className="py-20 text-center min-h-screen flex items-center justify-center">
+          <h2 className="text-2xl font-bold">Recipe not found</h2>
+        </section>
+        <Footer />
+      </>
+    );
+  }
+
+  // -------- IMAGE LOGIC ----------
+  // Support BOTH "images" array and "extraImages"
+  const imageList = [
+    recipe.image,
+    ...(recipe.images || []),
+    ...(recipe.extraImages || [])
+  ].filter(Boolean);
+
+  const mainImageUrl = buildImageUrl(imageList[0]);
+  const extraImages = imageList.slice(1);
+
+  // -------- SIMILAR RECIPES ----------
+  let similarRecipes = allRecipes.filter(
+    (r) => r.title !== recipe.title && r.category === recipe.category
+  );
+  similarRecipes = similarRecipes.sort(() => Math.random() - 0.5).slice(0, 3);
+
+  const sectionBg = theme === "dark" ? "#1a1a1a" : "#fffaf6";
+  const cardBg = theme === "dark" ? "#2a2a2a" : "#ffffff";
+  const titleColor = theme === "dark" ? "#f9c8c8" : "#7a1f2a";
+  const textColor = theme === "dark" ? "#e5e5e5" : "#444";
+
+  // ========== SAVE FAVORITE ==========
+  const handleSave = async () => {
+    try {
+      const res = await fetch(
+        `${API_BASE_URL}/favorites/${encodeURIComponent(recipe.title)}`,
+        { method: "POST" }
+      );
+      const data = await res.json();
+
       Swal.fire({
         icon: "success",
-        title: "Recipe Saved!",
-        text: "You can find it later in your favorites ❤️",
+        title:
+          data.message === "Already in favorites"
+            ? "Already Saved"
+            : "Recipe Saved!",
         confirmButtonColor: "#7a1f2a",
       });
-      navigate("/favorites");
-    } else {
+
+      if (data.message !== "Already in favorites") {
+        navigate("/favorites");
+      }
+    } catch {
       Swal.fire({
-        icon: "info",
-        title: "Already Saved",
-        text: "This recipe is already in your favorites!",
+        icon: "error",
+        title: "Error",
+        text: "Could not save recipe.",
         confirmButtonColor: "#7a1f2a",
       });
     }
   };
 
   const handleEdit = () => {
-    localStorage.setItem("editRecipe", JSON.stringify(recipe));
-    navigate("/add");
+    navigate(`/add?title=${encodeURIComponent(recipe.title)}`);
   };
 
   const handleShare = async () => {
@@ -84,121 +158,166 @@ useEffect(() => {
       await navigator.clipboard.writeText(window.location.href);
       Swal.fire({
         icon: "info",
-        title: "Link Copied!",
-        text: "Recipe link copied to clipboard!",
+        title: "Link copied!",
         confirmButtonColor: "#7a1f2a",
       });
-    } catch {
+    } catch {}
+  };
+
+  // ----------- FEEDBACK SUBMIT ----------
+  const handleFeedbackSubmit = async () => {
+    if (!feedback && rating === 0) {
+      Swal.fire({
+        icon: "warning",
+        title: "Add rating or comment first",
+        confirmButtonColor: "#7a1f2a",
+      });
+      return;
+    }
+
+    try {
+      const res = await fetch(
+        `${API_BASE_URL}/comments/${encodeURIComponent(recipe.title)}`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ rating, comment: feedback }),
+        }
+      );
+
+      const data = await res.json();
+      if (data.comment) {
+        setComments((prev) => [data.comment, ...prev].slice(0, 6));
+      }
+
+      Swal.fire({
+        icon: "success",
+        title: "Thank you!",
+        confirmButtonColor: "#7a1f2a",
+      });
+
+      setRating(0);
+      setFeedback("");
+    } catch (err) {
       Swal.fire({
         icon: "error",
-        title: "Oops!",
-        text: "Could not copy the link. Try again.",
+        title: "Couldn't send feedback",
         confirmButtonColor: "#7a1f2a",
       });
     }
   };
 
-  const handleFeedbackSubmit = () => {
-    if (!feedback && rating === 0) {
-      Swal.fire({
-        icon: "warning",
-        title: "Oops!",
-        text: "Please add a rating or comment before submitting",
-        confirmButtonColor: "#7a1f2a",
-      });
-      return;
-    }
-    Swal.fire({
-      icon: "success",
-      title: "Thank you!",
-      text: "Your feedback has been submitted!",
-      confirmButtonColor: "#7a1f2a",
-    });
-    setRating(0);
-    setFeedback("");
-  };
+  const limitedComments = comments.slice(0, 6);
+  const visibleComments = showAllComments
+    ? limitedComments
+    : limitedComments.slice(0, 3);
 
   return (
     <>
       <Header />
 
-      <section className="relative h-[70vh] sm:h-[60vh] w-full overflow-hidden">
-        <img
-          src={recipe.image}
-          alt={recipe.title}
-          className="absolute inset-0 w-full h-full object-cover"
-        />
-        <div className="absolute inset-0 bg-gradient-to-t from-[#7a1f2a]/70 via-[#7a1f2a]/30 to-transparent"></div>
+      {/* HERO */}
+      <section className="relative h-[60vh] sm:h-[65vh] w-full overflow-hidden">
+        {mainImageUrl && (
+          <img
+            src={mainImageUrl}
+            alt={recipe.title}
+            className="absolute inset-0 w-full h-full object-cover"
+          />
+        )}
+        <div className="absolute inset-0 bg-gradient-to-t from-[#7a1f2a]/75 via-[#7a1f2a]/30 to-transparent" />
+
         <div className="relative z-10 flex flex-col items-center justify-center text-center text-white h-full px-4">
-          <h1 className="text-4xl sm:text-5xl font-bold drop-shadow-md mb-2">
-            {recipe.title}
-          </h1>
+          <h1 className="text-3xl sm:text-5xl font-bold">{recipe.title}</h1>
 
           {recipe.category && (
-            <span className="inline-block bg-white/20 text-white backdrop-blur-md px-3 py-1 rounded-full text-xs sm:text-sm font-medium mb-4 border border-white/40">
+            <span className="inline-block bg-white/20 text-white px-4 py-1 rounded-full text-xs sm:text-sm mb-4 border border-white/40">
               {recipe.category}
             </span>
           )}
 
-          <p className="text-base sm:text-lg max-w-xl sm:max-w-2xl drop-shadow-sm px-2">
-            {recipe.description}
-          </p>
+          <p className="text-sm sm:text-lg max-w-2xl">{recipe.description}</p>
         </div>
       </section>
 
-      <section className="bg-[#fffaf6] py-14 px-4 sm:px-6">
-        <div className="max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-10 items-center">
-          <div>
-            <h2 className="text-xl sm:text-2xl font-bold text-[#7a1f2a] mb-4">
+      {/* THREE IMAGES */}
+      <section className="py-10 px-6" style={{ backgroundColor: sectionBg }}>
+        <div className="max-w-6xl mx-auto grid grid-cols-1 sm:grid-cols-3 gap-6">
+          {imageList.slice(0, 3).map((img, i) => (
+            <img
+              key={i}
+              src={buildImageUrl(img)}
+              alt={`extra ${i}`}
+              className="w-full h-56 object-cover rounded-xl shadow"
+            />
+          ))}
+        </div>
+      </section>
+
+      {/* WHY LOVE + INGREDIENTS + STEPS */}
+      <section className="py-16 px-6" style={{ backgroundColor: sectionBg }}>
+        <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-[2fr_1fr_1fr] gap-10">
+          {/* WHY */}
+          <div className="lg:pr-6 lg:border-r border-[#e0d3cd]">
+            <h2 className="text-2xl font-bold mb-4" style={{ color: titleColor }}>
               Why You’ll Love This Dish
             </h2>
-            <p className="text-gray-700 leading-relaxed mb-6">{recipe.whyLove}</p>
-            <div className="flex flex-wrap justify-center md:justify-start gap-3">
+            <p className="leading-relaxed mb-6" style={{ color: textColor }}>
+              {recipe.whyLove ||
+                "This dish is flavorful and simple—perfect for any day."}
+            </p>
+
+            <div className="flex gap-3 flex-wrap">
               <button
                 onClick={handleSave}
-                className="bg-[#7a1f2a] text-white px-5 py-2 rounded-lg hover:bg-[#a02a3d] transition"
+                className="px-5 py-2 rounded-lg text-white"
+                style={{ backgroundColor: "#7a1f2a" }}
               >
                 Save Recipe
               </button>
+
               <button
                 onClick={handleEdit}
-                className="border border-[#7a1f2a] text-[#7a1f2a] px-5 py-2 rounded-lg hover:bg-[#7a1f2a] hover:text-white transition"
+                className="border px-5 py-2 rounded-lg"
+                style={{ borderColor: "#7a1f2a", color: "#7a1f2a" }}
               >
                 Edit
               </button>
+
               <button
                 onClick={handleShare}
-                className="border border-[#7a1f2a] text-[#7a1f2a] px-5 py-2 rounded-lg hover:bg-[#7a1f2a] hover:text-white transition"
+                className="border px-5 py-2 rounded-lg"
+                style={{ borderColor: "#7a1f2a", color: "#7a1f2a" }}
               >
                 Share
               </button>
             </div>
           </div>
 
+          {/* INGREDIENTS */}
           <div>
-            <img
-              src={recipe.image}
-              alt={recipe.title}
-              className="rounded-xl shadow-md w-full object-cover"
-            />
-          </div>
-        </div>
-      </section>
-
-      <section className="py-14 px-4 sm:px-6 bg-[#fff8f0]">
-        <div className="max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-10">
-          <div>
-            <h2 className="text-xl sm:text-2xl font-bold text-[#7a1f2a] mb-4">Ingredients</h2>
-            <ul className="bg-white shadow rounded-xl p-5 space-y-2 text-gray-700 text-sm sm:text-base">
+            <h2 className="text-2xl font-bold mb-4" style={{ color: titleColor }}>
+              Ingredients
+            </h2>
+            <ul
+              className="shadow rounded-xl p-5 space-y-1 text-sm"
+              style={{ backgroundColor: cardBg, color: textColor }}
+            >
               {recipe.ingredients?.map((item, i) => (
                 <li key={i}>• {item}</li>
               ))}
             </ul>
           </div>
 
+          {/* STEPS */}
           <div>
-            <h2 className="text-xl sm:text-2xl font-bold text-[#7a1f2a] mb-4">Steps</h2>
-            <ol className="bg-white shadow rounded-xl p-5 space-y-2 text-gray-700 list-decimal list-inside text-sm sm:text-base">
+            <h2 className="text-2xl font-bold mb-4" style={{ color: titleColor }}>
+              Steps
+            </h2>
+            <ol
+              className="shadow rounded-xl p-5 space-y-1 text-sm list-decimal list-inside"
+              style={{ backgroundColor: cardBg, color: textColor }}
+            >
               {recipe.steps?.map((step, i) => (
                 <li key={i}>{step}</li>
               ))}
@@ -207,51 +326,104 @@ useEffect(() => {
         </div>
       </section>
 
-      <section className="bg-[#fff] py-14 px-4 sm:px-6 text-center">
-        <h2 className="text-xl sm:text-2xl font-bold text-[#7a1f2a] mb-10">Discover Similar Recipes</h2>
-        <div className="flex flex-wrap justify-center gap-6">
-          {recipe.similar?.map((sim, i) => (
-            <div
-              key={i}
-              onClick={() => navigate(`/recipe/${encodeURIComponent(sim.title)}`, { state: { recipe: sim } })}
-              className="w-60 sm:w-64 rounded-xl overflow-hidden shadow hover:shadow-lg transition hover:scale-105 cursor-pointer"
-            >
-              <img
-                src={sim.image}
-                alt={sim.title}
-                className="w-full h-40 object-cover"
-              />
-              <div className="bg-[#fffaf6] py-3 text-[#7a1f2a] font-medium">
-                {sim.title}
-              </div>
+      {/* SIMILAR RECIPES */}
+      <section className="py-16 px-6" style={{ backgroundColor: sectionBg }}>
+        <div className="max-w-6xl mx-auto text-center">
+          <h2
+            className="text-2xl font-bold mb-10"
+            style={{ color: titleColor }}
+          >
+            Discover Similar Recipes
+          </h2>
+
+          {similarRecipes.length > 0 ? (
+            <div className="flex flex-wrap justify-center gap-6">
+              {similarRecipes.map((sim, i) => (
+                <div
+                  key={i}
+                  onClick={() =>
+                    navigate(`/recipe/${encodeURIComponent(sim.title)}`)
+                  }
+                  className="w-64 rounded-xl overflow-hidden shadow hover:shadow-lg transition hover:scale-105 cursor-pointer"
+                  style={{ backgroundColor: cardBg }}
+                >
+                  {sim.image && (
+                    <img
+                      src={buildImageUrl(sim.image)}
+                      alt={sim.title}
+                      className="w-full h-40 object-cover"
+                    />
+                  )}
+                  <div className="py-3 font-medium" style={{ color: titleColor }}>
+                    {sim.title}
+                  </div>
+                </div>
+              ))}
             </div>
-          ))}
+          ) : (
+            <p style={{ color: textColor }}>No similar recipes available yet.</p>
+          )}
         </div>
       </section>
 
-      <section className="bg-[#fffaf6] py-14 px-4 sm:px-6 text-center">
-        <h2 className="text-xl sm:text-2xl font-bold text-[#7a1f2a] mb-8">Community Love</h2>
+      {/* FEEDBACK SECTION */}
+      <section className="py-16 px-6 text-center" style={{ backgroundColor: sectionBg }}>
+        <h2 className="text-2xl font-bold mb-10" style={{ color: titleColor }}>
+          Community Love
+        </h2>
 
         <div className="flex flex-wrap justify-center gap-6 mb-10">
-          {[
-            "So easy to follow — tastes like restaurant-quality!",
-            "Perfect weeknight dinner. Everyone loved it.",
-            "Simple, cozy, and absolutely delicious.",
-          ].map((text, index) => (
-            <div
-              key={index}
-              className="bg-white shadow rounded-xl max-w-xs sm:max-w-sm p-6 text-gray-700 text-sm sm:text-base"
-            >
-              <div className="flex justify-center mb-2 text-[#FFD700] text-lg sm:text-xl">
-                {"★★★★★"}
+          {visibleComments.length === 0 ? (
+            <p style={{ color: textColor }}>No feedback yet.</p>
+          ) : (
+            visibleComments.map((c, index) => (
+              <div
+                key={index}
+                className="rounded-xl max-w-xs p-6 text-left"
+                style={{ backgroundColor: cardBg, color: textColor }}
+              >
+                <div className="flex justify-center mb-2 text-xl">
+                  {[1, 2, 3, 4, 5].map((s) => (
+                    <span
+                      key={s}
+                      className={s <= (c.rating || 0) ? "text-[#FFD700]" : "text-gray-300"}
+                    >
+                      ★
+                    </span>
+                  ))}
+                </div>
+
+                {c.comment && <p className="italic text-sm">“{c.comment}”</p>}
+
+                {c.createdAt && (
+                  <p className="mt-3 text-xs opacity-70">
+                    {new Date(c.createdAt).toLocaleDateString()}
+                  </p>
+                )}
               </div>
-              <p className="italic">“{text}”</p>
-            </div>
-          ))}
+            ))
+          )}
         </div>
 
-        <div className="max-w-md mx-auto bg-white rounded-2xl shadow-lg p-6 text-left">
-          <h3 className="text-base sm:text-lg font-semibold text-[#7a1f2a] mb-4 text-center">
+        {limitedComments.length > 3 && (
+          <button
+            onClick={() => setShowAllComments((prev) => !prev)}
+            className="mb-10 text-sm underline"
+            style={{ color: titleColor }}
+          >
+            {showAllComments ? "Show less..." : "Show more..."}
+          </button>
+        )}
+
+        {/* Submit feedback */}
+        <div
+          className="max-w-md mx-auto rounded-2xl shadow-lg p-6 text-left"
+          style={{ backgroundColor: cardBg }}
+        >
+          <h3
+            className="text-lg font-semibold mb-4 text-center"
+            style={{ color: titleColor }}
+          >
             Share your experience ✍️
           </h3>
 
@@ -260,9 +432,9 @@ useEffect(() => {
               <span
                 key={star}
                 onClick={() => setRating(star)}
-                className={`cursor-pointer text-2xl sm:text-3xl ${
+                className={`cursor-pointer text-3xl ${
                   star <= rating ? "text-[#FFD700]" : "text-gray-300"
-                } transition`}
+                }`}
               >
                 ★
               </span>
@@ -270,16 +442,22 @@ useEffect(() => {
           </div>
 
           <textarea
-            placeholder="Write your feedback here..."
+            placeholder="Write your feedback..."
             value={feedback}
             onChange={(e) => setFeedback(e.target.value)}
-            className="w-full border border-gray-300 rounded-lg px-4 py-2 h-24 resize-none focus:outline-none focus:ring-2 focus:ring-[#7a1f2a] text-sm sm:text-base"
+            className="w-full border rounded-lg px-4 py-2 h-24 resize-none"
+            style={{
+              borderColor: theme === "dark" ? "#444" : "#ccc",
+              backgroundColor: cardBg,
+              color: textColor,
+            }}
           />
 
           <div className="text-center mt-5">
             <button
               onClick={handleFeedbackSubmit}
-              className="bg-[#7a1f2a] text-white px-6 py-2 rounded-lg hover:bg-[#a02a3d] transition text-sm sm:text-base"
+              className="px-6 py-2 rounded-lg"
+              style={{ backgroundColor: "#7a1f2a", color: "#fff" }}
             >
               Submit Feedback
             </button>
