@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 
 import AuthHeader from "./components/AuthHeader.jsx";
@@ -27,6 +27,30 @@ export default function SignUp() {
   const bgColor = theme === "dark" ? "#1e1e1e" : "#fff8f0";
   const textColor = theme === "dark" ? "#ddd" : "#444";
 
+  // auth check: if user already logged in (valid cookie), skip signup and send to home
+  useEffect(() => {
+    const checkAuth = async () => {
+      try {
+        const res = await fetch("http://localhost:5001/auth/check", {
+          credentials: "include", // include cookies so backend can read jwt
+        });
+
+        if (!res.ok) return; // not authenticated, user can stay on signup
+
+        const data = await res.json();
+
+        if (data.authenticated) {
+          // user is already logged in, no need to sign up again
+          navigate("/home");
+        }
+      } catch (err) {
+        console.error("auth check on signup failed", err);
+      }
+    };
+
+    checkAuth();
+  }, [navigate]);
+
   const handleSubmit = async (e) => {
     e.preventDefault(); // stop the page from refreshing
 
@@ -49,9 +73,10 @@ export default function SignUp() {
       setError("");
 
       // send signup request to backend
-      const res = await fetch("http://localhost:5000/signup", {
+      const res = await fetch("http://localhost:5001/signup", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
+        credentials: "include", // include cookies so backend can set auth cookie right after signup
         body: JSON.stringify({ name, email, password }),
       });
 
@@ -65,6 +90,7 @@ export default function SignUp() {
 
       // everything is good: user is created in the database
       // added a simple browser popup to confirm, then send them to the home page
+      // backend also keeps them logged in with a 30-day auth cookie
       window.alert("Account created successfully!");
       navigate("/home");
     } catch (err) {
@@ -96,7 +122,10 @@ export default function SignUp() {
             type="text"
             placeholder="Your name"
             value={name}
-            onChange={(e) => setName(e.target.value)}
+            onChange={(e) => {
+              setName(e.target.value);
+              if (error) setError(""); // clear error when user edits the form
+            }}
           />
 
           <InputField
@@ -104,7 +133,10 @@ export default function SignUp() {
             type="email"
             placeholder="you@example.com"
             value={email}
-            onChange={(e) => setEmail(e.target.value)}
+            onChange={(e) => {
+              setEmail(e.target.value);
+              if (error) setError("");
+            }}
           />
 
           <InputField
@@ -112,7 +144,10 @@ export default function SignUp() {
             type="password"
             placeholder="••••••••"
             value={password}
-            onChange={(e) => setPassword(e.target.value)}
+            onChange={(e) => {
+              setPassword(e.target.value);
+              if (error) setError("");
+            }}
           />
 
           {/* show any error message coming from validation or backend */}

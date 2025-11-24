@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react"; 
 import { useNavigate } from "react-router-dom";
 import { useTheme } from "../context/ThemeContext";
 
@@ -23,6 +23,30 @@ export default function LogIn() {
 
   const bgColor = theme === "dark" ? "#2a2a2a" : "#fff8f0";
 
+  // auth check: if user already logged in (valid cookie), skip login and send to home
+  useEffect(() => {
+    const checkAuth = async () => {
+      try {
+        const res = await fetch("http://localhost:5001/auth/check", {
+          credentials: "include", // include cookies so backend can read jwt
+        });
+
+        if (!res.ok) return; // not authenticated, user can stay on login
+
+        const data = await res.json();
+
+        if (data.authenticated) {
+          // user is already logged in, no need to log in again
+          navigate("/home");
+        }
+      } catch (err) {
+        console.error("auth check on login failed", err);
+      }
+    };
+
+    checkAuth();
+  }, [navigate]);
+
   const handleSubmit = async (e) => {
     e.preventDefault(); // stop the default form refresh
 
@@ -37,9 +61,10 @@ export default function LogIn() {
       setError("");
 
       // send login request to backend
-      const res = await fetch("http://localhost:5000/login", {
+      const res = await fetch("http://localhost:5001/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
+        credentials: "include", // include cookies so backend can set auth cookie for 30 days
         body: JSON.stringify({ email, password }),
       });
 
@@ -84,7 +109,10 @@ export default function LogIn() {
             type="email"
             placeholder="you@example.com"
             value={email}
-            onChange={(e) => setEmail(e.target.value)}
+            onChange={(e) => {
+              setEmail(e.target.value);
+              if (error) setError("");
+            }}
             theme={theme}
           />
 
@@ -93,7 +121,10 @@ export default function LogIn() {
             type="password"
             placeholder="••••••••"
             value={password}
-            onChange={(e) => setPassword(e.target.value)}
+            onChange={(e) => {
+              setPassword(e.target.value);
+              if (error) setError("");
+            }}
             theme={theme}
           />
 
