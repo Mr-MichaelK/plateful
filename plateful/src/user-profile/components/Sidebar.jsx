@@ -1,10 +1,18 @@
 //Made by Michael Kolanjian
-import { useTheme } from "../../context/ThemeContext";
-
 const ProfileIcon = () => (
-  <svg width="30px" height="30px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <svg
+    width="30px"
+    height="30px"
+    viewBox="0 0 24 24"
+    fill="none"
+    xmlns="http://www.w3.org/2000/svg"
+  >
     <g id="SVGRepo_bgCarrier" strokeWidth="0" />
-    <g id="SVGRepo_tracerCarrier" strokeLinecap="round" strokeLinejoin="round" />
+    <g
+      id="SVGRepo_tracerCarrier"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
     <g id="SVGRepo_iconCarrier">
       <path
         d="M22 12C22 6.49 17.51 2 12 2C6.49 2 2 6.49 2 12C2 14.9 3.25 17.51 5.23 19.34C5.23 19.35 5.23 19.35 5.22 19.36C5.32 19.46 5.44 19.54 5.54 19.63C5.6 19.68 5.65 19.73 5.71 19.77C5.89 19.92 6.09 20.06 6.28 20.2C6.35 20.25 6.41 20.29 6.48 20.34C6.67 20.47 6.87 20.59 7.08 20.7C7.15 20.74 7.23 20.79 7.3 20.83C7.5 20.94 7.71 21.04 7.93 21.13C8.01 21.17 8.09 21.21 8.17 21.24C8.39 21.33 8.61 21.41 8.83 21.48C8.91 21.51 8.99 21.54 9.07 21.56C9.31 21.63 9.55 21.69 9.79 21.75C9.86 21.77 9.93 21.79 10.01 21.8C10.29 21.86 10.57 21.9 10.86 21.93C10.9 21.93 10.94 21.94 10.98 21.95C11.32 21.98 11.66 22 12 22C12.34 22 12.68 21.98 13.01 21.95C13.05 21.95 13.09 21.94 13.13 21.93C13.42 21.9 13.7 21.86 13.98 21.8C14.05 21.79 14.12 21.76 14.2 21.75C14.44 21.69 14.69 21.64 14.92 21.56C15 21.53 15.08 21.5 15.16 21.48C15.38 21.4 15.61 21.33 15.82 21.24C15.9 21.21 15.98 21.17 16.06 21.13C16.27 21.04 16.48 20.94 16.69 20.83C16.77 20.79 16.84 20.74 16.91 20.7C17.11 20.58 17.31 20.47 17.51 20.34C17.58 20.3 17.64 20.25 17.71 20.2C17.91 20.06 18.1 19.92 18.28 19.77C18.34 19.72 18.39 19.67 18.45 19.63C18.56 19.54 18.67 19.45 18.77 19.36C18.77 19.35 18.77 19.35 18.76 19.34C20.75 17.51 22 14.9 22 12ZM16.94 16.97C14.23 15.15 9.79 15.15 7.06 16.97C6.62 17.26 6.26 17.6 5.96 17.97C4.44 16.43 3.5 14.32 3.5 12C3.5 7.31 7.31 3.5 12 3.5C16.69 3.5 20.5 7.31 20.5 12C20.5 14.32 19.56 16.43 18.04 17.97C17.75 17.6 17.38 17.26 16.94 16.97Z"
@@ -19,9 +27,19 @@ const ProfileIcon = () => (
 );
 
 const PasswordIcon = () => (
-  <svg width="25px" height="25px" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <svg
+    width="25px"
+    height="25px"
+    viewBox="0 0 16 16"
+    fill="none"
+    xmlns="http://www.w3.org/2000/svg"
+  >
     <g id="SVGRepo_bgCarrier" strokeWidth="0" />
-    <g id="SVGRepo_tracerCarrier" strokeLinecap="round" strokeLinejoin="round" />
+    <g
+      id="SVGRepo_tracerCarrier"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
     <g id="SVGRepo_iconCarrier">
       <path
         fillRule="evenodd"
@@ -34,24 +52,24 @@ const PasswordIcon = () => (
 );
 
 export default function Sidebar({ children }) {
-  const { theme } = useTheme();
   const pathname = window.location.pathname;
 
-  const pageBg = theme === "dark" ? "#2a2a2a" : "#fff8f0"; // cream background
-  const sidebarBg = theme === "dark" ? "#1f1f1f" : "#fff"; // sidebar white
-  const mainBg = theme === "dark" ? "#2a2a2a" : "#fff"; // main content white
-  const linkText = theme === "dark" ? "text-gray-400" : "text-gray-500";
-  const activeBg = "#7a1f2a";
-  const activeText = "text-white";
-
   return (
-    <div className="flex min-h-[calc(100vh-64px)] px-24 gap-6 items-start max-md:flex-col max-md:px-4 max-md:gap-4" style={{ backgroundColor: pageBg }}>
-      <aside className="w-[350px] rounded-lg p-6 flex-shrink-0 shadow-sm max-md:w-full" style={{ backgroundColor: sidebarBg }}>
+    <div className="flex min-h-[calc(100vh-64px)] text-[#7a1f2a] px-24 gap-6 items-start bg-[#fff8f0] max-md:flex-col max-md:px-4 max-md:gap-4">
+      <aside className="w-[350px] rounded-lg p-6 flex-shrink-0 bg-white shadow-sm max-md:w-full">
         <nav className="px-4 max-md:px-0">
           <ul className="list-none p-0 m-0 flex flex-col max-md:flex-row max-md:flex-wrap max-md:justify-center max-md:gap-2">
             {[
-              { name: "Profile", href: "/profile/user-info", icon: <ProfileIcon /> },
-              { name: "Password", href: "/profile/password", icon: <PasswordIcon /> },
+              {
+                name: "Profile",
+                href: "/profile/user-info",
+                icon: <ProfileIcon />,
+              },
+              {
+                name: "Password",
+                href: "/profile/password",
+                icon: <PasswordIcon />,
+              },
             ].map((item) => {
               const active = pathname === item.href;
               return (
@@ -60,11 +78,15 @@ export default function Sidebar({ children }) {
                     href={item.href}
                     className={`flex items-center gap-3 px-4 py-2 rounded-md font-medium transition-colors duration-200 ${
                       active
-                        ? `${activeText} bg-[${activeBg}]`
-                        : `${linkText} hover:bg-[#7a1f2a]/10 hover:text-[#7a1f2a]`
+                        ? "bg-[#7a1f2a] text-white"
+                        : "text-gray-500 hover:bg-[#7a1f2a]/10 hover:text-[#7a1f2a]"
                     }`}
                   >
-                    <span className={`transition-colors duration-200 ${active ? "text-white" : "text-gray-400"}`}>
+                    <span
+                      className={`${
+                        active ? "text-white" : "text-gray-400"
+                      } transition-colors duration-200`}
+                    >
                       {item.icon}
                     </span>
                     {item.name}
@@ -76,10 +98,9 @@ export default function Sidebar({ children }) {
         </nav>
       </aside>
 
-      <main className="flex-grow rounded-lg shadow-sm p-8 max-md:p-6" style={{ backgroundColor: mainBg }}>
+      <main className="flex-grow rounded-lg bg-white shadow-sm p-8 max-md:p-6">
         {children}
       </main>
     </div>
   );
 }
-

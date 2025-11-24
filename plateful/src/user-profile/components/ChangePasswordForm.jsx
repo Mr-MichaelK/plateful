@@ -1,11 +1,9 @@
 //Made by Michael Kolanjian
 import { useState } from "react";
-import { useTheme } from "../../context/ThemeContext"; // import your ThemeContext
 import eyeOpenIcon from "../../assets/eye-open.svg";
 import eyeClosedIcon from "../../assets/eye-closed.svg";
 
 export default function ChangePasswordForm() {
-  const { theme } = useTheme(); // get current theme
   const [showCurrentPassword, setShowCurrentPassword] = useState(false);
   const [showNewPassword, setShowNewPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
@@ -14,40 +12,25 @@ export default function ChangePasswordForm() {
     setter((prev) => !prev);
   };
 
-  // Theme-based colors
-  const bgColor = theme === "dark" ? "#2a2a2a" : "#fff8f0";
-  const borderColor = theme === "dark" ? "#555" : "#ccc";
-  const focusBorder = "#7a1f2a";
-  const textColor = theme === "dark" ? "#e5e5e5" : "#444";
-
   return (
-    <form className={`flex flex-col text-${textColor}`}>
+    <form className="flex flex-col text-gray-900">
       <h1 className="text-2xl font-semibold mb-2 text-[#7a1f2a]">
         Change Your Password
       </h1>
 
-      {/* Current Password */}
       <div className="mt-5">
         <label
           htmlFor="currentPassword"
-          className={`block font-semibold text-lg mb-3`}
-          style={{ color: textColor }}
+          className="block text-gray-700 font-semibold text-lg mb-3"
         >
           Current Password
         </label>
-        <div
-          className="flex items-center w-full rounded-md transition-colors"
-          style={{
-            backgroundColor: bgColor,
-            border: `1px solid ${borderColor}`,
-          }}
-        >
+        <div className="flex items-center w-full border border-gray-300 rounded-md bg-[#fff8f0] focus-within:border-[#7a1f2a] transition-colors">
           <input
             type={showCurrentPassword ? "text" : "password"}
             id="currentPassword"
             name="currentPassword"
-            className="w-full px-3 py-2 bg-transparent text-base focus:outline-none"
-            style={{ color: textColor }}
+            className="w-full px-3 py-2 bg-transparent text-gray-800 text-base focus:outline-none"
           />
           <span
             className="cursor-pointer pr-3 flex items-center justify-center"
@@ -63,28 +46,19 @@ export default function ChangePasswordForm() {
         </div>
       </div>
 
-      {/* New Password */}
       <div className="mt-5">
         <label
           htmlFor="newPassword"
-          className={`block font-semibold text-lg mb-3`}
-          style={{ color: textColor }}
+          className="block text-gray-700 font-semibold text-lg mb-3"
         >
           New Password
         </label>
-        <div
-          className="flex items-center w-full rounded-md transition-colors"
-          style={{
-            backgroundColor: bgColor,
-            border: `1px solid ${borderColor}`,
-          }}
-        >
+        <div className="flex items-center w-full border border-gray-300 rounded-md bg-[#fff8f0] focus-within:border-[#7a1f2a] transition-colors">
           <input
             type={showNewPassword ? "text" : "password"}
             id="newPassword"
             name="newPassword"
-            className="w-full px-3 py-2 bg-transparent text-base focus:outline-none"
-            style={{ color: textColor }}
+            className="w-full px-3 py-2 bg-transparent text-gray-800 text-base focus:outline-none"
           />
           <span
             className="cursor-pointer pr-3 flex items-center justify-center"
@@ -100,28 +74,19 @@ export default function ChangePasswordForm() {
         </div>
       </div>
 
-      {/* Confirm Password */}
       <div className="mt-5">
         <label
           htmlFor="confirmPassword"
-          className={`block font-semibold text-lg mb-3`}
-          style={{ color: textColor }}
+          className="block text-gray-700 font-semibold text-lg mb-3"
         >
           Confirm Password
         </label>
-        <div
-          className="flex items-center w-full rounded-md transition-colors"
-          style={{
-            backgroundColor: bgColor,
-            border: `1px solid ${borderColor}`,
-          }}
-        >
+        <div className="flex items-center w-full border border-gray-300 rounded-md bg-[#fff8f0] focus-within:border-[#7a1f2a] transition-colors">
           <input
             type={showConfirmPassword ? "text" : "password"}
             id="confirmPassword"
             name="confirmPassword"
-            className="w-full px-3 py-2 bg-transparent text-base focus:outline-none"
-            style={{ color: textColor }}
+            className="w-full px-3 py-2 bg-transparent text-gray-800 text-base focus:outline-none"
           />
           <span
             className="cursor-pointer pr-3 flex items-center justify-center"
@@ -139,15 +104,10 @@ export default function ChangePasswordForm() {
 
       <button
         type="submit"
-        className="mt-8 self-end px-6 py-2 rounded-md font-medium text-lg transition-colors"
-        style={{
-          backgroundColor: "#7a1f2a",
-          color: "#fff",
-        }}
+        className="mt-8 self-end px-6 py-2 rounded-md bg-[#7a1f2a] hover:bg-[#5c161f] text-white font-medium text-lg transition-colors"
       >
         Save
       </button>
     </form>
   );
 }
-

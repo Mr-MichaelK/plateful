@@ -1,20 +1,19 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { useTheme } from "../context/ThemeContext"; // Import ThemeContext
 
-// made by Nour Diab
+// made by nour diab
+
 const platefulLogo = new URL("/plateful-logo.svg", import.meta.url).href;
 
 export default function Splash() {
   const [fade, setFade] = useState("opacity-0");
   const navigate = useNavigate();
-  const { theme } = useTheme(); // Use theme
 
   useEffect(() => {
     const fadeIn = setTimeout(() => setFade("opacity-100"), 100);
 
-    // go to sign-up after 2.5s
-    const redirect = setTimeout(() => navigate("/home"), 2500);
+    // go to sign-up
+    const redirect = setTimeout(() => navigate("/sign-up"), 2500);
 
     return () => {
       clearTimeout(fadeIn);
@@ -22,14 +21,9 @@ export default function Splash() {
     };
   }, [navigate]);
 
-  // Theme-based background
-  const bgColor = theme === "dark" ? "#1a1a1a" : "#ffffff";
-
+  // white background and centering logo
   return (
-    <div
-      className="flex items-center justify-center h-screen transition-colors duration-500"
-      style={{ backgroundColor: bgColor }}
-    >
+    <div className="flex items-center justify-center h-screen bg-white">
       <img
         src={platefulLogo}
         alt="Plateful Logo"
