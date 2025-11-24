@@ -1,64 +1,28 @@
 //Made by Michael Kolanjian
-import { useTheme } from "../../context/ThemeContext";
 import trashIcon from "../../assets/trash-icon.svg";
 import repeatIcon from "../../assets/repeat-icon.svg";
 
 export default function DangerZoneSection() {
-  const { theme } = useTheme();
-
-  // Theme-based colors
-  const sectionBg = theme === "dark" ? "#2a2a2a" : "#fff8f0";
-  const sectionBorder = theme === "dark" ? "#555" : "#ccc";
-  const textColor = theme === "dark" ? "#e5e5e5" : "#444";
-  const subTextColor = theme === "dark" ? "#aaa" : "#666";
-  const dangerBtnBg = theme === "dark" ? "#7a1f2a" : "#7a1f2a";
-  const dangerBtnHover = theme === "dark" ? "#5c161f" : "#5c161f";
-  const resetBtnText = theme === "dark" ? "#f9c8c8" : "#7a1f2a";
-  const resetBtnHoverBg = theme === "dark" ? "#3a1a1a" : "#fff0e5";
-  const resetBtnBorder = theme === "dark" ? "#555" : "#ccc";
-
   return (
-    <section
-      className="flex flex-col rounded-xl p-4 md:p-8 shadow-sm transition-colors"
-      style={{
-        backgroundColor: sectionBg,
-        border: `1px solid ${sectionBorder}`,
-        color: textColor,
-      }}
-    >
-      <h1 className="text-2xl font-semibold mb-0" style={{ color: "#7a1f2a" }}>
+    <section className="flex flex-col bg-[#fff8f0] border border-gray-300 rounded-xl p-4 md:p-8 text-gray-900 shadow-sm">
+      <h1 className="text-2xl font-semibold mb-0 text-[#7a1f2a]">
         Danger Zone
       </h1>
-      <p className="text-base mb-6" style={{ color: subTextColor }}>
+      <p className="text-gray-600 text-base mb-6">
         Careful, these actions cannot be undone.
       </p>
 
-      {/* Reset Progress Button */}
-      <button
-        className="flex items-center gap-4 w-[200px] px-3 py-2 mb-4 rounded-md font-medium text-base transition-colors"
-        style={{
-          color: resetBtnText,
-          border: `1px solid ${resetBtnBorder}`,
-          backgroundColor: "transparent",
-        }}
-        onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = resetBtnHoverBg)}
-        onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = "transparent")}
-      >
-        <img src={repeatIcon} alt="Reset Progress Icon" width={25} height={25} />
+      <button className="flex items-center gap-4 w-[200px] px-3 py-2 mb-4 text-[#7a1f2a] border border-gray-400 rounded-md font-medium text-base hover:bg-[#fff0e5] transition-colors">
+        <img
+          src={repeatIcon}
+          alt="Reset Progress Icon"
+          width={25}
+          height={25}
+        />
         <p className="m-0 flex-grow text-left">Reset Progress</p>
       </button>
 
-      {/* Delete Account Button */}
-      <button
-        className="flex items-center gap-4 w-[200px] px-3 py-2 mb-4 rounded-md font-medium text-base transition-colors"
-        style={{
-          color: "#fff",
-          backgroundColor: dangerBtnBg,
-          border: `1px solid ${dangerBtnBg}`,
-        }}
-        onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = dangerBtnHover)}
-        onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = dangerBtnBg)}
-      >
+      <button className="flex items-center gap-4 w-[200px] px-3 py-2 mb-4 text-white bg-[#7a1f2a] border border-[#7a1f2a] rounded-md font-medium text-base hover:bg-[#5c161f] transition-colors">
         <img src={trashIcon} alt="Delete Account Icon" width={25} height={25} />
         <p className="m-0 flex-grow text-left">Delete Account</p>
       </button>
