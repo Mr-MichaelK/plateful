@@ -1,4 +1,4 @@
-// made by Noura Hajj Chehade, backend integration
+// made by Noura Hajj Chehade — backend image upload / stable version
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
@@ -16,12 +16,11 @@ function RecipeDetails() {
   const [allRecipes, setAllRecipes] = useState([]);
   const [comments, setComments] = useState([]);
   const [showAllComments, setShowAllComments] = useState(false);
-
   const [rating, setRating] = useState(0);
   const [feedback, setFeedback] = useState("");
   const [loading, setLoading] = useState(true);
 
-  // Remove /api from root to load images
+  // remove /api to load uploads correctly
   const API_ROOT = API_BASE_URL.replace(/\/api$/, "");
 
   const buildImageUrl = (imgPath) => {
@@ -30,38 +29,30 @@ function RecipeDetails() {
     return `${API_ROOT}${imgPath}`;
   };
 
+  // LOAD DATA
   useEffect(() => {
     const fetchData = async () => {
       try {
         setLoading(true);
         const decodedId = decodeURIComponent(id);
 
-        // ----- SINGLE RECIPE -----
-        const resRecipe = await fetch(
+        // Fetch recipe
+        const r = await fetch(
           `${API_BASE_URL}/recipes/${encodeURIComponent(decodedId)}`
         );
-        if (resRecipe.ok) {
-          const data = await resRecipe.json();
-          setRecipe(data);
-        }
+        if (r.ok) setRecipe(await r.json());
 
-        // ----- ALL RECIPES (SIMILAR) -----
-        const resAll = await fetch(`${API_BASE_URL}/recipes`);
-        if (resAll.ok) {
-          const all = await resAll.json();
-          setAllRecipes(all);
-        }
+        // Fetch all recipes (similar)
+        const all = await fetch(`${API_BASE_URL}/recipes`);
+        if (all.ok) setAllRecipes(await all.json());
 
-        // ----- COMMENTS -----
-        const resComments = await fetch(
+        // Fetch comments
+        const c = await fetch(
           `${API_BASE_URL}/comments/${encodeURIComponent(decodedId)}`
         );
-        if (resComments.ok) {
-          const cmts = await resComments.json();
-          setComments(cmts);
-        }
+        if (c.ok) setComments(await c.json());
       } catch (err) {
-        console.error("ERROR:", err);
+        console.error(err);
       } finally {
         setLoading(false);
         window.scrollTo(0, 0);
@@ -71,7 +62,7 @@ function RecipeDetails() {
     fetchData();
   }, [id]);
 
-  // ----------- LOADING -------------
+  // LOADING STATE
   if (loading) {
     return (
       <>
@@ -96,29 +87,46 @@ function RecipeDetails() {
     );
   }
 
-  // -------- IMAGE LOGIC ----------
-  // Support BOTH "images" array and "extraImages"
-  const imageList = [
-    recipe.image,
-    ...(recipe.images || []),
-    ...(recipe.extraImages || [])
-  ].filter(Boolean);
+  // ---------------------------------------------------
+  // ⭐ FIXED IMAGE LOGIC — NO DUPLICATES, CORRECT ORDER
+  // ---------------------------------------------------
+  const imageList = [];
+
+  // 1️⃣ Main image (always first)
+  if (recipe.image) {
+    imageList.push(recipe.image);
+  }
+
+  // 2️⃣ Full images array (new backend schema)
+  if (Array.isArray(recipe.images)) {
+    recipe.images.forEach((img) => {
+      if (!imageList.includes(img)) imageList.push(img);
+    });
+  }
+
+  // 3️⃣ Extra images (old backend schema)
+  if (Array.isArray(recipe.extraImages)) {
+    recipe.extraImages.forEach((img) => {
+      if (!imageList.includes(img)) imageList.push(img);
+    });
+  }
 
   const mainImageUrl = buildImageUrl(imageList[0]);
   const extraImages = imageList.slice(1);
 
-  // -------- SIMILAR RECIPES ----------
-  let similarRecipes = allRecipes.filter(
-    (r) => r.title !== recipe.title && r.category === recipe.category
-  );
-  similarRecipes = similarRecipes.sort(() => Math.random() - 0.5).slice(0, 3);
+  // SIMILAR RECIPES
+  let similarRecipes = allRecipes
+    .filter((r) => r.title !== recipe.title && r.category === recipe.category)
+    .sort(() => Math.random() - 0.5)
+    .slice(0, 3);
 
+  // COLORS
   const sectionBg = theme === "dark" ? "#1a1a1a" : "#fffaf6";
   const cardBg = theme === "dark" ? "#2a2a2a" : "#ffffff";
   const titleColor = theme === "dark" ? "#f9c8c8" : "#7a1f2a";
   const textColor = theme === "dark" ? "#e5e5e5" : "#444";
 
-  // ========== SAVE FAVORITE ==========
+  // SAVE FAVORITE
   const handleSave = async () => {
     try {
       const res = await fetch(
@@ -136,9 +144,7 @@ function RecipeDetails() {
         confirmButtonColor: "#7a1f2a",
       });
 
-      if (data.message !== "Already in favorites") {
-        navigate("/favorites");
-      }
+      if (data.message !== "Already in favorites") navigate("/favorites");
     } catch {
       Swal.fire({
         icon: "error",
@@ -164,7 +170,7 @@ function RecipeDetails() {
     } catch {}
   };
 
-  // ----------- FEEDBACK SUBMIT ----------
+  // SUBMIT FEEDBACK
   const handleFeedbackSubmit = async () => {
     if (!feedback && rating === 0) {
       Swal.fire({
@@ -240,7 +246,7 @@ function RecipeDetails() {
         </div>
       </section>
 
-      {/* THREE IMAGES */}
+      {/* 3 IMAGES */}
       <section className="py-10 px-6" style={{ backgroundColor: sectionBg }}>
         <div className="max-w-6xl mx-auto grid grid-cols-1 sm:grid-cols-3 gap-6">
           {imageList.slice(0, 3).map((img, i) => (
@@ -254,7 +260,7 @@ function RecipeDetails() {
         </div>
       </section>
 
-      {/* WHY LOVE + INGREDIENTS + STEPS */}
+      {/* WHY / INGREDIENTS / STEPS */}
       <section className="py-16 px-6" style={{ backgroundColor: sectionBg }}>
         <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-[2fr_1fr_1fr] gap-10">
           {/* WHY */}
@@ -326,7 +332,7 @@ function RecipeDetails() {
         </div>
       </section>
 
-      {/* SIMILAR RECIPES */}
+      {/* SIMILAR */}
       <section className="py-16 px-6" style={{ backgroundColor: sectionBg }}>
         <div className="max-w-6xl mx-auto text-center">
           <h2
@@ -366,7 +372,7 @@ function RecipeDetails() {
         </div>
       </section>
 
-      {/* FEEDBACK SECTION */}
+      {/* FEEDBACK */}
       <section className="py-16 px-6 text-center" style={{ backgroundColor: sectionBg }}>
         <h2 className="text-2xl font-bold mb-10" style={{ color: titleColor }}>
           Community Love
@@ -386,7 +392,9 @@ function RecipeDetails() {
                   {[1, 2, 3, 4, 5].map((s) => (
                     <span
                       key={s}
-                      className={s <= (c.rating || 0) ? "text-[#FFD700]" : "text-gray-300"}
+                      className={
+                        s <= (c.rating || 0) ? "text-[#FFD700]" : "text-gray-300"
+                      }
                     >
                       ★
                     </span>
