@@ -87,12 +87,29 @@ function RecipeDetails() {
     );
   }
 
-  // IMAGE LOGIC
-  const imageList = [
-    recipe.image,
-    ...(recipe.images || []),
-    ...(recipe.extraImages || [])
-  ].filter(Boolean);
+  // ---------------------------------------------------
+  // ⭐ FIXED IMAGE LOGIC — NO DUPLICATES, CORRECT ORDER
+  // ---------------------------------------------------
+  const imageList = [];
+
+  // 1️⃣ Main image (always first)
+  if (recipe.image) {
+    imageList.push(recipe.image);
+  }
+
+  // 2️⃣ Full images array (new backend schema)
+  if (Array.isArray(recipe.images)) {
+    recipe.images.forEach((img) => {
+      if (!imageList.includes(img)) imageList.push(img);
+    });
+  }
+
+  // 3️⃣ Extra images (old backend schema)
+  if (Array.isArray(recipe.extraImages)) {
+    recipe.extraImages.forEach((img) => {
+      if (!imageList.includes(img)) imageList.push(img);
+    });
+  }
 
   const mainImageUrl = buildImageUrl(imageList[0]);
   const extraImages = imageList.slice(1);
@@ -375,7 +392,9 @@ function RecipeDetails() {
                   {[1, 2, 3, 4, 5].map((s) => (
                     <span
                       key={s}
-                      className={s <= (c.rating || 0) ? "text-[#FFD700]" : "text-gray-300"}
+                      className={
+                        s <= (c.rating || 0) ? "text-[#FFD700]" : "text-gray-300"
+                      }
                     >
                       ★
                     </span>
