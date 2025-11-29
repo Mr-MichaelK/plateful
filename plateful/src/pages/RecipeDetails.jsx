@@ -1,16 +1,18 @@
-// made by Noura Hajj Chehade — backend image upload / stable version
+// made by Noura Hajj Chehade — FINAL STRICT MODE (auth + owner logic)
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
 import Header from "../shared-components/Header";
 import Footer from "../components/Footer";
 import { useTheme } from "../context/ThemeContext";
+import { useAuth } from "../Auth/AuthContext";
 import { API_BASE_URL } from "../apiConfig";
 
 function RecipeDetails() {
   const { id } = useParams();
   const navigate = useNavigate();
   const { theme } = useTheme();
+  const { user, loading: authLoading } = useAuth();
 
   const [recipe, setRecipe] = useState(null);
   const [allRecipes, setAllRecipes] = useState([]);
@@ -20,54 +22,44 @@ function RecipeDetails() {
   const [feedback, setFeedback] = useState("");
   const [loading, setLoading] = useState(true);
 
-  // remove /api to load uploads correctly
   const API_ROOT = API_BASE_URL.replace(/\/api$/, "");
+  const buildImageUrl = (imgPath) =>
+    !imgPath ? "" : imgPath.startsWith("http") ? imgPath : `${API_ROOT}${imgPath}`;
 
-  const buildImageUrl = (imgPath) => {
-    if (!imgPath) return "";
-    if (imgPath.startsWith("http")) return imgPath;
-    return `${API_ROOT}${imgPath}`;
-  };
+  // WAIT FOR AUTH
+  if (authLoading) return null;
 
   // LOAD DATA
   useEffect(() => {
-    const fetchData = async () => {
+    const loadData = async () => {
       try {
         setLoading(true);
-        const decodedId = decodeURIComponent(id);
+        const decoded = decodeURIComponent(id);
 
-        // Fetch recipe
-        const r = await fetch(
-          `${API_BASE_URL}/recipes/${encodeURIComponent(decodedId)}`
-        );
+        const r = await fetch(`${API_BASE_URL}/recipes/${encodeURIComponent(decoded)}`);
         if (r.ok) setRecipe(await r.json());
 
-        // Fetch all recipes (similar)
         const all = await fetch(`${API_BASE_URL}/recipes`);
         if (all.ok) setAllRecipes(await all.json());
 
-        // Fetch comments
-        const c = await fetch(
-          `${API_BASE_URL}/comments/${encodeURIComponent(decodedId)}`
-        );
+        const c = await fetch(`${API_BASE_URL}/comments/${encodeURIComponent(decoded)}`);
         if (c.ok) setComments(await c.json());
-      } catch (err) {
-        console.error(err);
+      } catch (e) {
+        console.error(e);
       } finally {
         setLoading(false);
         window.scrollTo(0, 0);
       }
     };
 
-    fetchData();
+    loadData();
   }, [id]);
 
-  // LOADING STATE
   if (loading) {
     return (
       <>
         <Header />
-        <section className="py-20 text-center min-h-screen flex items-center justify-center">
+        <section className="py-20 min-h-screen flex items-center justify-center">
           <h2 className="text-2xl font-bold">Loading recipe…</h2>
         </section>
         <Footer />
@@ -79,7 +71,7 @@ function RecipeDetails() {
     return (
       <>
         <Header />
-        <section className="py-20 text-center min-h-screen flex items-center justify-center">
+        <section className="py-20 min-h-screen flex items-center justify-center">
           <h2 className="text-2xl font-bold">Recipe not found</h2>
         </section>
         <Footer />
@@ -87,97 +79,128 @@ function RecipeDetails() {
     );
   }
 
-  // ---------------------------------------------------
-  // ⭐ FIXED IMAGE LOGIC — NO DUPLICATES, CORRECT ORDER
-  // ---------------------------------------------------
+  // OWNER CHECK
+  const isOwner = user && user.email === recipe.ownerEmail;
+
+  // IMAGES
   const imageList = [];
-
-  // 1️⃣ Main image (always first)
-  if (recipe.image) {
-    imageList.push(recipe.image);
-  }
-
-  // 2️⃣ Full images array (new backend schema)
+  if (recipe.image) imageList.push(recipe.image);
   if (Array.isArray(recipe.images)) {
-    recipe.images.forEach((img) => {
-      if (!imageList.includes(img)) imageList.push(img);
-    });
+    recipe.images.forEach((img) => img && !imageList.includes(img) && imageList.push(img));
   }
-
-  // 3️⃣ Extra images (old backend schema)
   if (Array.isArray(recipe.extraImages)) {
-    recipe.extraImages.forEach((img) => {
-      if (!imageList.includes(img)) imageList.push(img);
-    });
+    recipe.extraImages.forEach((img) => img && !imageList.includes(img) && imageList.push(img));
   }
 
   const mainImageUrl = buildImageUrl(imageList[0]);
-  const extraImages = imageList.slice(1);
 
   // SIMILAR RECIPES
-  let similarRecipes = allRecipes
+  const similarRecipes = allRecipes
     .filter((r) => r.title !== recipe.title && r.category === recipe.category)
     .sort(() => Math.random() - 0.5)
     .slice(0, 3);
 
-  // COLORS
   const sectionBg = theme === "dark" ? "#1a1a1a" : "#fffaf6";
   const cardBg = theme === "dark" ? "#2a2a2a" : "#ffffff";
   const titleColor = theme === "dark" ? "#f9c8c8" : "#7a1f2a";
   const textColor = theme === "dark" ? "#e5e5e5" : "#444";
 
-  // SAVE FAVORITE
+  // SAVE
   const handleSave = async () => {
+    if (!user) {
+      Swal.fire({ icon: "info", title: "Please log in to save recipes" });
+      return;
+    }
+
     try {
       const res = await fetch(
         `${API_BASE_URL}/favorites/${encodeURIComponent(recipe.title)}`,
-        { method: "POST" }
+        { method: "POST", credentials: "include" }
       );
       const data = await res.json();
 
+      if (!res.ok) {
+        Swal.fire({ icon: "error", title: data.error || "Error saving recipe" });
+        return;
+      }
+
+      Swal.fire({ icon: "success", title: "Recipe saved!" });
+      navigate("/favorites");
+    } catch {
+      Swal.fire({ icon: "error", title: "Error saving recipe" });
+    }
+  };
+
+  // EDIT
+  const handleEdit = () => {
+    if (isOwner) navigate(`/add?title=${encodeURIComponent(recipe.title)}`);
+  };
+
+  // DELETE
+  const handleDelete = async () => {
+    if (!isOwner) return;
+
+    Swal.fire({
+      icon: "warning",
+      title: "Delete this recipe?",
+      showCancelButton: true,
+      confirmButtonColor: "#7a1f2a",
+    }).then(async (result) => {
+      if (!result.isConfirmed) return;
+
+      try {
+        const res = await fetch(
+          `${API_BASE_URL}/recipes/${encodeURIComponent(recipe.title)}`,
+          { method: "DELETE", credentials: "include" }
+        );
+
+        if (!res.ok) {
+          const data = await res.json();
+          Swal.fire({ icon: "error", title: data.error || "Failed to delete" });
+          return;
+        }
+
+        Swal.fire({ icon: "success", title: "Recipe deleted!" });
+        navigate("/recipes");
+      } catch {
+        Swal.fire({ icon: "error", title: "Failed to delete" });
+      }
+    });
+  };
+
+  // ⭐ SHARE FEATURE
+  const handleShare = async () => {
+    const url = window.location.href;
+
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: recipe.title,
+          text: "Check out this recipe on Plateful!",
+          url,
+        });
+      } catch (err) {
+        console.log("Share cancelled");
+      }
+    } else {
+      navigator.clipboard.writeText(url);
       Swal.fire({
         icon: "success",
-        title:
-          data.message === "Already in favorites"
-            ? "Already Saved"
-            : "Recipe Saved!",
-        confirmButtonColor: "#7a1f2a",
-      });
-
-      if (data.message !== "Already in favorites") navigate("/favorites");
-    } catch {
-      Swal.fire({
-        icon: "error",
-        title: "Error",
-        text: "Could not save recipe.",
+        title: "Link copied!",
+        text: "You can now share it anywhere.",
         confirmButtonColor: "#7a1f2a",
       });
     }
   };
 
-  const handleEdit = () => {
-    navigate(`/add?title=${encodeURIComponent(recipe.title)}`);
-  };
-
-  const handleShare = async () => {
-    try {
-      await navigator.clipboard.writeText(window.location.href);
-      Swal.fire({
-        icon: "info",
-        title: "Link copied!",
-        confirmButtonColor: "#7a1f2a",
-      });
-    } catch {}
-  };
-
-  // SUBMIT FEEDBACK
+  // FEEDBACK
   const handleFeedbackSubmit = async () => {
+    if (!user) {
+      Swal.fire({ icon: "info", title: "Log in to leave feedback" });
+      return;
+    }
     if (!feedback && rating === 0) {
-      Swal.fire({
-        icon: "warning",
-        title: "Add rating or comment first",
-        confirmButtonColor: "#7a1f2a",
-      });
+      Swal.fire({ icon: "warning", title: "Add rating or comment first" });
       return;
     }
 
@@ -186,135 +209,120 @@ function RecipeDetails() {
         `${API_BASE_URL}/comments/${encodeURIComponent(recipe.title)}`,
         {
           method: "POST",
+          credentials: "include",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ rating, comment: feedback }),
         }
       );
 
       const data = await res.json();
-      if (data.comment) {
-        setComments((prev) => [data.comment, ...prev].slice(0, 6));
+
+      if (!res.ok) {
+        Swal.fire({ icon: "error", title: data.error || "Couldn't send feedback" });
+        return;
       }
 
-      Swal.fire({
-        icon: "success",
-        title: "Thank you!",
-        confirmButtonColor: "#7a1f2a",
-      });
+      if (data.comment)
+        setComments((prev) => [data.comment, ...prev].slice(0, 6));
 
+      Swal.fire({ icon: "success", title: "Thank you!" });
       setRating(0);
       setFeedback("");
-    } catch (err) {
-      Swal.fire({
-        icon: "error",
-        title: "Couldn't send feedback",
-        confirmButtonColor: "#7a1f2a",
-      });
+    } catch {
+      Swal.fire({ icon: "error", title: "Couldn't send feedback" });
     }
   };
 
   const limitedComments = comments.slice(0, 6);
-  const visibleComments = showAllComments
-    ? limitedComments
-    : limitedComments.slice(0, 3);
+  const visibleComments = showAllComments ? limitedComments : limitedComments.slice(0, 3);
 
   return (
     <>
       <Header />
 
       {/* HERO */}
-      <section className="relative h-[60vh] sm:h-[65vh] w-full overflow-hidden">
+      <section className="relative h-[60vh] sm:h-[65vh] overflow-hidden">
         {mainImageUrl && (
-          <img
-            src={mainImageUrl}
-            alt={recipe.title}
-            className="absolute inset-0 w-full h-full object-cover"
-          />
+          <img src={mainImageUrl} alt={recipe.title} className="absolute inset-0 w-full h-full object-cover" />
         )}
-        <div className="absolute inset-0 bg-gradient-to-t from-[#7a1f2a]/75 via-[#7a1f2a]/30 to-transparent" />
-
-        <div className="relative z-10 flex flex-col items-center justify-center text-center text-white h-full px-4">
+        <div className="absolute inset-0 bg-gradient-to-t from-[#7a1f2a]/75 to-transparent" />
+        <div className="relative z-10 flex flex-col items-center justify-center text-white text-center h-full px-4">
           <h1 className="text-3xl sm:text-5xl font-bold">{recipe.title}</h1>
-
           {recipe.category && (
-            <span className="inline-block bg-white/20 text-white px-4 py-1 rounded-full text-xs sm:text-sm mb-4 border border-white/40">
+            <span className="bg-white/20 px-4 py-1 rounded-full text-xs sm:text-sm mb-3 border border-white/40">
               {recipe.category}
             </span>
           )}
-
-          <p className="text-sm sm:text-lg max-w-2xl">{recipe.description}</p>
+          <p className="max-w-2xl text-sm sm:text-lg">{recipe.description}</p>
         </div>
       </section>
 
-      {/* 3 IMAGES */}
-      <section className="py-10 px-6" style={{ backgroundColor: sectionBg }}>
-        <div className="max-w-6xl mx-auto grid grid-cols-1 sm:grid-cols-3 gap-6">
-          {imageList.slice(0, 3).map((img, i) => (
-            <img
-              key={i}
-              src={buildImageUrl(img)}
-              alt={`extra ${i}`}
-              className="w-full h-56 object-cover rounded-xl shadow"
-            />
-          ))}
-        </div>
-      </section>
-
-      {/* WHY / INGREDIENTS / STEPS */}
+      {/* DETAILS */}
       <section className="py-16 px-6" style={{ backgroundColor: sectionBg }}>
         <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-[2fr_1fr_1fr] gap-10">
-          {/* WHY */}
-          <div className="lg:pr-6 lg:border-r border-[#e0d3cd]">
-            <h2
-              className="text-2xl font-bold mb-4"
-              style={{ color: titleColor }}
-            >
+
+          {/* WHY + BUTTONS */}
+          <div className="lg:border-r border-[#e0d3cd] lg:pr-6">
+            <h2 className="text-2xl font-bold mb-4" style={{ color: titleColor }}>
               Why You’ll Love This Dish
             </h2>
-            <p className="leading-relaxed mb-6" style={{ color: textColor }}>
-              {recipe.whyLove ||
-                "This dish is flavorful and simple—perfect for any day."}
+            <p className="mb-6 leading-relaxed" style={{ color: textColor }}>
+              {recipe.whyLove || "This dish is flavorful and easy to prepare!"}
             </p>
 
-            <div className="flex gap-3 flex-wrap">
-              <button
-                onClick={handleSave}
-                className="px-5 py-2 rounded-lg text-white cursor-pointer"
-                style={{ backgroundColor: "#7a1f2a" }}
-              >
-                Save Recipe
-              </button>
+            {user ? (
+              <div className="flex flex-wrap gap-3">
 
-              <button
-                onClick={handleEdit}
-                className="border px-5 py-2 rounded-lg cursor-pointer"
-                style={{ borderColor: "#7a1f2a", color: "#7a1f2a" }}
-              >
-                Edit
-              </button>
+                {/* SAVE */}
+                <button
+                  onClick={handleSave}
+                  className="px-5 py-2 rounded-lg text-white"
+                  style={{ backgroundColor: "#7a1f2a" }}
+                >
+                  Save
+                </button>
 
-              <button
-                onClick={handleShare}
-                className="border px-5 py-2 rounded-lg cursor-pointer"
-                style={{ borderColor: "#7a1f2a", color: "#7a1f2a" }}
-              >
-                Share
-              </button>
-            </div>
+                {/* SHARE (always available to logged-in users) */}
+                <button
+                  onClick={handleShare}
+                  className="px-5 py-2 rounded-lg border"
+                  style={{ borderColor: "#7a1f2a", color: "#7a1f2a" }}
+                >
+                  Share
+                </button>
+
+                {/* OWNER BUTTONS */}
+                {isOwner && (
+                  <>
+                    <button
+                      onClick={handleEdit}
+                      className="px-5 py-2 rounded-lg border"
+                      style={{ borderColor: "#7a1f2a", color: "#7a1f2a" }}
+                    >
+                      Edit
+                    </button>
+
+                    <button
+                      onClick={handleDelete}
+                      className="px-5 py-2 rounded-lg border"
+                      style={{ borderColor: "#7a1f2a", color: "#7a1f2a" }}
+                    >
+                      Delete
+                    </button>
+                  </>
+                )}
+              </div>
+            ) : (
+              <p className="italic mt-4 text-sm" style={{ color: textColor }}>
+                Log in to save, share, or leave feedback.
+              </p>
+            )}
           </div>
 
           {/* INGREDIENTS */}
           <div>
-            <h2
-              className="text-2xl font-bold mb-4"
-              style={{ color: titleColor }}
-            >
-              Ingredients
-            </h2>
-            <ul
-              className="shadow rounded-xl p-5 space-y-1 text-sm"
-              style={{ backgroundColor: cardBg, color: textColor }}
-            >
+            <h2 className="text-2xl font-bold mb-4" style={{ color: titleColor }}>Ingredients</h2>
+            <ul className="p-5 shadow rounded-xl space-y-1 text-sm" style={{ backgroundColor: cardBg, color: textColor }}>
               {recipe.ingredients?.map((item, i) => (
                 <li key={i}>• {item}</li>
               ))}
@@ -323,16 +331,8 @@ function RecipeDetails() {
 
           {/* STEPS */}
           <div>
-            <h2
-              className="text-2xl font-bold mb-4"
-              style={{ color: titleColor }}
-            >
-              Steps
-            </h2>
-            <ol
-              className="shadow rounded-xl p-5 space-y-1 text-sm list-decimal list-inside"
-              style={{ backgroundColor: cardBg, color: textColor }}
-            >
+            <h2 className="text-2xl font-bold mb-4" style={{ color: titleColor }}>Steps</h2>
+            <ol className="p-5 shadow rounded-xl text-sm space-y-1 list-decimal list-inside" style={{ backgroundColor: cardBg, color: textColor }}>
               {recipe.steps?.map((step, i) => (
                 <li key={i}>{step}</li>
               ))}
@@ -341,13 +341,10 @@ function RecipeDetails() {
         </div>
       </section>
 
-      {/* SIMILAR */}
+      {/* SIMILAR RECIPES */}
       <section className="py-16 px-6" style={{ backgroundColor: sectionBg }}>
         <div className="max-w-6xl mx-auto text-center">
-          <h2
-            className="text-2xl font-bold mb-10"
-            style={{ color: titleColor }}
-          >
+          <h2 className="text-2xl font-bold mb-10" style={{ color: titleColor }}>
             Discover Similar Recipes
           </h2>
 
@@ -356,41 +353,27 @@ function RecipeDetails() {
               {similarRecipes.map((sim, i) => (
                 <div
                   key={i}
-                  onClick={() =>
-                    navigate(`/recipe/${encodeURIComponent(sim.title)}`)
-                  }
-                  className="w-64 rounded-xl overflow-hidden shadow hover:shadow-lg transition hover:scale-105 cursor-pointer"
+                  onClick={() => navigate(`/recipe/${encodeURIComponent(sim.title)}`)}
+                  className="w-64 cursor-pointer rounded-xl shadow overflow-hidden hover:scale-105 transition"
                   style={{ backgroundColor: cardBg }}
                 >
                   {sim.image && (
-                    <img
-                      src={buildImageUrl(sim.image)}
-                      alt={sim.title}
-                      className="w-full h-40 object-cover"
-                    />
+                    <img src={buildImageUrl(sim.image)} className="w-full h-40 object-cover" />
                   )}
-                  <div
-                    className="py-3 font-medium"
-                    style={{ color: titleColor }}
-                  >
+                  <div className="py-3 font-medium" style={{ color: titleColor }}>
                     {sim.title}
                   </div>
                 </div>
               ))}
             </div>
           ) : (
-            <p style={{ color: textColor }}>
-              No similar recipes available yet.
-            </p>
+            <p style={{ color: textColor }}>No similar recipes yet.</p>
           )}
         </div>
       </section>
 
       {/* FEEDBACK */}
-      <section
-        className="py-16 px-6 text-center"
-        style={{ backgroundColor: sectionBg }}
-      >
+      <section className="py-16 px-6 text-center" style={{ backgroundColor: sectionBg }}>
         <h2 className="text-2xl font-bold mb-10" style={{ color: titleColor }}>
           Community Love
         </h2>
@@ -399,29 +382,16 @@ function RecipeDetails() {
           {visibleComments.length === 0 ? (
             <p style={{ color: textColor }}>No feedback yet.</p>
           ) : (
-            visibleComments.map((c, index) => (
-              <div
-                key={index}
-                className="rounded-xl max-w-xs p-6 text-left"
-                style={{ backgroundColor: cardBg, color: textColor }}
-              >
-                <div className="flex justify-center mb-2 text-xl">
-                  {[1, 2, 3, 4, 5].map((s) => (
-                    <span
-                      key={s}
-                      className={
-                        s <= (c.rating || 0)
-                          ? "text-[#FFD700]"
-                          : "text-gray-300"
-                      }
-                    >
+            visibleComments.map((c, i) => (
+              <div key={i} className="max-w-xs p-6 rounded-xl" style={{ backgroundColor: cardBg, color: textColor }}>
+                <div className="flex justify-center text-xl mb-2">
+                  {[1,2,3,4,5].map((s) => (
+                    <span key={s} className={s <= (c.rating || 0) ? "text-[#FFD700]" : "text-gray-300"}>
                       ★
                     </span>
                   ))}
                 </div>
-
                 {c.comment && <p className="italic text-sm">“{c.comment}”</p>}
-
                 {c.createdAt && (
                   <p className="mt-3 text-xs opacity-70">
                     {new Date(c.createdAt).toLocaleDateString()}
@@ -432,64 +402,62 @@ function RecipeDetails() {
           )}
         </div>
 
+        {/* TOGGLE */}
         {limitedComments.length > 3 && (
           <button
-            onClick={() => setShowAllComments((prev) => !prev)}
-            className="mb-10 text-sm underline cursor-pointer"
+            onClick={() => setShowAllComments((x) => !x)}
+            className="text-sm underline cursor-pointer mb-10"
             style={{ color: titleColor }}
           >
             {showAllComments ? "Show less..." : "Show more..."}
           </button>
         )}
 
-        {/* Submit feedback */}
-        <div
-          className="max-w-md mx-auto rounded-2xl shadow-lg p-6 text-left"
-          style={{ backgroundColor: cardBg }}
-        >
-          <h3
-            className="text-lg font-semibold mb-4 text-center"
-            style={{ color: titleColor }}
-          >
-            Share your experience ✍️
-          </h3>
+        {/* FEEDBACK FORM */}
+        {user && (
+          <div className="max-w-md mx-auto p-6 rounded-2xl shadow-lg" style={{ backgroundColor: cardBg }}>
+            <h3 className="text-lg font-semibold text-center mb-4" style={{ color: titleColor }}>
+              Share your experience ✍️
+            </h3>
 
-          <div className="flex justify-center mb-4">
-            {[1, 2, 3, 4, 5].map((star) => (
-              <span
-                key={star}
-                onClick={() => setRating(star)}
-                className={`cursor-pointer text-3xl ${
-                  star <= rating ? "text-[#FFD700]" : "text-gray-300"
-                }`}
+            {/* STARS */}
+            <div className="flex justify-center mb-4">
+              {[1,2,3,4,5].map((star) => (
+                <span
+                  key={star}
+                  onClick={() => setRating(star)}
+                  className={`cursor-pointer text-3xl ${
+                    star <= rating ? "text-[#FFD700]" : "text-gray-300"
+                  }`}
+                >
+                  ★
+                </span>
+              ))}
+            </div>
+
+            <textarea
+              placeholder="Write your feedback..."
+              value={feedback}
+              onChange={(e) => setFeedback(e.target.value)}
+              className="w-full border rounded-lg px-4 py-2 h-24 resize-none"
+              style={{
+                backgroundColor: cardBg,
+                color: textColor,
+                borderColor: theme === "dark" ? "#444" : "#ccc",
+              }}
+            />
+
+            <div className="text-center mt-5">
+              <button
+                onClick={handleFeedbackSubmit}
+                className="px-6 py-2 rounded-lg text-white"
+                style={{ backgroundColor: "#7a1f2a" }}
               >
-                ★
-              </span>
-            ))}
+                Submit Feedback
+              </button>
+            </div>
           </div>
-
-          <textarea
-            placeholder="Write your feedback..."
-            value={feedback}
-            onChange={(e) => setFeedback(e.target.value)}
-            className="w-full border rounded-lg px-4 py-2 h-24 resize-none"
-            style={{
-              borderColor: theme === "dark" ? "#444" : "#ccc",
-              backgroundColor: cardBg,
-              color: textColor,
-            }}
-          />
-
-          <div className="text-center mt-5">
-            <button
-              onClick={handleFeedbackSubmit}
-              className="px-6 py-2 rounded-lg cursor-pointer"
-              style={{ backgroundColor: "#7a1f2a", color: "#fff" }}
-            >
-              Submit Feedback
-            </button>
-          </div>
-        </div>
+        )}
       </section>
 
       <Footer />

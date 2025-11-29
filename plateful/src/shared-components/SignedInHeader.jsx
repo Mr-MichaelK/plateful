@@ -1,18 +1,23 @@
 import React, { useState } from "react";
 import { Menu, X, Sun, Moon } from "lucide-react";
 import { useTheme } from "../context/ThemeContext";
+import { useAuth } from "../Auth/AuthContext";
+import { Link } from "react-router-dom";          // FIXED
 import logo from "../../public/plateful-logo.svg";
 import profilePic from "../assets/profile-placeholder.svg";
 
-// made by Michael Kolanjian and Adam Abdel Karim
-// mobile menu and responsiveness added by Noura Hajj Chehade
 export default function SignedInHeader({ userProfilePicUrl }) {
   const [menuOpen, setMenuOpen] = useState(false);
   const [isDropdownOpen, setDropdownOpen] = useState(false);
   const { theme, toggleTheme } = useTheme();
+  const { logout } = useAuth();
 
   const toggleDropdown = () => setDropdownOpen((prev) => !prev);
-  const handleSignOut = () => console.log("Sign out logic here");
+
+  const handleSignOut = async () => {
+    await logout();
+    window.location.href = "/";
+  };
 
   const links = [
     { name: "Home", href: "/home" },
@@ -23,31 +28,27 @@ export default function SignedInHeader({ userProfilePicUrl }) {
     { name: "Contact", href: "/contact" },
   ];
 
-  // subtle dark colors
-// dark mode colors (Darker!)
-const bgColor = theme === "dark" ? "#1a1a1a" : "#fff8f0"; 
-const textColor = theme === "dark" ? "#f2d8d8" : "#7a1f2a";
-const borderColor = theme === "dark" ? "#7a1f2a" : "#7a1f2a"; // consistent brand
-const hoverBg = theme === "dark" ? "#2a2a2a" : "#f5eee4";
-const dropdownBg = theme === "dark" ? "#1f1f1f" : "#fff0e5";
-
+  const bgColor = theme === "dark" ? "#1a1a1a" : "#fff8f0";
+  const textColor = theme === "dark" ? "#f2d8d8" : "#7a1f2a";
+  const borderColor = "#7a1f2a";
+  const dropdownBg = theme === "dark" ? "#1f1f1f" : "#fff0e5";
 
   return (
     <>
       <header
-        className={`fixed top-0 left-0 w-full z-50 shadow-sm transition-colors duration-300`}
+        className="fixed top-0 left-0 w-full z-50 shadow-sm transition-colors duration-300"
         style={{ backgroundColor: bgColor, color: textColor }}
       >
         <nav className="py-4 px-6 flex flex-col md:flex-row justify-between items-center">
-          {/* Logo + Mobile Menu */}
           <div className="flex items-center justify-between w-full md:w-auto">
-            <a href="/" className="flex items-center gap-2">
+
+            {/* FIXED: Link instead of anchor */}
+            <Link to="/" className="flex items-center gap-2">
               <img src={logo} alt="Plateful logo" className="w-10 h-10" />
               <span className="text-xl font-semibold">Plateful</span>
-            </a>
+            </Link>
 
             <div className="flex items-center gap-3">
-              {/* Theme Toggle */}
               <button
                 onClick={toggleTheme}
                 className="p-2 rounded-full transition hover:bg-gray-200 dark:hover:bg-gray-300"
@@ -59,32 +60,27 @@ const dropdownBg = theme === "dark" ? "#1f1f1f" : "#fff0e5";
                 )}
               </button>
 
-              {/* Mobile Menu Button */}
               <button onClick={() => setMenuOpen(!menuOpen)} className="md:hidden">
                 {menuOpen ? <X size={26} /> : <Menu size={26} />}
               </button>
             </div>
           </div>
 
-          {/* Desktop Navigation */}
+          {/* DESKTOP MENU */}
           <ul className="hidden md:flex items-center space-x-4 mt-3 md:mt-0 text-sm font-medium">
             {links.map((link) => (
               <li key={link.name}>
-                <a
-                  href={link.href}
-                  className="relative px-1 py-0.5 hover:opacity-80 transition-opacity duration-200"
+                {/* FIXED */}
+                <Link
+                  to={link.href}
                   style={{ color: textColor }}
+                  className="relative px-1 py-0.5 hover:opacity-80 transition-opacity duration-200"
                 >
                   {link.name}
-                  <span
-                    className="absolute left-0 -bottom-1 w-0 h-[2px] transition-all duration-200"
-                    style={{ backgroundColor: borderColor }}
-                  />
-                </a>
+                </Link>
               </li>
             ))}
 
-            {/* Profile + Dropdown */}
             <li className="relative">
               <button onClick={toggleDropdown} className="p-0">
                 <img
@@ -100,15 +96,17 @@ const dropdownBg = theme === "dark" ? "#1f1f1f" : "#fff0e5";
 
               {isDropdownOpen && (
                 <div
-                  className="absolute top-full right-0 mt-2 rounded-lg shadow-lg p-4 flex flex-col gap-3 min-w-[150px] z-50 transition-colors duration-300"
+                  className="absolute top-full right-0 mt-2 rounded-lg shadow-lg p-4 flex flex-col gap-3 min-w-[150px] z-50"
                   style={{ backgroundColor: dropdownBg, color: textColor }}
                 >
-                  <a
-                    href="/profile/user-info"
+                  {/* FIXED */}
+                  <Link
+                    to="/profile/user-info"
                     className="text-base font-medium hover:opacity-80 transition-opacity duration-200"
                   >
                     Profile
-                  </a>
+                  </Link>
+
                   <button
                     onClick={handleSignOut}
                     className="text-base font-medium hover:opacity-80 transition-opacity duration-200 text-left"
@@ -121,27 +119,27 @@ const dropdownBg = theme === "dark" ? "#1f1f1f" : "#fff0e5";
           </ul>
         </nav>
 
-        {/* Mobile Dropdown */}
+        {/* MOBILE MENU */}
         {menuOpen && (
           <div
-            className="md:hidden shadow-inner flex flex-col items-center py-4 space-y-4 text-base font-medium transition-colors duration-300"
+            className="md:hidden shadow-inner flex flex-col items-center py-4 space-y-4 text-base font-medium"
             style={{ backgroundColor: bgColor, color: textColor }}
           >
             {links.map((link) => (
-              <a
+              <Link
                 key={link.name}
-                href={link.href}
+                to={link.href}
                 onClick={() => setMenuOpen(false)}
                 className="hover:opacity-80 transition-opacity duration-200"
               >
                 {link.name}
-              </a>
+              </Link>
             ))}
 
-            <a
-              href="/profile/user-info"
+            <Link
+              to="/profile/user-info"
               onClick={() => setMenuOpen(false)}
-              className="flex items-center space-x-2 border px-3 py-1.5 rounded-lg hover:opacity-80 transition-opacity duration-200"
+              className="flex items-center space-x-2 border px-3 py-1.5 rounded-lg hover:opacity-80"
               style={{ borderColor }}
             >
               <img
@@ -151,12 +149,19 @@ const dropdownBg = theme === "dark" ? "#1f1f1f" : "#fff0e5";
                 style={{ borderColor }}
               />
               <span>Profile</span>
-            </a>
+            </Link>
+
+            <button
+              onClick={handleSignOut}
+              className="border px-3 py-1.5 rounded-lg text-center w-32"
+              style={{ borderColor }}
+            >
+              Sign Out
+            </button>
           </div>
         )}
       </header>
 
-      {/* Spacer */}
       <div className="h-[70px] md:h-[76px]"></div>
     </>
   );
