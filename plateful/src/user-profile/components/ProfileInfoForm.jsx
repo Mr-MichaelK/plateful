@@ -35,9 +35,17 @@ export default function ProfileInfoForm({ name, email, aboutMe, pfpLink }) {
   const btnHover = theme === "dark" ? "#5c161f" : "#5c161f";
 
   return (
-    <form className="flex flex-col transition-colors" style={{ color: textColor }}>
-      <h1 className="text-2xl font-semibold mb-0" style={{ color: "#7a1f2a" }}>Profile</h1>
-      <p className="text-base mb-3" style={{ color: theme === "dark" ? "#aaa" : "#666" }}>
+    <form
+      className="flex flex-col transition-colors"
+      style={{ color: textColor }}
+    >
+      <h1 className="text-2xl font-semibold mb-0" style={{ color: "#7a1f2a" }}>
+        Profile
+      </h1>
+      <p
+        className="text-base mb-3"
+        style={{ color: theme === "dark" ? "#aaa" : "#666" }}
+      >
         Profile information will be displayed on your dashboard.
       </p>
 
@@ -60,11 +68,7 @@ export default function ProfileInfoForm({ name, email, aboutMe, pfpLink }) {
             onClick={handlePictureClick}
             className="absolute bottom-0 right-0 p-0 bg-transparent border-none cursor-pointer z-10"
           >
-            <img
-              src={uploadIcon}
-              alt="Upload Icon"
-              className="w-6 h-6"
-            />
+            <img src={uploadIcon} alt="Upload Icon" className="w-6 h-6" />
           </button>
           <input
             type="file"
@@ -87,7 +91,11 @@ export default function ProfileInfoForm({ name, email, aboutMe, pfpLink }) {
           id="username"
           defaultValue={name}
           className="w-full px-3 py-2 rounded-md text-base focus:outline-none"
-          style={{ backgroundColor: inputBg, color: textColor, border: `1px solid ${borderColor}` }}
+          style={{
+            backgroundColor: inputBg,
+            color: textColor,
+            border: `1px solid ${borderColor}`,
+          }}
         />
       </div>
 
@@ -101,7 +109,11 @@ export default function ProfileInfoForm({ name, email, aboutMe, pfpLink }) {
           id="email"
           defaultValue={email}
           className="w-full px-3 py-2 rounded-md text-base focus:outline-none"
-          style={{ backgroundColor: inputBg, color: textColor, border: `1px solid ${borderColor}` }}
+          style={{
+            backgroundColor: inputBg,
+            color: textColor,
+            border: `1px solid ${borderColor}`,
+          }}
         />
       </div>
 
@@ -114,14 +126,18 @@ export default function ProfileInfoForm({ name, email, aboutMe, pfpLink }) {
           id="aboutMe"
           defaultValue={aboutMe || ""}
           className="w-full px-3 py-2 rounded-md text-base focus:outline-none min-h-[100px] resize-y"
-          style={{ backgroundColor: inputBg, color: textColor, border: `1px solid ${borderColor}` }}
+          style={{
+            backgroundColor: inputBg,
+            color: textColor,
+            border: `1px solid ${borderColor}`,
+          }}
         />
       </div>
 
       {/* Save Button */}
       <button
         type="submit"
-        className="mt-8 self-end px-6 py-2 rounded-md text-white font-medium text-lg transition-colors"
+        className="mt-8 self-end px-6 py-2 rounded-md text-white font-medium text-lg transition-colors cursor-pointer"
         style={{ backgroundColor: btnBg }}
         onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = btnHover)}
         onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = btnBg)}

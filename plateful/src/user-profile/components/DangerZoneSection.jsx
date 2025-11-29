@@ -35,29 +35,42 @@ export default function DangerZoneSection() {
 
       {/* Reset Progress Button */}
       <button
-        className="flex items-center gap-4 w-[200px] px-3 py-2 mb-4 rounded-md font-medium text-base transition-colors"
+        className="flex items-center gap-4 w-[200px] px-3 py-2 mb-4 rounded-md font-medium text-base transition-colors cursor-pointer"
         style={{
           color: resetBtnText,
           border: `1px solid ${resetBtnBorder}`,
           backgroundColor: "transparent",
         }}
-        onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = resetBtnHoverBg)}
-        onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = "transparent")}
+        onMouseEnter={(e) =>
+          (e.currentTarget.style.backgroundColor = resetBtnHoverBg)
+        }
+        onMouseLeave={(e) =>
+          (e.currentTarget.style.backgroundColor = "transparent")
+        }
       >
-        <img src={repeatIcon} alt="Reset Progress Icon" width={25} height={25} />
-        <p className="m-0 flex-grow text-left">Reset Progress</p>
+        <img
+          src={repeatIcon}
+          alt="Reset Progress Icon"
+          width={25}
+          height={25}
+        />
+        <p className="m-0 flex-grow text-left">Reset Data</p>
       </button>
 
       {/* Delete Account Button */}
       <button
-        className="flex items-center gap-4 w-[200px] px-3 py-2 mb-4 rounded-md font-medium text-base transition-colors"
+        className="flex items-center gap-4 w-[200px] px-3 py-2 mb-4 rounded-md font-medium text-base transition-colors cursor-pointer"
         style={{
           color: "#fff",
           backgroundColor: dangerBtnBg,
           border: `1px solid ${dangerBtnBg}`,
         }}
-        onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = dangerBtnHover)}
-        onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = dangerBtnBg)}
+        onMouseEnter={(e) =>
+          (e.currentTarget.style.backgroundColor = dangerBtnHover)
+        }
+        onMouseLeave={(e) =>
+          (e.currentTarget.style.backgroundColor = dangerBtnBg)
+        }
       >
         <img src={trashIcon} alt="Delete Account Icon" width={25} height={25} />
         <p className="m-0 flex-grow text-left">Delete Account</p>

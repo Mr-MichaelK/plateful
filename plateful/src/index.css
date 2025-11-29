@@ -14,3 +14,10 @@
   animation: gradientMove 10s ease infinite;
 }
 
+body {
+  background-color: #fffdf9;
+}
+
+.dark body {
+  background-color: #1a1a1a;
+}

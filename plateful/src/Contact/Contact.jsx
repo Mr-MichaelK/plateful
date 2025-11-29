@@ -21,31 +21,33 @@ export default function Contact() {
         className="min-h-screen flex flex-col pt-10 md:pt-14 transition-colors duration-300"
         style={{ backgroundColor: sectionBg, color: textColor }}
       >
-        <Title
-          heading="Contact Us"
-          subheading="We’d love to hear from you."
-        />
+        <Title heading="Contact Us" subheading="We’d love to hear from you." />
 
         <Box>
           <p className="leading-relaxed mb-4" style={{ color: textColor }}>
-            We’d love to hear from you. Whether you have a recipe idea, feedback on the site,
-            or want to collaborate, the Plateful team is here for you. We read every message
-            and typically reply within one business day.
+            We'd love to hear from you. Whether you have a recipe idea, feedback
+            on the site, or want to collaborate, the Plateful team is here for
+            you. We read every message and typically reply within one business
+            day.
           </p>
 
           <div className="space-y-2 text-sm">
             <p>
-              <span className="font-medium" style={{ color: highlightColor }}>Email:</span>{" "}
+              <span className="font-medium" style={{ color: highlightColor }}>
+                Email:
+              </span>{" "}
               <a
                 href="mailto:customerservice@plateful.co"
                 className="underline hover:opacity-80 transition"
                 style={{ color: textColor }}
               >
-                customerservice@plateful.co
+                customerservice@plateful.com
               </a>
             </p>
             <p>
-              <span className="font-medium" style={{ color: highlightColor }}>Phone (Lebanon):</span>{" "}
+              <span className="font-medium" style={{ color: highlightColor }}>
+                Phone (Lebanon):
+              </span>{" "}
               <a
                 href="tel:+96171234567"
                 className="underline hover:opacity-80 transition"

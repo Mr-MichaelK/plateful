@@ -523,7 +523,7 @@ const AddEditRecipe = () => {
             <div className="text-center">
               <button
                 type="submit"
-                className="px-8 py-3 rounded-lg font-medium transition"
+                className="px-8 py-3 rounded-lg font-medium transition cursor-pointer hover:scale-102 shadow-lg"
                 style={{
                   backgroundColor: sectionText,
                   color: theme === "dark" ? "#1a1a1a" : "#fff",

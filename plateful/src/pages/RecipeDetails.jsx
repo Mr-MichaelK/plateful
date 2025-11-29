@@ -265,7 +265,10 @@ function RecipeDetails() {
         <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-[2fr_1fr_1fr] gap-10">
           {/* WHY */}
           <div className="lg:pr-6 lg:border-r border-[#e0d3cd]">
-            <h2 className="text-2xl font-bold mb-4" style={{ color: titleColor }}>
+            <h2
+              className="text-2xl font-bold mb-4"
+              style={{ color: titleColor }}
+            >
               Why You’ll Love This Dish
             </h2>
             <p className="leading-relaxed mb-6" style={{ color: textColor }}>
@@ -276,7 +279,7 @@ function RecipeDetails() {
             <div className="flex gap-3 flex-wrap">
               <button
                 onClick={handleSave}
-                className="px-5 py-2 rounded-lg text-white"
+                className="px-5 py-2 rounded-lg text-white cursor-pointer"
                 style={{ backgroundColor: "#7a1f2a" }}
               >
                 Save Recipe
@@ -284,7 +287,7 @@ function RecipeDetails() {
 
               <button
                 onClick={handleEdit}
-                className="border px-5 py-2 rounded-lg"
+                className="border px-5 py-2 rounded-lg cursor-pointer"
                 style={{ borderColor: "#7a1f2a", color: "#7a1f2a" }}
               >
                 Edit
@@ -292,7 +295,7 @@ function RecipeDetails() {
 
               <button
                 onClick={handleShare}
-                className="border px-5 py-2 rounded-lg"
+                className="border px-5 py-2 rounded-lg cursor-pointer"
                 style={{ borderColor: "#7a1f2a", color: "#7a1f2a" }}
               >
                 Share
@@ -302,7 +305,10 @@ function RecipeDetails() {
 
           {/* INGREDIENTS */}
           <div>
-            <h2 className="text-2xl font-bold mb-4" style={{ color: titleColor }}>
+            <h2
+              className="text-2xl font-bold mb-4"
+              style={{ color: titleColor }}
+            >
               Ingredients
             </h2>
             <ul
@@ -317,7 +323,10 @@ function RecipeDetails() {
 
           {/* STEPS */}
           <div>
-            <h2 className="text-2xl font-bold mb-4" style={{ color: titleColor }}>
+            <h2
+              className="text-2xl font-bold mb-4"
+              style={{ color: titleColor }}
+            >
               Steps
             </h2>
             <ol
@@ -360,20 +369,28 @@ function RecipeDetails() {
                       className="w-full h-40 object-cover"
                     />
                   )}
-                  <div className="py-3 font-medium" style={{ color: titleColor }}>
+                  <div
+                    className="py-3 font-medium"
+                    style={{ color: titleColor }}
+                  >
                     {sim.title}
                   </div>
                 </div>
               ))}
             </div>
           ) : (
-            <p style={{ color: textColor }}>No similar recipes available yet.</p>
+            <p style={{ color: textColor }}>
+              No similar recipes available yet.
+            </p>
           )}
         </div>
       </section>
 
       {/* FEEDBACK */}
-      <section className="py-16 px-6 text-center" style={{ backgroundColor: sectionBg }}>
+      <section
+        className="py-16 px-6 text-center"
+        style={{ backgroundColor: sectionBg }}
+      >
         <h2 className="text-2xl font-bold mb-10" style={{ color: titleColor }}>
           Community Love
         </h2>
@@ -393,7 +410,9 @@ function RecipeDetails() {
                     <span
                       key={s}
                       className={
-                        s <= (c.rating || 0) ? "text-[#FFD700]" : "text-gray-300"
+                        s <= (c.rating || 0)
+                          ? "text-[#FFD700]"
+                          : "text-gray-300"
                       }
                     >
                       ★
@@ -416,7 +435,7 @@ function RecipeDetails() {
         {limitedComments.length > 3 && (
           <button
             onClick={() => setShowAllComments((prev) => !prev)}
-            className="mb-10 text-sm underline"
+            className="mb-10 text-sm underline cursor-pointer"
             style={{ color: titleColor }}
           >
             {showAllComments ? "Show less..." : "Show more..."}
@@ -464,7 +483,7 @@ function RecipeDetails() {
           <div className="text-center mt-5">
             <button
               onClick={handleFeedbackSubmit}
-              className="px-6 py-2 rounded-lg"
+              className="px-6 py-2 rounded-lg cursor-pointer"
               style={{ backgroundColor: "#7a1f2a", color: "#fff" }}
             >
               Submit Feedback
