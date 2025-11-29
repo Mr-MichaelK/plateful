@@ -31,7 +31,7 @@ const RecipeCard = ({ recipe }) => {
   const imageList = [
     recipe.image,
     ...(recipe.images || []),
-    ...(recipe.extraImages || [])
+    ...(recipe.extraImages || []),
   ].filter(Boolean);
 
   const mainImage = buildImageUrl(imageList[0]);
@@ -39,7 +39,7 @@ const RecipeCard = ({ recipe }) => {
   return (
     <div
       onClick={handleClick}
-      className="rounded-lg shadow transition-all duration-200 cursor-pointer hover:scale-[1.02] group overflow-hidden"
+      className="rounded-lg shadow transition-all duration-200 cursor-pointer hover:scale-[1.02] group overflow-hidden flex flex-col h-full"
       style={{ backgroundColor: cardBg }}
     >
       {/* IMAGE */}
@@ -48,13 +48,18 @@ const RecipeCard = ({ recipe }) => {
           src={mainImage}
           alt={recipe.title}
           className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
-          style={{ filter: theme === "dark" ? "brightness(85%)" : "brightness(100%)" }}
+          style={{
+            filter: theme === "dark" ? "brightness(85%)" : "brightness(100%)",
+          }}
         />
       </div>
 
       {/* TEXT */}
-      <div className="p-4">
-        <h3 className="font-semibold text-lg mb-1" style={{ color: titleColor }}>
+      <div className="p-4 flex-grow bg-white">
+        <h3
+          className="font-semibold text-lg mb-1"
+          style={{ color: titleColor }}
+        >
           {recipe.title}
         </h3>
 

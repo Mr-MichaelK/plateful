@@ -9,9 +9,9 @@ const FeaturedRecipes = () => {
   const [loading, setLoading] = useState(true);
 
   // Colors
-  const sectionBg = theme === "dark" ? "#1a1a1a" : "#fffdf9"; 
-  const sectionText = theme === "dark" ? "#f9c8c8" : "#7a1f2a"; 
-  const cardBg = theme === "dark" ? "#262626" : "#fff0e5"; 
+  const sectionBg = theme === "dark" ? "#1a1a1a" : "#fffdf9";
+  const sectionText = theme === "dark" ? "#f9c8c8" : "#7a1f2a";
+  const cardBg = theme === "dark" ? "#262626" : "#fff0e5";
   const cardHover = theme === "dark" ? "#2f2f2f" : "#f5e8de";
 
   // Fetch featured recipes from backend
@@ -33,7 +33,10 @@ const FeaturedRecipes = () => {
 
   if (loading) {
     return (
-      <section className="py-14 px-6 text-center" style={{ backgroundColor: sectionBg }}>
+      <section
+        className="py-14 px-6 text-center"
+        style={{ backgroundColor: sectionBg }}
+      >
         <h2 className="text-2xl font-bold mb-8" style={{ color: sectionText }}>
           Featured Recipes
         </h2>
@@ -44,7 +47,10 @@ const FeaturedRecipes = () => {
 
   if (!featuredRecipes.length) {
     return (
-      <section className="py-14 px-6 text-center" style={{ backgroundColor: sectionBg }}>
+      <section
+        className="py-14 px-6 text-center"
+        style={{ backgroundColor: sectionBg }}
+      >
         <h2 className="text-2xl font-bold mb-8" style={{ color: sectionText }}>
           Featured Recipes
         </h2>
@@ -54,7 +60,10 @@ const FeaturedRecipes = () => {
   }
 
   return (
-    <section className="py-14 px-6 text-center" style={{ backgroundColor: sectionBg }}>
+    <section
+      className="py-14 px-6 text-center"
+      style={{ backgroundColor: sectionBg }}
+    >
       <h2 className="text-2xl font-bold mb-8" style={{ color: sectionText }}>
         Featured Recipes
       </h2>
@@ -63,8 +72,7 @@ const FeaturedRecipes = () => {
         {featuredRecipes.map((recipe, i) => (
           <div
             key={i}
-            style={{ backgroundColor: cardBg }}
-            className="rounded-lg shadow cursor-pointer transition duration-300 hover:shadow-lg"
+            className="rounded-lg shadow cursor-pointer transition duration-300 hover:shadow-lg h-full"
           >
             <RecipeCard recipe={recipe} theme={theme} />
           </div>
