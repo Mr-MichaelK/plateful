@@ -152,7 +152,7 @@ function FavoriteRecipes() {
                       e.stopPropagation();
                       handleDelete(recipe.title);
                     }}
-                    className="px-4 py-2 rounded-lg w-full text-sm"
+                    className="px-4 py-2 rounded-lg w-full text-sm cursor-pointer"
                     style={{ backgroundColor: buttonBg, color: buttonText }}
                   >
                     Remove
