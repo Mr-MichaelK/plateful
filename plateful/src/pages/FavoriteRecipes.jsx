@@ -1,18 +1,21 @@
-// made by Noura Hajj Chehade — FIXED FULL FAVORITES VERSION
+// made by Noura Hajj Chehade — FINAL STRICT AUTH FAVORITES (fixed auth timing)
 import React, { useState, useEffect } from "react";
 import Header from "../shared-components/Header";
 import Footer from "../components/Footer";
 import Swal from "sweetalert2";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { useTheme } from "../context/ThemeContext";
+import { useAuth } from "../Auth/AuthContext";
 import { API_BASE_URL } from "../apiConfig";
 
 function FavoriteRecipes() {
   const [favorites, setFavorites] = useState([]);
   const { theme } = useTheme();
+  const { user, loading: authLoading } = useAuth(); // FIXED: use authLoading
   const navigate = useNavigate();
+  const location = useLocation();
 
-  // same as RecipeDetails
+  // Build image URL
   const API_ROOT = API_BASE_URL.replace(/\/api$/, "");
   const buildImageUrl = (imgPath) => {
     if (!imgPath) return "";
@@ -20,20 +23,43 @@ function FavoriteRecipes() {
     return `${API_ROOT}${imgPath}`;
   };
 
-  // ---------------- LOAD FAVORITES THEN LOAD FULL RECIPE DATA ----------------
+  // ---------------------- PROTECT PAGE ----------------------
   useEffect(() => {
+    if (authLoading) return; // WAIT for auth to finish
+
+    if (!user) {
+      // Avoid redirect loop
+      if (location.pathname !== "/log-in") {
+        Swal.fire({
+          icon: "info",
+          title: "You must log in first",
+          confirmButtonColor: "#7a1f2a",
+        });
+        navigate("/log-in");
+      }
+    }
+  }, [authLoading, user]);
+
+  // ---------------------- LOAD FAVORITES ----------------------
+  useEffect(() => {
+    if (authLoading) return; // wait
+    if (!user) return;
+
     const loadFavorites = async () => {
       try {
-        // 1) Get list of titles
-        const res = await fetch(`${API_BASE_URL}/favorites`);
-        const favTitles = await res.json(); // example: [{ title: "Chickpea Veggie Patties" }]
+        const res = await fetch(`${API_BASE_URL}/favorites`, {
+          credentials: "include",
+        });
 
-        // 2) Fetch full recipe data for each title
-        const recipePromises = favTitles.map(async (f) => {
-          const res = await fetch(
-            `${API_BASE_URL}/recipes/${encodeURIComponent(f.title)}`
+        if (!res.ok) return;
+
+        const favoriteTitles = await res.json();
+
+        const recipePromises = favoriteTitles.map(async (fav) => {
+          const r = await fetch(
+            `${API_BASE_URL}/recipes/${encodeURIComponent(fav.title)}`
           );
-          return res.ok ? res.json() : null;
+          return r.ok ? r.json() : null;
         });
 
         const fullRecipes = (await Promise.all(recipePromises)).filter(Boolean);
@@ -44,14 +70,27 @@ function FavoriteRecipes() {
     };
 
     loadFavorites();
-  }, []);
+  }, [authLoading, user]);
 
-  // -------------------- DELETE FAVORITE --------------------
+  // ---------------------- REMOVE ----------------------
   const handleDelete = async (title) => {
     try {
-      await fetch(`${API_BASE_URL}/favorites/${encodeURIComponent(title)}`, {
-        method: "DELETE",
-      });
+      const res = await fetch(
+        `${API_BASE_URL}/favorites/${encodeURIComponent(title)}`,
+        {
+          method: "DELETE",
+          credentials: "include",
+        }
+      );
+
+      if (!res.ok) {
+        Swal.fire({
+          icon: "error",
+          title: "Could not remove recipe",
+          confirmButtonColor: "#7a1f2a",
+        });
+        return;
+      }
 
       setFavorites((prev) => prev.filter((item) => item.title !== title));
 
@@ -61,12 +100,11 @@ function FavoriteRecipes() {
         text: "Recipe removed from favorites",
         confirmButtonColor: "#7a1f2a",
       });
-    } catch (err) {
-      console.error("Failed to delete favorite:", err);
+    } catch {
       Swal.fire({
         icon: "error",
         title: "Oops!",
-        text: "Could not remove recipe. Try again.",
+        text: "Failed to remove recipe",
         confirmButtonColor: "#7a1f2a",
       });
     }
@@ -76,13 +114,13 @@ function FavoriteRecipes() {
     navigate(`/recipe/${encodeURIComponent(title)}`);
   };
 
-  // -------------------- THEME COLORS --------------------
+  // THEME COLORS
   const sectionBg = theme === "dark" ? "#1a1a1a" : "#fffaf6";
   const cardBg = theme === "dark" ? "#2a2a2a" : "#ffffff";
   const titleColor = theme === "dark" ? "#f9c8c8" : "#7a1f2a";
   const textColor = theme === "dark" ? "#e5e5e5" : "#444";
-  const buttonBg = "#7a1f2a";
-  const buttonText = "#fff";
+
+  if (authLoading) return null; // FIX: wait for auth
 
   return (
     <>
@@ -114,7 +152,7 @@ function FavoriteRecipes() {
       >
         {favorites.length === 0 ? (
           <p className="text-center text-lg" style={{ color: textColor }}>
-            No saved recipes yet! Start adding some delicious meals!
+            No saved recipes yet — start exploring!
           </p>
         ) : (
           <div className="max-w-7xl mx-auto grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
@@ -153,7 +191,7 @@ function FavoriteRecipes() {
                       handleDelete(recipe.title);
                     }}
                     className="px-4 py-2 rounded-lg w-full text-sm cursor-pointer"
-                    style={{ backgroundColor: buttonBg, color: buttonText }}
+                    style={{ backgroundColor: "#7a1f2a", color: "#fff" }}
                   >
                     Remove
                   </button>
