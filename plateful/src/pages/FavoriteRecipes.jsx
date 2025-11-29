@@ -26,7 +26,7 @@ function FavoriteRecipes() {
       try {
         // 1) Get list of titles
         const res = await fetch(`${API_BASE_URL}/favorites`);
-        const favTitles = await res.json();  // example: [{ title: "Chickpea Veggie Patties" }]
+        const favTitles = await res.json(); // example: [{ title: "Chickpea Veggie Patties" }]
 
         // 2) Fetch full recipe data for each title
         const recipePromises = favTitles.map(async (f) => {
@@ -122,7 +122,7 @@ function FavoriteRecipes() {
               <div
                 key={i}
                 onClick={() => handleCardClick(recipe.title)}
-                className="rounded-2xl shadow-lg hover:shadow-xl cursor-pointer overflow-hidden group"
+                className="rounded-2xl shadow-lg hover:shadow-xl cursor-pointer overflow-hidden group flex flex-col h-full"
                 style={{ backgroundColor: cardBg }}
               >
                 {recipe.image && (
@@ -132,11 +132,18 @@ function FavoriteRecipes() {
                   />
                 )}
 
-                <div className="p-5">
-                  <h3 className="text-xl font-bold mb-1" style={{ color: titleColor }}>
+                <div className="p-5 flex flex-col flex-grow">
+                  <h3
+                    className="text-xl font-bold mb-1"
+                    style={{ color: titleColor }}
+                  >
                     {recipe.title}
                   </h3>
-                  <p className="text-sm mb-4" style={{ color: textColor }}>
+
+                  <p
+                    className="text-sm mb-4 flex-grow"
+                    style={{ color: textColor }}
+                  >
                     {recipe.description}
                   </p>
 
