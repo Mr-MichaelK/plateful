@@ -41,11 +41,20 @@ export default function DangerZoneSection() {
           border: `1px solid ${resetBtnBorder}`,
           backgroundColor: "transparent",
         }}
-        onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = resetBtnHoverBg)}
-        onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = "transparent")}
+        onMouseEnter={(e) =>
+          (e.currentTarget.style.backgroundColor = resetBtnHoverBg)
+        }
+        onMouseLeave={(e) =>
+          (e.currentTarget.style.backgroundColor = "transparent")
+        }
       >
-        <img src={repeatIcon} alt="Reset Progress Icon" width={25} height={25} />
-        <p className="m-0 flex-grow text-left">Reset Progress</p>
+        <img
+          src={repeatIcon}
+          alt="Reset Progress Icon"
+          width={25}
+          height={25}
+        />
+        <p className="m-0 flex-grow text-left">Reset Data</p>
       </button>
 
       {/* Delete Account Button */}
@@ -56,8 +65,12 @@ export default function DangerZoneSection() {
           backgroundColor: dangerBtnBg,
           border: `1px solid ${dangerBtnBg}`,
         }}
-        onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = dangerBtnHover)}
-        onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = dangerBtnBg)}
+        onMouseEnter={(e) =>
+          (e.currentTarget.style.backgroundColor = dangerBtnHover)
+        }
+        onMouseLeave={(e) =>
+          (e.currentTarget.style.backgroundColor = dangerBtnBg)
+        }
       >
         <img src={trashIcon} alt="Delete Account Icon" width={25} height={25} />
         <p className="m-0 flex-grow text-left">Delete Account</p>
