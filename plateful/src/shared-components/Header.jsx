@@ -10,7 +10,7 @@ export default function Header() {
   if (loading) {
     return (
       <div className="fixed top-0 left-0 w-full h-[70px] z-50 flex items-center justify-center bg-white dark:bg-gray-900 shadow-sm">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-brand-color"></div>
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-red-500"></div>
       </div>
     );
   }
