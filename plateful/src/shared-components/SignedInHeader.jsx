@@ -9,7 +9,6 @@ import { useAuth } from "../context/AuthContext";
 import Swal from "sweetalert2";
 import { API_BASE_URL } from "../apiConfig";
 
-// 🌟 ADD HELPER FUNCTION 🌟
 function getServerRoot(baseUrl) {
   return baseUrl.replace(/\/api$/, "");
 }
