@@ -1,23 +1,24 @@
-import { useAuth } from "../Auth/AuthContext";
 import SignedInHeader from "./SignedInHeader";
 import SignedOutHeader from "./SignedOutHeader";
-import React from "react";
+import { useAuth } from "../context/AuthContext";
 
 export default function Header() {
-  const { user, loading } = useAuth();
+  const { isAuthenticated, loading, user } = useAuth();
 
-  // Prevent UI flash while checking auth
-  if (loading) return null;
-
-  // If logged in → show signed-in header
-  if (user) {
+  // show a spinner while checking auth status
+  if (loading) {
     return (
-      <SignedInHeader
-        userProfilePicUrl={user.profilePicUrl ?? null}  // FIXED: safe fallback
-      />
+      <div className="fixed top-0 left-0 w-full h-[70px] z-50 flex items-center justify-center bg-white dark:bg-gray-900 shadow-sm">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-red-500"></div>
+      </div>
     );
   }
 
-  // Otherwise → signed-out header
+  // if authenticated, render the SignedInHeader
+  if (isAuthenticated) {
+    return <SignedInHeader user={user} />;
+  }
+
+  // otherwise, render the SignedOutHeader
   return <SignedOutHeader />;
 }

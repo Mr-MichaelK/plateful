@@ -5,7 +5,7 @@ import Footer from "../components/Footer";
 import Swal from "sweetalert2";
 import { useTheme } from "../context/ThemeContext";
 import { useLocation, useNavigate } from "react-router-dom";
-import { useAuth } from "../Auth/AuthContext";
+import { useAuth } from "../context/AuthContext";
 import { API_BASE_URL } from "../apiConfig";
 
 const AddEditRecipe = () => {
@@ -42,7 +42,11 @@ const AddEditRecipe = () => {
 
   const API_ROOT = API_BASE_URL.replace(/\/api$/, "");
   const buildImageUrl = (imgPath) =>
-    !imgPath ? "" : imgPath.startsWith("http") ? imgPath : `${API_ROOT}${imgPath}`;
+    !imgPath
+      ? ""
+      : imgPath.startsWith("http")
+      ? imgPath
+      : `${API_ROOT}${imgPath}`;
 
   // AUTH REDIRECT (only after auth finished)
   useEffect(() => {
@@ -91,9 +95,7 @@ const AddEditRecipe = () => {
         setIngredients(
           Array.isArray(data.ingredients) ? data.ingredients.join(", ") : ""
         );
-        setSteps(
-          Array.isArray(data.steps) ? data.steps.join(". ") : ""
-        );
+        setSteps(Array.isArray(data.steps) ? data.steps.join(". ") : "");
         setCategory(data.category || "");
 
         const imgs = [data.image, ...(data.extraImages || [])].filter(Boolean);
@@ -418,7 +420,11 @@ const AddEditRecipe = () => {
                   placeholder("No image selected")
                 )}
 
-                <input type="file" accept="image/*" onChange={handleImage1Change} />
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={handleImage1Change}
+                />
               </div>
 
               {/* IMAGE 2 */}
@@ -440,7 +446,11 @@ const AddEditRecipe = () => {
                   placeholder("No image selected")
                 )}
 
-                <input type="file" accept="image/*" onChange={handleImage2Change} />
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={handleImage2Change}
+                />
               </div>
 
               {/* IMAGE 3 */}
@@ -462,7 +472,11 @@ const AddEditRecipe = () => {
                   placeholder("No image selected")
                 )}
 
-                <input type="file" accept="image/*" onChange={handleImage3Change} />
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={handleImage3Change}
+                />
               </div>
             </div>
 

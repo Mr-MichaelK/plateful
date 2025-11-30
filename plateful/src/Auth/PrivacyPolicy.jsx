@@ -1,7 +1,6 @@
 // Made by Nour Diab
 import React from "react";
 import { useTheme } from "../context/ThemeContext";
-import AuthHeader from "./components/AuthHeader.jsx";
 import Footer from "../components/Footer";
 
 function PrivacyPolicy() {
@@ -17,8 +16,6 @@ function PrivacyPolicy() {
       className="flex flex-col min-h-screen"
       style={{ backgroundColor: bgColor, color: textColor }}
     >
-      <AuthHeader />
-
       <main className="flex-grow w-full max-w-3xl mx-auto px-6 py-12">
         <h1
           className="text-4xl font-bold text-center mb-10"
@@ -81,13 +78,14 @@ function PrivacyPolicy() {
             className="text-sm leading-relaxed mb-4"
             style={{ color: sectionTextColor }}
           >
-            Plateful is provided “as is” and “as available,” without any warranty
-            of any kind, whether express or implied. We do not promise that the
-            app will always be available, that it will be error-free, or that
-            data will never be lost. Features may be added, changed, or removed
-            at any time without notice. We are not liable for any damage, loss,
-            or inconvenience that results from using the app, inability to
-            access the app, or reliance on any content within the app.
+            Plateful is provided “as is” and “as available,” without any
+            warranty of any kind, whether express or implied. We do not promise
+            that the app will always be available, that it will be error-free,
+            or that data will never be lost. Features may be added, changed, or
+            removed at any time without notice. We are not liable for any
+            damage, loss, or inconvenience that results from using the app,
+            inability to access the app, or reliance on any content within the
+            app.
           </p>
           <p
             className="text-sm leading-relaxed"

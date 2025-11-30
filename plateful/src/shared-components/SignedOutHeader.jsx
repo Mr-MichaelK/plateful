@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Menu, X, Sun, Moon } from "lucide-react";
 import { useTheme } from "../context/ThemeContext";
-import { Link } from "react-router-dom";     // FIXED: Ensure React Router navigation
+import { Link } from "react-router-dom";
 import logo from "../assets/plateful-logo.svg";
 
 export default function SignedOutHeader() {
@@ -29,8 +29,6 @@ export default function SignedOutHeader() {
       >
         <nav className="py-4 px-6 flex flex-col md:flex-row justify-between items-center">
           <div className="flex items-center justify-between w-full md:w-auto">
-
-            {/* FIXED: Use <Link> instead of <a href> */}
             <Link to="/" className="flex items-center space-x-2">
               <img src={logo} alt="Plateful logo" className="w-10 h-10" />
               <span className="text-xl font-bold">Plateful</span>
@@ -48,7 +46,10 @@ export default function SignedOutHeader() {
                 )}
               </button>
 
-              <button onClick={() => setMenuOpen(!menuOpen)} className="md:hidden">
+              <button
+                onClick={() => setMenuOpen(!menuOpen)}
+                className="md:hidden"
+              >
                 {menuOpen ? <X size={26} /> : <Menu size={26} />}
               </button>
             </div>
@@ -58,7 +59,6 @@ export default function SignedOutHeader() {
           <ul className="hidden md:flex flex-wrap justify-center md:justify-end mt-3 md:mt-0 space-x-4 text-sm font-medium">
             {menuLinks.map((item) => (
               <li key={item.name}>
-                {/* FIXED */}
                 <Link
                   to={item.href}
                   className="relative px-1 py-0.5 transition-colors duration-200 hover:opacity-80"
@@ -74,7 +74,6 @@ export default function SignedOutHeader() {
             ))}
 
             <li className="ml-3">
-              {/* FIXED */}
               <Link
                 to="/sign-up"
                 className="px-3 py-1.5 rounded-md transition-colors duration-200"
@@ -112,7 +111,6 @@ export default function SignedOutHeader() {
               </Link>
             ))}
 
-            {/* FIXED: Sign up link */}
             <Link
               to="/sign-up"
               onClick={() => setMenuOpen(false)}

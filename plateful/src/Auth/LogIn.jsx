@@ -1,16 +1,18 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useTheme } from "../context/ThemeContext";
-import { useAuth } from "../Auth/AuthContext";
-import { API_BASE_URL } from "../apiConfig";
+import { API_BASE_URL } from "../apiConfig.js";
+import { useAuth } from "../context/AuthContext";
 
-import AuthHeader from "./components/AuthHeader.jsx";
 import Title from "./components/Title.jsx";
 import Box from "./components/Box.jsx";
 import InputField from "./components/InputField.jsx";
 import PrimaryButton from "./components/PrimaryButton.jsx";
 import BottomText from "./components/BottomText.jsx";
 import Footer from "../components/Footer.jsx";
+
+// made by nour diab
+// auth context made by Michael
 
 export default function LogIn() {
   const navigate = useNavigate();
@@ -31,8 +33,8 @@ export default function LogIn() {
   useEffect(() => {
     const checkAuth = async () => {
       try {
-        const res = await fetch(`${API_ROOT}/auth/check`, {
-          credentials: "include",
+        const res = await fetch(`${API_BASE_URL}/auth/check`, {
+          credentials: "include", // include cookies so backend can read jwt
         });
 
         if (!res.ok) return;
@@ -42,9 +44,10 @@ export default function LogIn() {
     };
 
     checkAuth();
-  }, [navigate, API_ROOT]);  // FIXED
+  }, [navigate, API_ROOT]); // FIXED
 
   const handleSubmit = async (e) => {
+    e.preventDefault();
     e.preventDefault();
 
     if (!email.trim() || !password) {
@@ -56,9 +59,10 @@ export default function LogIn() {
       setLoading(true);
       setError("");
 
-      const res = await fetch(`${API_ROOT}/auth/login`, {
+      const res = await fetch(`${API_BASE_URL}/auth/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
+        credentials: "include",
         credentials: "include",
         body: JSON.stringify({ email, password }),
       });
@@ -71,20 +75,21 @@ export default function LogIn() {
       }
 
       setUser(data.user);
-
       window.alert(`Welcome back, ${data.user.name}!`);
       navigate("/home");
     } catch (err) {
-      setError("Could not connect to the server.");
+      console.error(err);
+      setError("Could not connect to the server. Please try again.");
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen flex flex-col" style={{ backgroundColor: bgColor }}>
-      <AuthHeader active="login" />
-
+    <div
+      className="min-h-screen flex flex-col"
+      style={{ backgroundColor: bgColor }}
+    >
       <Title
         heading="Welcome back"
         subheading="Log in to access your saved recipes, meal plans, and favorite dishes."

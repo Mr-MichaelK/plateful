@@ -5,7 +5,7 @@ import Swal from "sweetalert2";
 import Header from "../shared-components/Header";
 import Footer from "../components/Footer";
 import { useTheme } from "../context/ThemeContext";
-import { useAuth } from "../Auth/AuthContext";
+import { useAuth } from "../context/AuthContext";
 import { API_BASE_URL } from "../apiConfig";
 
 function RecipeDetails() {
@@ -24,7 +24,11 @@ function RecipeDetails() {
 
   const API_ROOT = API_BASE_URL.replace(/\/api$/, "");
   const buildImageUrl = (imgPath) =>
-    !imgPath ? "" : imgPath.startsWith("http") ? imgPath : `${API_ROOT}${imgPath}`;
+    !imgPath
+      ? ""
+      : imgPath.startsWith("http")
+      ? imgPath
+      : `${API_ROOT}${imgPath}`;
 
   // WAIT FOR AUTH
   if (authLoading) return null;
@@ -36,13 +40,17 @@ function RecipeDetails() {
         setLoading(true);
         const decoded = decodeURIComponent(id);
 
-        const r = await fetch(`${API_BASE_URL}/recipes/${encodeURIComponent(decoded)}`);
+        const r = await fetch(
+          `${API_BASE_URL}/recipes/${encodeURIComponent(decoded)}`
+        );
         if (r.ok) setRecipe(await r.json());
 
         const all = await fetch(`${API_BASE_URL}/recipes`);
         if (all.ok) setAllRecipes(await all.json());
 
-        const c = await fetch(`${API_BASE_URL}/comments/${encodeURIComponent(decoded)}`);
+        const c = await fetch(
+          `${API_BASE_URL}/comments/${encodeURIComponent(decoded)}`
+        );
         if (c.ok) setComments(await c.json());
       } catch (e) {
         console.error(e);
@@ -86,10 +94,14 @@ function RecipeDetails() {
   const imageList = [];
   if (recipe.image) imageList.push(recipe.image);
   if (Array.isArray(recipe.images)) {
-    recipe.images.forEach((img) => img && !imageList.includes(img) && imageList.push(img));
+    recipe.images.forEach(
+      (img) => img && !imageList.includes(img) && imageList.push(img)
+    );
   }
   if (Array.isArray(recipe.extraImages)) {
-    recipe.extraImages.forEach((img) => img && !imageList.includes(img) && imageList.push(img));
+    recipe.extraImages.forEach(
+      (img) => img && !imageList.includes(img) && imageList.push(img)
+    );
   }
 
   const mainImageUrl = buildImageUrl(imageList[0]);
@@ -120,7 +132,10 @@ function RecipeDetails() {
       const data = await res.json();
 
       if (!res.ok) {
-        Swal.fire({ icon: "error", title: data.error || "Error saving recipe" });
+        Swal.fire({
+          icon: "error",
+          title: data.error || "Error saving recipe",
+        });
         return;
       }
 
@@ -218,7 +233,10 @@ function RecipeDetails() {
       const data = await res.json();
 
       if (!res.ok) {
-        Swal.fire({ icon: "error", title: data.error || "Couldn't send feedback" });
+        Swal.fire({
+          icon: "error",
+          title: data.error || "Couldn't send feedback",
+        });
         return;
       }
 
@@ -234,7 +252,9 @@ function RecipeDetails() {
   };
 
   const limitedComments = comments.slice(0, 6);
-  const visibleComments = showAllComments ? limitedComments : limitedComments.slice(0, 3);
+  const visibleComments = showAllComments
+    ? limitedComments
+    : limitedComments.slice(0, 3);
 
   return (
     <>
@@ -243,7 +263,11 @@ function RecipeDetails() {
       {/* HERO */}
       <section className="relative h-[60vh] sm:h-[65vh] overflow-hidden">
         {mainImageUrl && (
-          <img src={mainImageUrl} alt={recipe.title} className="absolute inset-0 w-full h-full object-cover" />
+          <img
+            src={mainImageUrl}
+            alt={recipe.title}
+            className="absolute inset-0 w-full h-full object-cover"
+          />
         )}
         <div className="absolute inset-0 bg-gradient-to-t from-[#7a1f2a]/75 to-transparent" />
         <div className="relative z-10 flex flex-col items-center justify-center text-white text-center h-full px-4">
@@ -260,10 +284,12 @@ function RecipeDetails() {
       {/* DETAILS */}
       <section className="py-16 px-6" style={{ backgroundColor: sectionBg }}>
         <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-[2fr_1fr_1fr] gap-10">
-
           {/* WHY + BUTTONS */}
           <div className="lg:border-r border-[#e0d3cd] lg:pr-6">
-            <h2 className="text-2xl font-bold mb-4" style={{ color: titleColor }}>
+            <h2
+              className="text-2xl font-bold mb-4"
+              style={{ color: titleColor }}
+            >
               Why You’ll Love This Dish
             </h2>
             <p className="mb-6 leading-relaxed" style={{ color: textColor }}>
@@ -272,7 +298,6 @@ function RecipeDetails() {
 
             {user ? (
               <div className="flex flex-wrap gap-3">
-
                 {/* SAVE */}
                 <button
                   onClick={handleSave}
@@ -321,8 +346,16 @@ function RecipeDetails() {
 
           {/* INGREDIENTS */}
           <div>
-            <h2 className="text-2xl font-bold mb-4" style={{ color: titleColor }}>Ingredients</h2>
-            <ul className="p-5 shadow rounded-xl space-y-1 text-sm" style={{ backgroundColor: cardBg, color: textColor }}>
+            <h2
+              className="text-2xl font-bold mb-4"
+              style={{ color: titleColor }}
+            >
+              Ingredients
+            </h2>
+            <ul
+              className="p-5 shadow rounded-xl space-y-1 text-sm"
+              style={{ backgroundColor: cardBg, color: textColor }}
+            >
               {recipe.ingredients?.map((item, i) => (
                 <li key={i}>• {item}</li>
               ))}
@@ -331,8 +364,16 @@ function RecipeDetails() {
 
           {/* STEPS */}
           <div>
-            <h2 className="text-2xl font-bold mb-4" style={{ color: titleColor }}>Steps</h2>
-            <ol className="p-5 shadow rounded-xl text-sm space-y-1 list-decimal list-inside" style={{ backgroundColor: cardBg, color: textColor }}>
+            <h2
+              className="text-2xl font-bold mb-4"
+              style={{ color: titleColor }}
+            >
+              Steps
+            </h2>
+            <ol
+              className="p-5 shadow rounded-xl text-sm space-y-1 list-decimal list-inside"
+              style={{ backgroundColor: cardBg, color: textColor }}
+            >
               {recipe.steps?.map((step, i) => (
                 <li key={i}>{step}</li>
               ))}
@@ -344,7 +385,10 @@ function RecipeDetails() {
       {/* SIMILAR RECIPES */}
       <section className="py-16 px-6" style={{ backgroundColor: sectionBg }}>
         <div className="max-w-6xl mx-auto text-center">
-          <h2 className="text-2xl font-bold mb-10" style={{ color: titleColor }}>
+          <h2
+            className="text-2xl font-bold mb-10"
+            style={{ color: titleColor }}
+          >
             Discover Similar Recipes
           </h2>
 
@@ -353,14 +397,22 @@ function RecipeDetails() {
               {similarRecipes.map((sim, i) => (
                 <div
                   key={i}
-                  onClick={() => navigate(`/recipe/${encodeURIComponent(sim.title)}`)}
+                  onClick={() =>
+                    navigate(`/recipe/${encodeURIComponent(sim.title)}`)
+                  }
                   className="w-64 cursor-pointer rounded-xl shadow overflow-hidden hover:scale-105 transition"
                   style={{ backgroundColor: cardBg }}
                 >
                   {sim.image && (
-                    <img src={buildImageUrl(sim.image)} className="w-full h-40 object-cover" />
+                    <img
+                      src={buildImageUrl(sim.image)}
+                      className="w-full h-40 object-cover"
+                    />
                   )}
-                  <div className="py-3 font-medium" style={{ color: titleColor }}>
+                  <div
+                    className="py-3 font-medium"
+                    style={{ color: titleColor }}
+                  >
                     {sim.title}
                   </div>
                 </div>
@@ -373,7 +425,10 @@ function RecipeDetails() {
       </section>
 
       {/* FEEDBACK */}
-      <section className="py-16 px-6 text-center" style={{ backgroundColor: sectionBg }}>
+      <section
+        className="py-16 px-6 text-center"
+        style={{ backgroundColor: sectionBg }}
+      >
         <h2 className="text-2xl font-bold mb-10" style={{ color: titleColor }}>
           Community Love
         </h2>
@@ -383,10 +438,21 @@ function RecipeDetails() {
             <p style={{ color: textColor }}>No feedback yet.</p>
           ) : (
             visibleComments.map((c, i) => (
-              <div key={i} className="max-w-xs p-6 rounded-xl" style={{ backgroundColor: cardBg, color: textColor }}>
+              <div
+                key={i}
+                className="max-w-xs p-6 rounded-xl"
+                style={{ backgroundColor: cardBg, color: textColor }}
+              >
                 <div className="flex justify-center text-xl mb-2">
-                  {[1,2,3,4,5].map((s) => (
-                    <span key={s} className={s <= (c.rating || 0) ? "text-[#FFD700]" : "text-gray-300"}>
+                  {[1, 2, 3, 4, 5].map((s) => (
+                    <span
+                      key={s}
+                      className={
+                        s <= (c.rating || 0)
+                          ? "text-[#FFD700]"
+                          : "text-gray-300"
+                      }
+                    >
                       ★
                     </span>
                   ))}
@@ -415,14 +481,20 @@ function RecipeDetails() {
 
         {/* FEEDBACK FORM */}
         {user && (
-          <div className="max-w-md mx-auto p-6 rounded-2xl shadow-lg" style={{ backgroundColor: cardBg }}>
-            <h3 className="text-lg font-semibold text-center mb-4" style={{ color: titleColor }}>
+          <div
+            className="max-w-md mx-auto p-6 rounded-2xl shadow-lg"
+            style={{ backgroundColor: cardBg }}
+          >
+            <h3
+              className="text-lg font-semibold text-center mb-4"
+              style={{ color: titleColor }}
+            >
               Share your experience ✍️
             </h3>
 
             {/* STARS */}
             <div className="flex justify-center mb-4">
-              {[1,2,3,4,5].map((star) => (
+              {[1, 2, 3, 4, 5].map((star) => (
                 <span
                   key={star}
                   onClick={() => setRating(star)}

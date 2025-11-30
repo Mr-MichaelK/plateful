@@ -1,23 +1,25 @@
 import React, { useState } from "react";
 import { Menu, X, Sun, Moon } from "lucide-react";
 import { useTheme } from "../context/ThemeContext";
-import { useAuth } from "../Auth/AuthContext";
-import { Link } from "react-router-dom";          // FIXED
+import { Link } from "react-router-dom";
 import logo from "../../public/plateful-logo.svg";
 import profilePic from "../assets/profile-placeholder.svg";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
+import Swal from "sweetalert2";
 
-export default function SignedInHeader({ userProfilePicUrl }) {
+// made by Michael Kolanjian and Adam Abdel Karim
+// mobile menu and responsiveness added by Noura Hajj Chehade
+export default function SignedInHeader({ user }) {
+  const navigate = useNavigate();
   const [menuOpen, setMenuOpen] = useState(false);
   const [isDropdownOpen, setDropdownOpen] = useState(false);
   const { theme, toggleTheme } = useTheme();
-  const { logout } = useAuth();
+  const { signOut } = useAuth();
 
   const toggleDropdown = () => setDropdownOpen((prev) => !prev);
 
-  const handleSignOut = async () => {
-    await logout();
-    window.location.href = "/";
-  };
+  const profileImageUrl = user?.profilePicUrl || profilePic;
 
   const links = [
     { name: "Home", href: "/home" },
@@ -28,10 +30,32 @@ export default function SignedInHeader({ userProfilePicUrl }) {
     { name: "Contact", href: "/contact" },
   ];
 
+  // subtle dark colors
   const bgColor = theme === "dark" ? "#1a1a1a" : "#fff8f0";
   const textColor = theme === "dark" ? "#f2d8d8" : "#7a1f2a";
-  const borderColor = "#7a1f2a";
+  const borderColor = theme === "dark" ? "#7a1f2a" : "#7a1f2a"; // consistent brand
+  const hoverBg = theme === "dark" ? "#2a2a2a" : "#f5eee4";
   const dropdownBg = theme === "dark" ? "#1f1f1f" : "#fff0e5";
+
+  const handleSignOut = async () => {
+    setDropdownOpen(false);
+
+    try {
+      // This clears the cookie and the global state instantly
+      await signOut();
+
+      // redirect to homepage
+      navigate("/", { replace: true });
+    } catch (error) {
+      console.error("Sign out failed:", error);
+      Swal.fire({
+        icon: "error",
+        title: "Sign Out Failed",
+        text: "We couldn't complete your request. Please check your connection and try again.",
+        confirmButtonColor: "#7a1f2a",
+      });
+    }
+  };
 
   return (
     <>
@@ -41,8 +65,6 @@ export default function SignedInHeader({ userProfilePicUrl }) {
       >
         <nav className="py-4 px-6 flex flex-col md:flex-row justify-between items-center">
           <div className="flex items-center justify-between w-full md:w-auto">
-
-            {/* FIXED: Link instead of anchor */}
             <Link to="/" className="flex items-center gap-2">
               <img src={logo} alt="Plateful logo" className="w-10 h-10" />
               <span className="text-xl font-semibold">Plateful</span>
@@ -60,7 +82,11 @@ export default function SignedInHeader({ userProfilePicUrl }) {
                 )}
               </button>
 
-              <button onClick={() => setMenuOpen(!menuOpen)} className="md:hidden">
+              {/* Mobile Menu Button */}
+              <button
+                onClick={() => setMenuOpen(!menuOpen)}
+                className="md:hidden"
+              >
                 {menuOpen ? <X size={26} /> : <Menu size={26} />}
               </button>
             </div>
@@ -70,7 +96,6 @@ export default function SignedInHeader({ userProfilePicUrl }) {
           <ul className="hidden md:flex items-center space-x-4 mt-3 md:mt-0 text-sm font-medium">
             {links.map((link) => (
               <li key={link.name}>
-                {/* FIXED */}
                 <Link
                   to={link.href}
                   style={{ color: textColor }}
@@ -84,7 +109,7 @@ export default function SignedInHeader({ userProfilePicUrl }) {
             <li className="relative">
               <button onClick={toggleDropdown} className="p-0">
                 <img
-                  src={userProfilePicUrl || profilePic}
+                  src={profileImageUrl}
                   alt="Profile"
                   width={40}
                   height={40}
@@ -99,7 +124,6 @@ export default function SignedInHeader({ userProfilePicUrl }) {
                   className="absolute top-full right-0 mt-2 rounded-lg shadow-lg p-4 flex flex-col gap-3 min-w-[150px] z-50"
                   style={{ backgroundColor: dropdownBg, color: textColor }}
                 >
-                  {/* FIXED */}
                   <Link
                     to="/profile/user-info"
                     className="text-base font-medium hover:opacity-80 transition-opacity duration-200"
@@ -143,7 +167,7 @@ export default function SignedInHeader({ userProfilePicUrl }) {
               style={{ borderColor }}
             >
               <img
-                src={userProfilePicUrl || profilePic}
+                src={profileImageUrl}
                 alt="Your profile"
                 className="w-7 h-7 rounded-full"
                 style={{ borderColor }}
