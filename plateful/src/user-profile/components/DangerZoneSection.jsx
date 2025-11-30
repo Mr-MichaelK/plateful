@@ -1,10 +1,52 @@
 //Made by Michael Kolanjian
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { useTheme } from "../../context/ThemeContext";
+import { useAuth } from "../../context/AuthContext";
+import { API_BASE_URL } from "../../apiConfig";
 import trashIcon from "../../assets/trash-icon.svg";
-import repeatIcon from "../../assets/repeat-icon.svg";
 
 export default function DangerZoneSection() {
-  const { theme } = useTheme();
+  const { theme, showToast } = useTheme();
+  const { setUser } = useAuth();
+  const navigate = useNavigate();
+
+  const [isDeleting, setIsDeleting] = useState(false);
+
+  const handleDeleteAccount = async () => {
+    const isConfirmed = window.confirm(
+      "Are you absolutely sure you want to delete your account? This action cannot be undone."
+    );
+
+    if (!isConfirmed) {
+      return;
+    }
+
+    setIsDeleting(true);
+
+    try {
+      const res = await fetch(`${API_BASE_URL}/users/profile`, {
+        method: "DELETE",
+        credentials: "include",
+      });
+
+      if (!res.ok) {
+        const errorData = await res.json();
+        throw new Error(errorData.error || "Failed to delete account.");
+      }
+
+      setUser(null);
+
+      alert("Your account has been successfully deleted.");
+
+      navigate("/");
+    } catch (error) {
+      console.error("Account Deletion Error:", error);
+      alert(`Could not delete account. Error: ${error.message}`);
+    } finally {
+      setIsDeleting(false);
+    }
+  };
 
   // Theme-based colors
   const sectionBg = theme === "dark" ? "#2a2a2a" : "#fff8f0";
@@ -13,9 +55,7 @@ export default function DangerZoneSection() {
   const subTextColor = theme === "dark" ? "#aaa" : "#666";
   const dangerBtnBg = theme === "dark" ? "#7a1f2a" : "#7a1f2a";
   const dangerBtnHover = theme === "dark" ? "#5c161f" : "#5c161f";
-  const resetBtnText = theme === "dark" ? "#f9c8c8" : "#7a1f2a";
-  const resetBtnHoverBg = theme === "dark" ? "#3a1a1a" : "#fff0e5";
-  const resetBtnBorder = theme === "dark" ? "#555" : "#ccc";
+  const btnDisabledBg = theme === "dark" ? "#4a131b" : "#4a131b";
 
   return (
     <section
@@ -33,47 +73,28 @@ export default function DangerZoneSection() {
         Careful, these actions cannot be undone.
       </p>
 
-      {/* Reset Progress Button */}
-      <button
-        className="flex items-center gap-4 w-[200px] px-3 py-2 mb-4 rounded-md font-medium text-base transition-colors cursor-pointer"
-        style={{
-          color: resetBtnText,
-          border: `1px solid ${resetBtnBorder}`,
-          backgroundColor: "transparent",
-        }}
-        onMouseEnter={(e) =>
-          (e.currentTarget.style.backgroundColor = resetBtnHoverBg)
-        }
-        onMouseLeave={(e) =>
-          (e.currentTarget.style.backgroundColor = "transparent")
-        }
-      >
-        <img
-          src={repeatIcon}
-          alt="Reset Progress Icon"
-          width={25}
-          height={25}
-        />
-        <p className="m-0 flex-grow text-left">Reset Data</p>
-      </button>
-
       {/* Delete Account Button */}
       <button
-        className="flex items-center gap-4 w-[200px] px-3 py-2 mb-4 rounded-md font-medium text-base transition-colors cursor-pointer"
+        onClick={handleDeleteAccount}
+        disabled={isDeleting}
+        className="flex items-center gap-4 w-[200px] px-3 py-2 mb-4 rounded-md font-medium text-base transition-colors cursor-pointer disabled:opacity-70"
         style={{
           color: "#fff",
-          backgroundColor: dangerBtnBg,
+          backgroundColor: isDeleting ? btnDisabledBg : dangerBtnBg, // Change color when loading
           border: `1px solid ${dangerBtnBg}`,
         }}
         onMouseEnter={(e) =>
+          !isDeleting &&
           (e.currentTarget.style.backgroundColor = dangerBtnHover)
         }
         onMouseLeave={(e) =>
-          (e.currentTarget.style.backgroundColor = dangerBtnBg)
+          !isDeleting && (e.currentTarget.style.backgroundColor = dangerBtnBg)
         }
       >
         <img src={trashIcon} alt="Delete Account Icon" width={25} height={25} />
-        <p className="m-0 flex-grow text-left">Delete Account</p>
+        <p className="m-0 flex-grow text-left">
+          {isDeleting ? "Deleting..." : "Delete Account"}
+        </p>
       </button>
     </section>
   );

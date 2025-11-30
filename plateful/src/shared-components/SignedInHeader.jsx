@@ -7,6 +7,11 @@ import profilePic from "../assets/profile-placeholder.svg";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import Swal from "sweetalert2";
+import { API_BASE_URL } from "../apiConfig";
+
+function getServerRoot(baseUrl) {
+  return baseUrl.replace(/\/api$/, "");
+}
 
 // made by Michael Kolanjian and Adam Abdel Karim
 // mobile menu and responsiveness added by Noura Hajj Chehade
@@ -17,9 +22,13 @@ export default function SignedInHeader({ user }) {
   const { theme, toggleTheme } = useTheme();
   const { signOut } = useAuth();
 
+  const SERVER_ROOT = getServerRoot(API_BASE_URL);
+
   const toggleDropdown = () => setDropdownOpen((prev) => !prev);
 
-  const profileImageUrl = user?.profilePicUrl || profilePic;
+  const profileImageUrl = user?.profilePicUrl
+    ? `${SERVER_ROOT}${user.profilePicUrl}`
+    : profilePic;
 
   const links = [
     { name: "Home", href: "/home" },
