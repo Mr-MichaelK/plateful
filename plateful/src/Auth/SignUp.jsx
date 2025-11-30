@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { API_BASE_URL } from "../apiConfig.js";
 
 import AuthHeader from "./components/AuthHeader.jsx";
 import Title from "./components/Title.jsx";
@@ -10,17 +11,19 @@ import PrimaryButton from "./components/PrimaryButton.jsx";
 import BottomText from "./components/BottomText.jsx";
 import Footer from "../components/Footer.jsx";
 import { useTheme } from "../context/ThemeContext";
+import { useAuth } from "../context/AuthContext";
 
 // made by nour diab
 
 export default function SignUp() {
   const navigate = useNavigate();
   const { theme } = useTheme();
+  const { setUser } = useAuth();
 
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [agree, setAgree] = useState(false); 
+  const [agree, setAgree] = useState(false);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
@@ -31,7 +34,7 @@ export default function SignUp() {
   useEffect(() => {
     const checkAuth = async () => {
       try {
-        const res = await fetch("http://localhost:5001/auth/check", {
+        const res = await fetch(`${API_BASE_URL}/auth/check`, {
           credentials: "include", // include cookies so backend can read jwt
         });
 
@@ -73,7 +76,7 @@ export default function SignUp() {
       setError("");
 
       // send signup request to backend
-      const res = await fetch("http://localhost:5001/signup", {
+      const res = await fetch(`${API_BASE_URL}/auth/signup`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include", // include cookies so backend can set auth cookie right after signup
@@ -87,6 +90,8 @@ export default function SignUp() {
         setError(data.error || "Something went wrong during sign up.");
         return;
       }
+
+      setUser(data.user);
 
       // everything is good: user is created in the database
       // added a simple browser popup to confirm, then send them to the home page
@@ -107,7 +112,6 @@ export default function SignUp() {
       className="min-h-screen flex flex-col"
       style={{ backgroundColor: bgColor, color: textColor }}
     >
-
       <AuthHeader active="signup" />
 
       <Title
@@ -163,11 +167,7 @@ export default function SignUp() {
           <PrimaryButton
             text={loading ? "Signing up..." : "Sign up for free"}
             disabled={
-              loading ||
-              !agree ||
-              !name.trim() ||
-              !email.trim() ||
-              !password
+              loading || !agree || !name.trim() || !email.trim() || !password
             }
             type="submit"
           />

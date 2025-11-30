@@ -9,14 +9,16 @@ import Swal from "sweetalert2";
 
 // made by Michael Kolanjian and Adam Abdel Karim
 // mobile menu and responsiveness added by Noura Hajj Chehade
-export default function SignedInHeader({ userProfilePicUrl }) {
+export default function SignedInHeader({ user }) {
   const navigate = useNavigate();
   const [menuOpen, setMenuOpen] = useState(false);
   const [isDropdownOpen, setDropdownOpen] = useState(false);
   const { theme, toggleTheme } = useTheme();
-  const { signOut, user } = useAuth();
+  const { signOut } = useAuth();
 
   const toggleDropdown = () => setDropdownOpen((prev) => !prev);
+
+  const profileImageUrl = user?.profilePicUrl || profilePic;
 
   const links = [
     { name: "Home", href: "/home" },
@@ -38,6 +40,7 @@ export default function SignedInHeader({ userProfilePicUrl }) {
     setDropdownOpen(false);
 
     try {
+      // This clears the cookie and the global state instantly
       await signOut();
 
       // redirect to homepage
@@ -112,7 +115,7 @@ export default function SignedInHeader({ userProfilePicUrl }) {
             <li className="relative">
               <button onClick={toggleDropdown} className="p-0">
                 <img
-                  src={userProfilePicUrl || profilePic}
+                  src={profileImageUrl}
                   alt="Profile"
                   width={40}
                   height={40}
@@ -134,7 +137,7 @@ export default function SignedInHeader({ userProfilePicUrl }) {
                     Profile
                   </a>
                   <button
-                    onClick={handleSignOut} // This is the fixed, state-clearing function
+                    onClick={handleSignOut}
                     className="text-base font-medium hover:opacity-80 transition-opacity duration-200 text-left"
                   >
                     Sign Out
@@ -169,7 +172,7 @@ export default function SignedInHeader({ userProfilePicUrl }) {
               style={{ borderColor }}
             >
               <img
-                src={userProfilePicUrl || profilePic}
+                src={profileImageUrl}
                 alt="Your profile"
                 className="w-7 h-7 rounded-full"
                 style={{ borderColor }}
