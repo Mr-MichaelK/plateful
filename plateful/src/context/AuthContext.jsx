@@ -1,17 +1,15 @@
-// src/context/AuthContext.jsx
 import React, { createContext, useContext, useState, useEffect } from "react";
-import { API_BASE_URL } from "../apiConfig"; // Import your API Base URL
+import { API_BASE_URL } from "../apiConfig";
 
 const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
-  const [user, setUser] = useState(null); // Holds user data if authenticated
-  const [loading, setLoading] = useState(true); // To prevent flashing content
+  const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true);
 
   // 1. Function to check authentication status
   const checkAuthStatus = async () => {
     try {
-      // Must include credentials for the browser to send the auth_token cookie
       const response = await fetch(`${API_BASE_URL}/auth/check`, {
         method: "GET",
         credentials: "include",
@@ -31,19 +29,18 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  // Run check when component mounts
+  // check when component mounts
   useEffect(() => {
     checkAuthStatus();
   }, []);
 
-  // 2. Function to handle frontend sign-out
   const signOut = async () => {
     try {
       await fetch(`${API_BASE_URL}/auth/logout`, {
         method: "POST",
         credentials: "include",
       });
-      setUser(null); // Clear local state immediately
+      setUser(null); // clear local state immediately
     } catch (error) {
       console.error("Logout failed:", error);
     }

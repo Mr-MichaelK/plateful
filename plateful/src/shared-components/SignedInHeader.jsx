@@ -3,16 +3,20 @@ import { Menu, X, Sun, Moon } from "lucide-react";
 import { useTheme } from "../context/ThemeContext";
 import logo from "../../public/plateful-logo.svg";
 import profilePic from "../assets/profile-placeholder.svg";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
+import Swal from "sweetalert2";
 
 // made by Michael Kolanjian and Adam Abdel Karim
 // mobile menu and responsiveness added by Noura Hajj Chehade
 export default function SignedInHeader({ userProfilePicUrl }) {
+  const navigate = useNavigate();
   const [menuOpen, setMenuOpen] = useState(false);
   const [isDropdownOpen, setDropdownOpen] = useState(false);
   const { theme, toggleTheme } = useTheme();
+  const { signOut, user } = useAuth();
 
   const toggleDropdown = () => setDropdownOpen((prev) => !prev);
-  const handleSignOut = () => console.log("Sign out logic here");
 
   const links = [
     { name: "Home", href: "/home" },
@@ -24,13 +28,30 @@ export default function SignedInHeader({ userProfilePicUrl }) {
   ];
 
   // subtle dark colors
-// dark mode colors (Darker!)
-const bgColor = theme === "dark" ? "#1a1a1a" : "#fff8f0"; 
-const textColor = theme === "dark" ? "#f2d8d8" : "#7a1f2a";
-const borderColor = theme === "dark" ? "#7a1f2a" : "#7a1f2a"; // consistent brand
-const hoverBg = theme === "dark" ? "#2a2a2a" : "#f5eee4";
-const dropdownBg = theme === "dark" ? "#1f1f1f" : "#fff0e5";
+  const bgColor = theme === "dark" ? "#1a1a1a" : "#fff8f0";
+  const textColor = theme === "dark" ? "#f2d8d8" : "#7a1f2a";
+  const borderColor = theme === "dark" ? "#7a1f2a" : "#7a1f2a"; // consistent brand
+  const hoverBg = theme === "dark" ? "#2a2a2a" : "#f5eee4";
+  const dropdownBg = theme === "dark" ? "#1f1f1f" : "#fff0e5";
 
+  const handleSignOut = async () => {
+    setDropdownOpen(false);
+
+    try {
+      await signOut();
+
+      // redirect to homepage
+      navigate("/", { replace: true });
+    } catch (error) {
+      console.error("Sign out failed:", error);
+      Swal.fire({
+        icon: "error",
+        title: "Sign Out Failed",
+        text: "We couldn't complete your request. Please check your connection and try again.",
+        confirmButtonColor: "#7a1f2a",
+      });
+    }
+  };
 
   return (
     <>
@@ -60,7 +81,10 @@ const dropdownBg = theme === "dark" ? "#1f1f1f" : "#fff0e5";
               </button>
 
               {/* Mobile Menu Button */}
-              <button onClick={() => setMenuOpen(!menuOpen)} className="md:hidden">
+              <button
+                onClick={() => setMenuOpen(!menuOpen)}
+                className="md:hidden"
+              >
                 {menuOpen ? <X size={26} /> : <Menu size={26} />}
               </button>
             </div>
@@ -110,7 +134,7 @@ const dropdownBg = theme === "dark" ? "#1f1f1f" : "#fff0e5";
                     Profile
                   </a>
                   <button
-                    onClick={handleSignOut}
+                    onClick={handleSignOut} // This is the fixed, state-clearing function
                     className="text-base font-medium hover:opacity-80 transition-opacity duration-200 text-left"
                   >
                     Sign Out
