@@ -1,5 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { useTheme } from "../context/ThemeContext";
+import { useAuth } from "../Auth/AuthContext";
+import { API_BASE_URL } from "../apiConfig";
 import { API_BASE_URL } from "../apiConfig.js";
 
 import AuthHeader from "./components/AuthHeader.jsx";
@@ -19,18 +22,22 @@ export default function SignUp() {
   const navigate = useNavigate();
   const { theme } = useTheme();
   const { setUser } = useAuth();
+  const { setUser } = useAuth();
 
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [agree, setAgree] = useState(false);
+  const [agree, setAgree] = useState(false);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+
+  const API_ROOT = API_BASE_URL.replace("/api", "");
 
   const bgColor = theme === "dark" ? "#1e1e1e" : "#fff8f0";
   const textColor = theme === "dark" ? "#ddd" : "#444";
 
-  // auth check: if user already logged in (valid cookie), skip signup and send to home
+  // redirect if authenticated
   useEffect(() => {
     const checkAuth = async () => {
       try {
@@ -38,34 +45,24 @@ export default function SignUp() {
           credentials: "include", // include cookies so backend can read jwt
         });
 
-        if (!res.ok) return; // not authenticated, user can stay on signup
-
+        if (!res.ok) return;
         const data = await res.json();
 
-        if (data.authenticated) {
-          // user is already logged in, no need to sign up again
-          navigate("/home");
-        }
-      } catch (err) {
-        console.error("auth check on signup failed", err);
-      }
+        if (data.authenticated) navigate("/home");
+      } catch {}
     };
 
     checkAuth();
-  }, [navigate]);
+  }, [navigate, API_ROOT]); // FIXED
 
   const handleSubmit = async (e) => {
-    e.preventDefault(); // stop the page from refreshing
+    e.preventDefault();
 
-    // front-end validation before talking to the backend
-    if (!agree) return; // user has to accept the checkbox
-
+    if (!agree) return;
     if (!name.trim() || !email.trim() || !password) {
       setError("All fields are required.");
       return;
     }
-
-    // same password rule as the backend: at least 12 chars
     if (password.length < 12) {
       setError("Password must be at least 12 characters long.");
       return;
@@ -79,29 +76,23 @@ export default function SignUp() {
       const res = await fetch(`${API_BASE_URL}/auth/signup`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        credentials: "include", // include cookies so backend can set auth cookie right after signup
+        credentials: "include",
         body: JSON.stringify({ name, email, password }),
       });
 
       const data = await res.json();
 
-      // if backend returns an error (ex: email already in use), show it under the form
       if (!res.ok) {
-        setError(data.error || "Something went wrong during sign up.");
+        setError(data.error || "Signup failed.");
         return;
       }
 
       setUser(data.user);
 
-      // everything is good: user is created in the database
-      // added a simple browser popup to confirm, then send them to the home page
-      // backend also keeps them logged in with a 30-day auth cookie
       window.alert("Account created successfully!");
       navigate("/home");
     } catch (err) {
-      console.error(err);
-      // fallback message if the server is down or not reachable
-      setError("Could not connect to the server. Please try again.");
+      setError("Could not connect to the server.");
     } finally {
       setLoading(false);
     }
@@ -116,7 +107,7 @@ export default function SignUp() {
 
       <Title
         heading="Cook smarter with Plateful"
-        subheading="Sign up to plan meals, save recipes, and keep your kitchen organized in minutes."
+        subheading="Sign up to plan meals, save recipes, and keep your kitchen organized."
       />
 
       <Box>
@@ -128,7 +119,7 @@ export default function SignUp() {
             value={name}
             onChange={(e) => {
               setName(e.target.value);
-              if (error) setError(""); // clear error when user edits the form
+              if (error) setError("");
             }}
           />
 
@@ -154,16 +145,10 @@ export default function SignUp() {
             }}
           />
 
-          {/* show any error message coming from validation or backend */}
-          {error && (
-            <p className="text-red-600 text-sm mt-2" aria-live="polite">
-              {error}
-            </p>
-          )}
+          {error && <p className="text-red-600 text-sm mt-2">{error}</p>}
 
           <Checkbox checked={agree} onChange={setAgree} />
 
-          {/* main submit button. disabled when form is not ready or when request is in progress */}
           <PrimaryButton
             text={loading ? "Signing up..." : "Sign up for free"}
             disabled={

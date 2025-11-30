@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useTheme } from "../context/ThemeContext";
 import { API_BASE_URL } from "../apiConfig.js";
@@ -19,7 +20,12 @@ export default function LogIn() {
   const navigate = useNavigate();
   const { theme } = useTheme();
   const { setUser } = useAuth();
+  const { setUser } = useAuth();
 
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
@@ -27,7 +33,10 @@ export default function LogIn() {
 
   const bgColor = theme === "dark" ? "#2a2a2a" : "#fff8f0";
 
-  // auth check: if user already logged in (valid cookie), skip login and send to home
+  // backend root
+  const API_ROOT = API_BASE_URL.replace("/api", "");
+
+  // redirect if logged in
   useEffect(() => {
     const checkAuth = async () => {
       try {
@@ -35,23 +44,17 @@ export default function LogIn() {
           credentials: "include", // include cookies so backend can read jwt
         });
 
-        if (!res.ok) return; // not authenticated, user can stay on login
-
+        if (!res.ok) return;
         const data = await res.json();
-
-        if (data.authenticated) {
-          // user is already logged in, no need to log in again
-          navigate("/home");
-        }
-      } catch (err) {
-        console.error("auth check on login failed", err);
-      }
+        if (data.authenticated) navigate("/home");
+      } catch {}
     };
 
     checkAuth();
-  }, [navigate]);
+  }, [navigate, API_ROOT]); // FIXED
 
   const handleSubmit = async (e) => {
+    e.preventDefault();
     e.preventDefault();
 
     if (!email.trim() || !password) {
@@ -66,6 +69,7 @@ export default function LogIn() {
       const res = await fetch(`${API_BASE_URL}/auth/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
+        credentials: "include",
         credentials: "include",
         body: JSON.stringify({ email, password }),
       });
@@ -126,14 +130,8 @@ export default function LogIn() {
             theme={theme}
           />
 
-          {/* error text from validation or backend (wrong creds, etc.) */}
-          {error && (
-            <p className="text-red-600 text-sm mt-2" aria-live="polite">
-              {error}
-            </p>
-          )}
+          {error && <p className="text-red-600 text-sm mt-2">{error}</p>}
 
-          {/* login button. disabled when fields are empty or request is loading */}
           <PrimaryButton
             text={loading ? "Logging in..." : "Log in"}
             type="submit"
