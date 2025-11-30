@@ -1,32 +1,27 @@
 //Made by Michael Kolanjian
 import { useState } from "react";
-// Added imports for functionality and routing
 import { useNavigate } from "react-router-dom";
 import { useTheme } from "../../context/ThemeContext";
 import { useAuth } from "../../context/AuthContext";
 import { API_BASE_URL } from "../../apiConfig";
-// Using imported SVG paths as requested:
 import eyeOpenIcon from "../../assets/eye-open.svg";
 import eyeClosedIcon from "../../assets/eye-closed.svg";
 
 export default function ChangePasswordForm() {
   const { theme } = useTheme();
-  const { setUser } = useAuth(); // Function to clear user state
-  const navigate = useNavigate(); // Function to redirect
+  const { setUser } = useAuth();
+  const navigate = useNavigate();
 
-  // 🌟 State for form data
   const [passwords, setPasswords] = useState({
     currentPassword: "",
     newPassword: "",
     confirmPassword: "",
   });
 
-  // 🌟 State for UI feedback
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(null);
 
-  // States for password visibility (existing)
   const [showCurrentPassword, setShowCurrentPassword] = useState(false);
   const [showNewPassword, setShowNewPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
@@ -35,16 +30,13 @@ export default function ChangePasswordForm() {
     setter((prev) => !prev);
   };
 
-  // Handler to manage form state
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setPasswords((prev) => ({ ...prev, [name]: value }));
-    // Clear feedback when user starts typing
     setError(null);
     setSuccess(null);
   };
 
-  // 🌟 Handler for form submission
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError(null);
@@ -52,7 +44,6 @@ export default function ChangePasswordForm() {
 
     const { currentPassword, newPassword, confirmPassword } = passwords;
 
-    // Client-side Validation
     if (!currentPassword || !newPassword || !confirmPassword) {
       return setError("All password fields are required.");
     }
@@ -71,7 +62,7 @@ export default function ChangePasswordForm() {
       const res = await fetch(`${API_BASE_URL}/users/password`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        credentials: "include", // Sends auth cookie
+        credentials: "include",
         body: JSON.stringify({ currentPassword, newPassword }),
       });
 
@@ -81,10 +72,8 @@ export default function ChangePasswordForm() {
         throw new Error(data.error || "Password update failed.");
       }
 
-      // Success: Clear state, show message, and redirect to login
       setSuccess(data.message);
 
-      // Clear user state and inputs
       setUser(null);
       setPasswords({
         currentPassword: "",
@@ -92,7 +81,6 @@ export default function ChangePasswordForm() {
         confirmPassword: "",
       });
 
-      // Redirect user after a short delay
       setTimeout(() => {
         navigate("/log-in");
       }, 2000);
@@ -157,8 +145,8 @@ export default function ChangePasswordForm() {
             type={showCurrentPassword ? "text" : "password"}
             id="currentPassword"
             name="currentPassword"
-            value={passwords.currentPassword} // BIND VALUE
-            onChange={handleInputChange} // BIND HANDLER
+            value={passwords.currentPassword}
+            onChange={handleInputChange}
             className="w-full px-3 py-2 bg-transparent text-base focus:outline-none"
             style={{ color: textColor }}
           />
@@ -197,8 +185,8 @@ export default function ChangePasswordForm() {
             type={showNewPassword ? "text" : "password"}
             id="newPassword"
             name="newPassword"
-            value={passwords.newPassword} // BIND VALUE
-            onChange={handleInputChange} // BIND HANDLER
+            value={passwords.newPassword}
+            onChange={handleInputChange}
             className="w-full px-3 py-2 bg-transparent text-base focus:outline-none"
             style={{ color: textColor }}
           />
@@ -206,7 +194,6 @@ export default function ChangePasswordForm() {
             className="cursor-pointer pr-3 flex items-center justify-center text-current"
             onClick={() => togglePasswordVisibility(setShowNewPassword)}
           >
-            {/* Using img tag with imported SVG path */}
             <img
               src={showNewPassword ? eyeOpenIcon : eyeClosedIcon}
               alt="Toggle new password visibility"
@@ -237,8 +224,8 @@ export default function ChangePasswordForm() {
             type={showConfirmPassword ? "text" : "password"}
             id="confirmPassword"
             name="confirmPassword"
-            value={passwords.confirmPassword} // BIND VALUE
-            onChange={handleInputChange} // BIND HANDLER
+            value={passwords.confirmPassword}
+            onChange={handleInputChange}
             className="w-full px-3 py-2 bg-transparent text-base focus:outline-none"
             style={{ color: textColor }}
           />
@@ -246,7 +233,6 @@ export default function ChangePasswordForm() {
             className="cursor-pointer pr-3 flex items-center justify-center text-current"
             onClick={() => togglePasswordVisibility(setShowConfirmPassword)}
           >
-            {/* Using img tag with imported SVG path */}
             <img
               src={showConfirmPassword ? eyeOpenIcon : eyeClosedIcon}
               alt="Toggle confirm password visibility"
@@ -259,7 +245,7 @@ export default function ChangePasswordForm() {
 
       <button
         type="submit"
-        disabled={loading} // DISABLE WHEN LOADING
+        disabled={loading}
         className="mt-8 self-end px-6 py-2 rounded-md font-medium text-lg transition-colors cursor-pointer disabled:opacity-50"
         style={{
           backgroundColor: btnColor,
