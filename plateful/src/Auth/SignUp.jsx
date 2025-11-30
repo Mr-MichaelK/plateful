@@ -1,11 +1,9 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useTheme } from "../context/ThemeContext";
-import { useAuth } from "../Auth/AuthContext";
-import { API_BASE_URL } from "../apiConfig";
+import { useAuth } from "../context/AuthContext";
 import { API_BASE_URL } from "../apiConfig.js";
 
-import AuthHeader from "./components/AuthHeader.jsx";
 import Title from "./components/Title.jsx";
 import Box from "./components/Box.jsx";
 import InputField from "./components/InputField.jsx";
@@ -13,8 +11,6 @@ import Checkbox from "./components/Checkbox.jsx";
 import PrimaryButton from "./components/PrimaryButton.jsx";
 import BottomText from "./components/BottomText.jsx";
 import Footer from "../components/Footer.jsx";
-import { useTheme } from "../context/ThemeContext";
-import { useAuth } from "../context/AuthContext";
 
 // made by nour diab
 
@@ -22,17 +18,13 @@ export default function SignUp() {
   const navigate = useNavigate();
   const { theme } = useTheme();
   const { setUser } = useAuth();
-  const { setUser } = useAuth();
 
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [agree, setAgree] = useState(false);
-  const [agree, setAgree] = useState(false);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
-
-  const API_ROOT = API_BASE_URL.replace("/api", "");
 
   const bgColor = theme === "dark" ? "#1e1e1e" : "#fff8f0";
   const textColor = theme === "dark" ? "#ddd" : "#444";
@@ -53,7 +45,7 @@ export default function SignUp() {
     };
 
     checkAuth();
-  }, [navigate, API_ROOT]); // FIXED
+  }, [navigate]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -103,8 +95,6 @@ export default function SignUp() {
       className="min-h-screen flex flex-col"
       style={{ backgroundColor: bgColor, color: textColor }}
     >
-      <AuthHeader active="signup" />
-
       <Title
         heading="Cook smarter with Plateful"
         subheading="Sign up to plan meals, save recipes, and keep your kitchen organized."

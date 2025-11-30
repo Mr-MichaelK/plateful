@@ -1,4 +1,3 @@
-import { useAuth } from "../Auth/AuthContext";
 import SignedInHeader from "./SignedInHeader";
 import SignedOutHeader from "./SignedOutHeader";
 import { useAuth } from "../context/AuthContext";

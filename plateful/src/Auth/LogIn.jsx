@@ -1,11 +1,9 @@
 import React, { useState, useEffect } from "react";
-import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useTheme } from "../context/ThemeContext";
 import { API_BASE_URL } from "../apiConfig.js";
 import { useAuth } from "../context/AuthContext";
 
-import AuthHeader from "./components/AuthHeader.jsx";
 import Title from "./components/Title.jsx";
 import Box from "./components/Box.jsx";
 import InputField from "./components/InputField.jsx";
@@ -20,12 +18,7 @@ export default function LogIn() {
   const navigate = useNavigate();
   const { theme } = useTheme();
   const { setUser } = useAuth();
-  const { setUser } = useAuth();
 
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
-  const [loading, setLoading] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
@@ -97,8 +90,6 @@ export default function LogIn() {
       className="min-h-screen flex flex-col"
       style={{ backgroundColor: bgColor }}
     >
-      <AuthHeader active="login" />
-
       <Title
         heading="Welcome back"
         subheading="Log in to access your saved recipes, meal plans, and favorite dishes."

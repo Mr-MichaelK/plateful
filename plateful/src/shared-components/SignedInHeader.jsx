@@ -1,8 +1,7 @@
 import React, { useState } from "react";
 import { Menu, X, Sun, Moon } from "lucide-react";
 import { useTheme } from "../context/ThemeContext";
-import { useAuth } from "../Auth/AuthContext";
-import { Link } from "react-router-dom"; // FIXED
+import { Link } from "react-router-dom";
 import logo from "../../public/plateful-logo.svg";
 import profilePic from "../assets/profile-placeholder.svg";
 import { useNavigate } from "react-router-dom";
@@ -66,7 +65,6 @@ export default function SignedInHeader({ user }) {
       >
         <nav className="py-4 px-6 flex flex-col md:flex-row justify-between items-center">
           <div className="flex items-center justify-between w-full md:w-auto">
-            {/* FIXED: Link instead of anchor */}
             <Link to="/" className="flex items-center gap-2">
               <img src={logo} alt="Plateful logo" className="w-10 h-10" />
               <span className="text-xl font-semibold">Plateful</span>
@@ -98,7 +96,6 @@ export default function SignedInHeader({ user }) {
           <ul className="hidden md:flex items-center space-x-4 mt-3 md:mt-0 text-sm font-medium">
             {links.map((link) => (
               <li key={link.name}>
-                {/* FIXED */}
                 <Link
                   to={link.href}
                   style={{ color: textColor }}
@@ -127,7 +124,6 @@ export default function SignedInHeader({ user }) {
                   className="absolute top-full right-0 mt-2 rounded-lg shadow-lg p-4 flex flex-col gap-3 min-w-[150px] z-50"
                   style={{ backgroundColor: dropdownBg, color: textColor }}
                 >
-                  {/* FIXED */}
                   <Link
                     to="/profile/user-info"
                     className="text-base font-medium hover:opacity-80 transition-opacity duration-200"

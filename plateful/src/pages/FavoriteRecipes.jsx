@@ -5,7 +5,7 @@ import Footer from "../components/Footer";
 import Swal from "sweetalert2";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useTheme } from "../context/ThemeContext";
-import { useAuth } from "../Auth/AuthContext";
+import { useAuth } from "../context/AuthContext";
 import { API_BASE_URL } from "../apiConfig";
 
 function FavoriteRecipes() {
@@ -23,7 +23,6 @@ function FavoriteRecipes() {
     return `${API_ROOT}${imgPath}`;
   };
 
-  // ---------------------- PROTECT PAGE ----------------------
   useEffect(() => {
     if (authLoading) return; // WAIT for auth to finish
 
@@ -40,7 +39,6 @@ function FavoriteRecipes() {
     }
   }, [authLoading, user]);
 
-  // ---------------------- LOAD FAVORITES ----------------------
   useEffect(() => {
     if (authLoading) return; // wait
     if (!user) return;
