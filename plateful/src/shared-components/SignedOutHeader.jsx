@@ -17,7 +17,6 @@ export default function SignedOutHeader() {
   const menuLinks = [
     { name: "Home", href: "/" },
     { name: "Recipes", href: "/recipes" },
-    { name: "Meal Plans", href: "/meal-plans" },
     { name: "Contact", href: "/contact" },
   ];
 
