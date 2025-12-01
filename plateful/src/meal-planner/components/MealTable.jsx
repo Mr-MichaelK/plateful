@@ -3,19 +3,33 @@ import React, { useState, useEffect } from "react";
 import { Trash2 } from "lucide-react";
 import RecipeSelectorModal from "./RecipeSelectorModal";
 import { useTheme } from "../../context/ThemeContext";
+import { API_BASE_URL } from "../../apiConfig";
 
 const meals = ["Breakfast", "Lunch", "Dinner"];
 
+const initialMealObject = { id: null, name: "-", imageUrl: null };
+
+// 3 meals (rows) x 7 days (columns) filled with the initial object
+const initialMealData = Array(meals.length)
+  .fill(0)
+  .map(() => Array(7).fill(initialMealObject));
+
 const getWeekKey = (date) => {
   const startOfWeek = new Date(date);
-  startOfWeek.setDate(date.getDate() - date.getDay() + 1);
-  return `meals-${startOfWeek.toISOString().split("T")[0]}`;
+  const day = startOfWeek.getDay();
+  const diff = day === 0 ? 6 : day - 1;
+  startOfWeek.setDate(date.getDate() - diff);
+  startOfWeek.setHours(0, 0, 0, 0);
+  return startOfWeek.toISOString().split("T")[0];
 };
 
 export default function MealTable({ currentDate }) {
   const { theme } = useTheme();
+  const [modalOpen, setModalOpen] = useState(false);
+  const [selectedSlot, setSelectedSlot] = useState({ day: null, meal: null });
+  const [mealData, setMealData] = useState(initialMealData);
+  const [isLoading, setIsLoading] = useState(true); // New loading state for fetch
 
-  // Defensive check
   if (!currentDate || !(currentDate instanceof Date)) {
     return (
       <div className="p-4 text-center text-red-500">
@@ -25,7 +39,9 @@ export default function MealTable({ currentDate }) {
   }
 
   const startOfWeek = new Date(currentDate);
-  startOfWeek.setDate(currentDate.getDate() - currentDate.getDay() + 1);
+  const day = startOfWeek.getDay();
+  const diff = day === 0 ? 6 : day - 1;
+  startOfWeek.setDate(currentDate.getDate() - diff);
 
   const days = Array.from({ length: 7 }, (_, i) => {
     const d = new Date(startOfWeek);
@@ -33,33 +49,57 @@ export default function MealTable({ currentDate }) {
     return d;
   });
 
-  const [modalOpen, setModalOpen] = useState(false);
-  const [selectedSlot, setSelectedSlot] = useState({ day: null, meal: null });
-
-  const initialMealData = Array(meals.length)
-    .fill(0)
-    .map(() => Array(7).fill("-"));
-
-  const [mealData, setMealData] = useState(initialMealData);
-
   useEffect(() => {
-    const key = getWeekKey(currentDate);
-    const saved = localStorage.getItem(key);
-    if (saved) {
-      setMealData(JSON.parse(saved));
-    } else {
-      setMealData(initialMealData);
-    }
-  }, [currentDate]);
+    const fetchMealData = async () => {
+      const dateString = getWeekKey(currentDate);
+      setIsLoading(true);
 
-  const saveMealData = (newData) => {
+      try {
+        const res = await fetch(`${API_BASE_URL}/meal-plans/${dateString}`, {
+          credentials: "include",
+        });
+
+        if (res.ok) {
+          const data = await res.json();
+          setMealData(data.meals);
+        } else {
+          console.error("Failed to fetch meal plan:", res.statusText);
+          setMealData(initialMealData);
+        }
+      } catch (error) {
+        console.error("Fetch error:", error);
+        setMealData(initialMealData);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchMealData();
+  }, [currentDate]);
+  const saveMealData = async (newData) => {
     setMealData(newData);
-    const key = getWeekKey(currentDate);
-    localStorage.setItem(key, JSON.stringify(newData));
+    const dateString = getWeekKey(currentDate);
+
+    try {
+      const res = await fetch(`${API_BASE_URL}/meal-plans`, {
+        method: "PUT", // Use PUT for upsert (create or update)
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({
+          dateString: dateString,
+          meals: newData,
+        }),
+      });
+
+      if (!res.ok) {
+        throw new Error("Failed to save meal plan on the server.");
+      }
+    } catch (error) {
+      console.error("Save error:", error);
+    }
   };
 
-  const isCellEmpty = (data) =>
-    data === "-" || data === null || data === undefined;
+  const isCellEmpty = (data) => data.id === null;
 
   const handleCellClick = (dayIdx, mealIdx) => {
     if (isCellEmpty(mealData[mealIdx][dayIdx])) {
@@ -69,15 +109,15 @@ export default function MealTable({ currentDate }) {
   };
 
   const handleSelectRecipe = (recipe) => {
-    const newMealData = [...mealData];
+    const newMealData = JSON.parse(JSON.stringify(mealData));
     newMealData[selectedSlot.meal][selectedSlot.day] = recipe;
     saveMealData(newMealData);
     setModalOpen(false);
   };
 
   const handleDelete = (dayIdx, mealIdx) => {
-    const newMealData = [...mealData];
-    newMealData[mealIdx][dayIdx] = "-";
+    const newMealData = JSON.parse(JSON.stringify(mealData));
+    newMealData[mealIdx][dayIdx] = initialMealObject; // Reset to empty object
     saveMealData(newMealData);
   };
 
@@ -100,6 +140,23 @@ export default function MealTable({ currentDate }) {
     theme === "dark" ? "#1f3d2e" : "#e8ffe8", // lunch
     theme === "dark" ? "#1f2f4a" : "#e8f0ff", // dinner
   ];
+
+  if (isLoading) {
+    return (
+      <div className="p-8 text-center" style={{ color: headerText }}>
+        <div
+          className="animate-spin inline-block w-8 h-8 border-4 rounded-full border-t-transparent"
+          style={{
+            borderColor: headerText,
+            borderTopColor: "transparent",
+          }}
+        ></div>
+        <p className="mt-3" style={{ color: headerText }}>
+          Loading your weekly meal plan...
+        </p>
+      </div>
+    );
+  }
 
   return (
     <div className="overflow-x-auto">
@@ -132,13 +189,10 @@ export default function MealTable({ currentDate }) {
 
               {days.map((_, dayIdx) => {
                 const cellData = mealData[mealIdx][dayIdx];
-                const isRecipe =
-                  !isCellEmpty(cellData) &&
-                  typeof cellData === "object" &&
-                  cellData.name;
+                const isRecipe = !isCellEmpty(cellData);
 
-                const recipeName = isRecipe ? cellData.name : cellData;
-                const recipeImageUrl = isRecipe ? cellData.imageUrl : null;
+                const recipeName = cellData.name;
+                const recipeImageUrl = cellData.imageUrl;
 
                 return (
                   <td
