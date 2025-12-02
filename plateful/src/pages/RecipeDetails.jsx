@@ -102,18 +102,28 @@ function RecipeDetails() {
     navigate("/favorites");
   };
 
-  // SHARE
-  const handleShare = async () => {
-    const url = window.location.href;
-    if (navigator.share) {
-      try {
-        await navigator.share({ title: recipe.title, url });
-      } catch {}
-    } else {
-      navigator.clipboard.writeText(url);
-      Swal.fire({ icon: "success", title: "Link copied!" });
-    }
-  };
+  function slugify(title) {
+  return title
+    .toLowerCase()
+    .replace(/ /g, "-")       // spaces → dashes
+    .replace(/[^\w-]+/g, ""); // remove special chars
+}
+
+
+const handleShare = async () => {
+  const slug = slugify(recipe.title); // e.g., "Blueberry Smoothie" → "blueberry-smoothie"
+  const url = `${window.location.origin}/recipe/${slug}`;
+
+  if (navigator.share) {
+    try {
+      await navigator.share({ title: recipe.title, url });
+    } catch {}
+  } else {
+    navigator.clipboard.writeText(url);
+    Swal.fire({ icon: "success", title: "Link copied!" });
+  }
+};
+
 
   // DELETE
   const handleDelete = async () => {
