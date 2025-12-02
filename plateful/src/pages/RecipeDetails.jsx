@@ -102,18 +102,8 @@ function RecipeDetails() {
     navigate("/favorites");
   };
 
-  function slugify(title) {
-  return title
-    .toLowerCase()
-    .replace(/ /g, "-")       // spaces → dashes
-    .replace(/[^\w-]+/g, ""); // remove special chars
-}
-
-
 const handleShare = async () => {
-  const slug = slugify(recipe.title); // e.g., "Blueberry Smoothie" → "blueberry-smoothie"
-  const url = `${window.location.origin}/recipe/${slug}`;
-
+  const url = `${window.location.origin}/recipe/${encodeURIComponent(recipe.title)}`;
   if (navigator.share) {
     try {
       await navigator.share({ title: recipe.title, url });
@@ -123,8 +113,6 @@ const handleShare = async () => {
     Swal.fire({ icon: "success", title: "Link copied!" });
   }
 };
-
-
   // DELETE
   const handleDelete = async () => {
     if (!isOwner) return;
