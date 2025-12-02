@@ -8,11 +8,13 @@ export default function SignedOutHeader() {
   const [menuOpen, setMenuOpen] = useState(false);
   const { theme, toggleTheme } = useTheme();
 
-  const bgColor = theme === "dark" ? "#e6e1dd" : "#fff8f0";
-  const textColor = theme === "dark" ? "#5a191f" : "#7a1f2a";
-  const linkHoverColor = theme === "dark" ? "#7a2a2e" : "#a02a3d";
-  const signUpBg = theme === "dark" ? "#d9bcbc" : "#7a1f2a";
-  const signUpHoverBg = theme === "dark" ? "#cfa8a8" : "#5c161f";
+// Match SignedInHeader colors:
+const bgColor = theme === "dark" ? "#1a1a1a" : "#fff8f0";
+const textColor = theme === "dark" ? "#f2d8d8" : "#7a1f2a";
+const linkHoverColor = theme === "dark" ? "#d9bcbc" : "#a02a3d";
+const signUpBg = theme === "dark" ? "#7a1f2a" : "#7a1f2a"; // brand consistent
+const signUpHoverBg = theme === "dark" ? "#5c161f" : "#5c161f"; 
+
 
   const menuLinks = [
     { name: "Home", href: "/" },
