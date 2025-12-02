@@ -18,7 +18,7 @@ const FeaturedRecipes = () => {
   useEffect(() => {
     async function fetchFeatured() {
       try {
-        const res = await fetch("http://localhost:5001/api/recipes/featured");
+        const res = await fetch("https://plateful-backend-dn0i.onrender.com/api/recipes/featured");
         const data = await res.json();
         setFeaturedRecipes(data);
       } catch (err) {
