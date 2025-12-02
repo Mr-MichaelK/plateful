@@ -1,4 +1,4 @@
-// made by Noura Hajj Chehade 
+// made by Noura Hajj Chehade
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
@@ -14,6 +14,7 @@ function RecipeDetails() {
   const { theme } = useTheme();
   const { user, loading: authLoading } = useAuth();
 
+  // HOOKS — always called
   const [recipe, setRecipe] = useState(null);
   const [allRecipes, setAllRecipes] = useState([]);
   const [comments, setComments] = useState([]);
@@ -25,8 +26,6 @@ function RecipeDetails() {
   const API_ROOT = API_BASE_URL.replace(/\/api$/, "");
   const buildImageUrl = (imgPath) =>
     !imgPath ? "" : imgPath.startsWith("http") ? imgPath : `${API_ROOT}${imgPath}`;
-
-  if (authLoading) return null;
 
   // LOAD DATA
   useEffect(() => {
@@ -43,8 +42,9 @@ function RecipeDetails() {
 
         const c = await fetch(`${API_BASE_URL}/comments/${encodeURIComponent(decoded)}`);
         if (c.ok) setComments(await c.json());
-      } catch {}
-      finally {
+      } catch (err) {
+        console.error("Error loading data:", err);
+      } finally {
         setLoading(false);
         window.scrollTo(0, 0);
       }
@@ -53,32 +53,20 @@ function RecipeDetails() {
     load();
   }, [id]);
 
-  if (loading || !recipe) {
-    return (
-      <>
-        <Header />
-        <section className="py-24 min-h-screen flex justify-center items-center">
-          <h2 className="text-3xl font-semibold">Loading recipe…</h2>
-        </section>
-        <Footer />
-      </>
-    );
-  }
-
-  const isOwner = user && user.email === recipe.ownerEmail;
+  const isOwner = user && recipe && user.email === recipe.ownerEmail;
 
   // IMAGE LIST
   const imageList = [];
-  if (recipe.image) imageList.push(recipe.image);
-  if (Array.isArray(recipe.images))
+  if (recipe?.image) imageList.push(recipe.image);
+  if (Array.isArray(recipe?.images))
     recipe.images.forEach((img) => img && !imageList.includes(img) && imageList.push(img));
-  if (Array.isArray(recipe.extraImages))
+  if (Array.isArray(recipe?.extraImages))
     recipe.extraImages.forEach((img) => img && !imageList.includes(img) && imageList.push(img));
 
   const mainImageUrl = buildImageUrl(imageList[0]);
 
   const similarRecipes = allRecipes
-    .filter((r) => r.title !== recipe.title && r.category === recipe.category)
+    .filter((r) => r.title !== recipe?.title && r.category === recipe?.category)
     .sort(() => Math.random() - 0.5)
     .slice(0, 3);
 
@@ -102,17 +90,19 @@ function RecipeDetails() {
     navigate("/favorites");
   };
 
-const handleShare = async () => {
-  const url = `${window.location.origin}/recipe/${encodeURIComponent(recipe.title)}`;
-  if (navigator.share) {
-    try {
-      await navigator.share({ title: recipe.title, url });
-    } catch {}
-  } else {
-    navigator.clipboard.writeText(url);
-    Swal.fire({ icon: "success", title: "Link copied!" });
-  }
-};
+  // SHARE
+  const handleShare = async () => {
+    const url = window.location.href;
+    if (navigator.share) {
+      try {
+        await navigator.share({ title: recipe.title, url });
+      } catch {}
+    } else {
+      navigator.clipboard.writeText(url);
+      Swal.fire({ icon: "success", title: "Link copied!" });
+    }
+  };
+
   // DELETE
   const handleDelete = async () => {
     if (!isOwner) return;
@@ -130,8 +120,7 @@ const handleShare = async () => {
         { method: "DELETE", credentials: "include" }
       );
 
-      if (!res.ok)
-        return Swal.fire({ icon: "error", title: "Failed to delete" });
+      if (!res.ok) return Swal.fire({ icon: "error", title: "Failed to delete" });
 
       Swal.fire({ icon: "success", title: "Recipe deleted" });
       navigate("/recipes");
@@ -163,6 +152,19 @@ const handleShare = async () => {
     Swal.fire({ icon: "success", title: "Thank you!" });
   };
 
+  // RENDER LOADING IF DATA OR AUTH IS LOADING
+  if (authLoading || loading || !recipe) {
+    return (
+      <>
+        <Header />
+        <section className="py-24 min-h-screen flex justify-center items-center">
+          <h2 className="text-3xl font-semibold">Loading recipe…</h2>
+        </section>
+        <Footer />
+      </>
+    );
+  }
+
   return (
     <>
       <Header />
@@ -174,16 +176,12 @@ const handleShare = async () => {
 
         <div className="relative z-10 h-full flex flex-col items-center justify-center text-white text-center px-4">
           <h1 className="text-4xl sm:text-6xl font-bold mb-2">{recipe.title}</h1>
-
           {recipe.category && (
             <span className="mb-3 px-4 py-1 text-sm rounded-full bg-white/20 border border-white/40">
               {recipe.category}
             </span>
           )}
-
-          <p className="max-w-2xl text-lg sm:text-xl opacity-90">
-            {recipe.description}
-          </p>
+          <p className="max-w-2xl text-lg sm:text-xl opacity-90">{recipe.description}</p>
         </div>
       </section>
 
@@ -200,7 +198,7 @@ const handleShare = async () => {
         </div>
       </section>
 
-      {/* DETAILS SECTION — FIXED LAYOUT */}
+      {/* DETAILS SECTION */}
       <section className="py-20 px-6" style={{ backgroundColor: sectionBg }}>
         <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-3 gap-14">
 
@@ -209,7 +207,6 @@ const handleShare = async () => {
             <h2 className="text-3xl font-bold mb-4" style={{ color: titleColor }}>
               Why You’ll Love This Dish
             </h2>
-
             <p className="text-lg leading-relaxed mb-6" style={{ color: textColor }}>
               {recipe.whyLove}
             </p>
@@ -264,7 +261,6 @@ const handleShare = async () => {
             <h2 className="text-3xl font-bold mb-4" style={{ color: titleColor }}>
               Ingredients
             </h2>
-
             <ul
               className="p-6 rounded-xl shadow text-base space-y-2"
               style={{ backgroundColor: cardBg, color: textColor }}
@@ -280,7 +276,6 @@ const handleShare = async () => {
             <h2 className="text-3xl font-bold mb-4" style={{ color: titleColor }}>
               Steps
             </h2>
-
             <ol
               className="p-6 rounded-xl shadow text-base space-y-2 list-decimal list-inside"
               style={{ backgroundColor: cardBg, color: textColor }}
@@ -337,7 +332,6 @@ const handleShare = async () => {
                     <span key={s} className={s <= c.rating ? "text-[#FFD700]" : "text-gray-300"}>★</span>
                   ))}
                 </div>
-
                 {c.comment && <p className="italic text-base">“{c.comment}”</p>}
                 {c.createdAt && (
                   <p className="mt-3 text-xs opacity-70">
