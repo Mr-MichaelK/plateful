@@ -17,7 +17,7 @@ Recipe Collector/Meal Planner
 
 ## Links to the Deployed Frontend and Backend
 Link to the deployed frontend: https://plateful-three.vercel.app/
-Link to the deployed backend: https://plateful-backend-dn0i.onrender.com/api-docs
+Link to the deployed backend: https://plateful-backend-dn0i.onrender.com
 
 ## Detailed Setup Instructions for Running the Full-Stack Project Locally
 1. Download the frontend repository (folder name: plateful).
@@ -47,6 +47,7 @@ Link to the deployed backend: https://plateful-backend-dn0i.onrender.com/api-doc
 19. Explore!
 
 ## Comprehensive API Documentation
+Swagger: https://plateful-backend-dn0i.onrender.com/api-docs
 
 ## Screenshots Showcasing the Final Fully Functional Application
 ### SignUp Page:
@@ -77,13 +78,35 @@ Link to the deployed backend: https://plateful-backend-dn0i.onrender.com/api-doc
   
 ### Backend:
 * Nour Diab:
-  POST /signup
-  POST /login
-  POST /logout
-  GET /auth/check
+POST /signup
+POST /login
+POST /logout
+GET /auth/check
 
-* Noura Hajj Chehade: 
-* Michael Kolanjian: 
+* Noura Hajj Chehade:
+POST /recipes
+PUT /recipes/:title
+GET /recipes/:title
+GET /comments/:title
+POST /comments/:title
+POST /favorites/:title
+DELETE /recipes/:title
+GET /favorites
+POST /favorites/:title
+DELETE /favorites/:title
+
+* Michael Kolanjian:
+PUT /users/profile
+DELETE /users/profile
+PUT /users/password
+GET /meal-plans/:weekStartDate
+PUT /meal-plans
+
 * Adam Abdel Karim:
+GET /recipes
+GET /recipes/featured
+GET /recipes/:title
+POST /newsletter/subscribe
 
 # Significant Technical Challenges Encountered and How They Were Overcome
+First, we encountered a significant technical challenge when the backend server failed to launch on its default port (5000). After investigating, we discovered that macOS was already running a system service on port 5000, which caused the conflict. We resolved this issue by reconfiguring the server to run on port 5001, allowing the application to start and function correctly. Second, for image handling in the backend, we initially faced issues sending images directly to MongoDB, so we implemented Multer, a middleware that processes file uploads. Multer saves each uploaded image inside the backend uploads/ folder with a unique filename, and instead of storing the actual image in MongoDB, we only store the file path (e.g., /uploads/abc123.png). This keeps the database lightweight and efficient while allowing the frontend to load images using these stored paths. Overall, the backend manages physical image storage while MongoDB stores clean references to them.
