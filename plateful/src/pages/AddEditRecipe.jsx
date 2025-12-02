@@ -1,4 +1,4 @@
-// made by Noura Hajj Chehade — FINAL STRICT AUTH + OWNER (FULL FIXED)
+// made by Noura Hajj Chehade 
 import React, { useState, useEffect } from "react";
 import Header from "../shared-components/Header";
 import Footer from "../components/Footer";
@@ -42,13 +42,9 @@ const AddEditRecipe = () => {
 
   const API_ROOT = API_BASE_URL.replace(/\/api$/, "");
   const buildImageUrl = (imgPath) =>
-    !imgPath
-      ? ""
-      : imgPath.startsWith("http")
-      ? imgPath
-      : `${API_ROOT}${imgPath}`;
+    !imgPath ? "" : imgPath.startsWith("http") ? imgPath : `${API_ROOT}${imgPath}`;
 
-  // AUTH REDIRECT (only after auth finished)
+  // AUTH REDIRECT
   useEffect(() => {
     if (authLoading) return;
     if (!user) {
@@ -62,11 +58,9 @@ const AddEditRecipe = () => {
     }
   }, [authLoading, user, navigate]);
 
-  // LOAD EXISTING RECIPE WHEN EDITING
+  // LOAD RECIPE (EDIT)
   useEffect(() => {
-    if (!editingTitle) return;
-    if (authLoading) return;
-    if (!user) return;
+    if (!editingTitle || authLoading || !user) return;
 
     const loadRecipe = async () => {
       try {
@@ -77,7 +71,6 @@ const AddEditRecipe = () => {
 
         const data = await res.json();
 
-        // OWNER CHECK
         if (data.ownerEmail !== user.email) {
           Swal.fire({
             icon: "error",
@@ -158,15 +151,8 @@ const AddEditRecipe = () => {
       return;
     }
 
-    const ingredientsArray = ingredients
-      .split(",")
-      .map((s) => s.trim())
-      .filter(Boolean);
-
-    const stepsArray = steps
-      .split(".")
-      .map((s) => s.trim())
-      .filter(Boolean);
+    const ingredientsArray = ingredients.split(",").map((s) => s.trim()).filter(Boolean);
+    const stepsArray = steps.split(".").map((s) => s.trim()).filter(Boolean);
 
     try {
       const fd = new FormData();
@@ -181,23 +167,16 @@ const AddEditRecipe = () => {
       if (image2File) fd.append("images", image2File);
       if (image3File) fd.append("images", image3File);
 
-      let res;
-      if (editingTitle) {
-        res = await fetch(
-          `${API_BASE_URL}/recipes/${encodeURIComponent(editingTitle)}`,
-          {
-            method: "PUT",
-            body: fd,
-            credentials: "include",
-          }
-        );
-      } else {
-        res = await fetch(`${API_BASE_URL}/recipes`, {
-          method: "POST",
+      const res = await fetch(
+        editingTitle
+          ? `${API_BASE_URL}/recipes/${encodeURIComponent(editingTitle)}`
+          : `${API_BASE_URL}/recipes`,
+        {
+          method: editingTitle ? "PUT" : "POST",
           body: fd,
           credentials: "include",
-        });
-      }
+        }
+      );
 
       if (!res.ok) throw new Error("Failed to save recipe");
 
@@ -218,7 +197,6 @@ const AddEditRecipe = () => {
     }
   };
 
-  // THEME COLORS
   const sectionBg = theme === "dark" ? "#1a1a1a" : "#fff8f0";
   const sectionText = theme === "dark" ? "#f9c8c8" : "#7a1f2a";
   const cardBg = theme === "dark" ? "#2a2a2a" : "#ffffff";
@@ -226,7 +204,7 @@ const AddEditRecipe = () => {
   const inputText = theme === "dark" ? "#f2d8d8" : "#444";
   const inputBorder = theme === "dark" ? "#5a191f" : "#ccc";
 
-  const placeholder = (text) => (
+  const placeholderBox = (text) => (
     <div
       className="w-full h-40 rounded-lg border border-dashed flex items-center justify-center text-sm"
       style={{ color: inputText, borderColor: inputBorder }}
@@ -272,21 +250,16 @@ const AddEditRecipe = () => {
           </h2>
 
           <form onSubmit={handleSubmit} className="space-y-6 text-left">
+
             {/* TITLE */}
             <div>
-              <label
-                style={{ color: sectionText }}
-                className="block font-semibold mb-2"
-              >
+              <label className="block font-semibold mb-2" style={{ color: sectionText }}>
                 Recipe Title
               </label>
               <input
+                placeholder="Write a clear and simple title"
                 className="w-full rounded-lg px-4 py-2 border"
-                style={{
-                  backgroundColor: inputBg,
-                  color: inputText,
-                  borderColor: inputBorder,
-                }}
+                style={{ backgroundColor: inputBg, color: inputText, borderColor: inputBorder }}
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
               />
@@ -294,19 +267,13 @@ const AddEditRecipe = () => {
 
             {/* DESCRIPTION */}
             <div>
-              <label
-                style={{ color: sectionText }}
-                className="block font-semibold mb-2"
-              >
+              <label className="block font-semibold mb-2" style={{ color: sectionText }}>
                 Description
               </label>
               <textarea
+                placeholder="Write a short description of the recipe"
                 className="w-full rounded-lg px-4 py-2 h-24 resize-none border"
-                style={{
-                  backgroundColor: inputBg,
-                  color: inputText,
-                  borderColor: inputBorder,
-                }}
+                style={{ backgroundColor: inputBg, color: inputText, borderColor: inputBorder }}
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
               />
@@ -314,19 +281,13 @@ const AddEditRecipe = () => {
 
             {/* WHY LOVE */}
             <div>
-              <label
-                style={{ color: sectionText }}
-                className="block font-semibold mb-2"
-              >
+              <label className="block font-semibold mb-2" style={{ color: sectionText }}>
                 Why You’ll Love It
               </label>
               <textarea
+                placeholder="Write why someone will enjoy this dish"
                 className="w-full rounded-lg px-4 py-2 h-24 resize-none border"
-                style={{
-                  backgroundColor: inputBg,
-                  color: inputText,
-                  borderColor: inputBorder,
-                }}
+                style={{ backgroundColor: inputBg, color: inputText, borderColor: inputBorder }}
                 value={whyLove}
                 onChange={(e) => setWhyLove(e.target.value)}
               />
@@ -334,19 +295,12 @@ const AddEditRecipe = () => {
 
             {/* CATEGORY */}
             <div>
-              <label
-                style={{ color: sectionText }}
-                className="block font-semibold mb-2"
-              >
+              <label className="block font-semibold mb-2" style={{ color: sectionText }}>
                 Category
               </label>
               <select
                 className="w-full rounded-lg px-4 py-2 border"
-                style={{
-                  backgroundColor: inputBg,
-                  color: inputText,
-                  borderColor: inputBorder,
-                }}
+                style={{ backgroundColor: inputBg, color: inputText, borderColor: inputBorder }}
                 value={category}
                 onChange={(e) => setCategory(e.target.value)}
               >
@@ -361,19 +315,13 @@ const AddEditRecipe = () => {
 
             {/* INGREDIENTS */}
             <div>
-              <label
-                style={{ color: sectionText }}
-                className="block font-semibold mb-2"
-              >
-                Ingredients (comma-separated)
+              <label className="block font-semibold mb-2" style={{ color: sectionText }}>
+                Ingredients
               </label>
               <textarea
+                placeholder="Write ingredients separated by commas"
                 className="w-full rounded-lg px-4 py-2 h-24 resize-none border"
-                style={{
-                  backgroundColor: inputBg,
-                  color: inputText,
-                  borderColor: inputBorder,
-                }}
+                style={{ backgroundColor: inputBg, color: inputText, borderColor: inputBorder }}
                 value={ingredients}
                 onChange={(e) => setIngredients(e.target.value)}
               />
@@ -381,19 +329,13 @@ const AddEditRecipe = () => {
 
             {/* STEPS */}
             <div>
-              <label
-                style={{ color: sectionText }}
-                className="block font-semibold mb-2"
-              >
-                Steps (separated by dots)
+              <label className="block font-semibold mb-2" style={{ color: sectionText }}>
+                Steps
               </label>
               <textarea
+                placeholder="Write steps separated by dots"
                 className="w-full rounded-lg px-4 py-2 h-32 resize-none border"
-                style={{
-                  backgroundColor: inputBg,
-                  color: inputText,
-                  borderColor: inputBorder,
-                }}
+                style={{ backgroundColor: inputBg, color: inputText, borderColor: inputBorder }}
                 value={steps}
                 onChange={(e) => setSteps(e.target.value)}
               />
@@ -401,81 +343,70 @@ const AddEditRecipe = () => {
 
             {/* IMAGES */}
             <div className="space-y-6">
+
               {/* MAIN IMAGE */}
               <div>
-                <label
-                  style={{ color: sectionText }}
-                  className="block font-semibold mb-2"
-                >
+                <label className="block font-semibold mb-2" style={{ color: sectionText }}>
                   Main Image {editingTitle ? "(optional)" : "(required)"}
                 </label>
 
                 {image1Preview ? (
-                  <img
-                    src={image1Preview}
-                    className="w-full h-40 rounded-lg object-cover mb-2"
-                    alt="Main preview"
-                  />
+                  <img src={image1Preview} className="w-full h-40 rounded-lg object-cover mb-3" />
                 ) : (
-                  placeholder("No image selected")
+                  placeholderBox("No image selected")
                 )}
 
                 <input
                   type="file"
                   accept="image/*"
                   onChange={handleImage1Change}
+                  className="cursor-pointer block w-full text-sm px-4 py-2 rounded-lg 
+                             bg-[#7a1f2a]/10 text-[#7a1f2a] font-semibold border border-[#7a1f2a]
+                             hover:bg-[#7a1f2a]/20 transition"
                 />
               </div>
 
               {/* IMAGE 2 */}
               <div>
-                <label
-                  style={{ color: sectionText }}
-                  className="block font-semibold mb-2"
-                >
+                <label className="block font-semibold mb-2" style={{ color: sectionText }}>
                   Image 2 (optional)
                 </label>
 
                 {image2Preview ? (
-                  <img
-                    src={image2Preview}
-                    className="w-full h-40 rounded-lg object-cover mb-2"
-                    alt="Second preview"
-                  />
+                  <img src={image2Preview} className="w-full h-40 rounded-lg object-cover mb-3" />
                 ) : (
-                  placeholder("No image selected")
+                  placeholderBox("No image selected")
                 )}
 
                 <input
                   type="file"
                   accept="image/*"
                   onChange={handleImage2Change}
+                  className="cursor-pointer block w-full text-sm px-4 py-2 rounded-lg 
+                             bg-[#7a1f2a]/10 text-[#7a1f2a] font-semibold border border-[#7a1f2a]
+                             hover:bg-[#7a1f2a]/20 transition"
                 />
               </div>
 
               {/* IMAGE 3 */}
               <div>
-                <label
-                  style={{ color: sectionText }}
-                  className="block font-semibold mb-2"
-                >
+                <label className="block font-semibold mb-2" style={{ color: sectionText }}>
                   Image 3 (optional)
                 </label>
 
                 {image3Preview ? (
-                  <img
-                    src={image3Preview}
-                    className="w-full h-40 rounded-lg object-cover mb-2"
-                    alt="Third preview"
-                  />
+                  <img src={image3Preview} className="w-full h-40 rounded-lg object-cover mb-3" />
                 ) : (
-                  placeholder("No image selected")
+                  placeholderBox("No image selected")
                 )}
 
                 <input
                   type="file"
                   accept="image/*"
                   onChange={handleImage3Change}
+                  className="cursor-pointer block w-full text-sm px-4 py-2 rounded-lg 
+                             bg-[#7a1f2a]/10 text-[#7a1f2a] font-semibold border border-[#7a1f2a]
+                             hover:bg-[#7a1f2a]/20 transition"
                 />
               </div>
             </div>
@@ -484,15 +415,13 @@ const AddEditRecipe = () => {
             <div className="text-center">
               <button
                 type="submit"
-                className="px-8 py-3 rounded-lg font-medium shadow-lg hover:scale-105 transition cursor-pointer"
-                style={{
-                  backgroundColor: sectionText,
-                  color: theme === "dark" ? "#1a1a1a" : "#fff",
-                }}
+                className="px-8 py-3 rounded-lg font-medium shadow-lg hover:scale-105 transition"
+                style={{ backgroundColor: sectionText, color: theme === "dark" ? "#1a1a1a" : "#fff" }}
               >
                 {editingTitle ? "Update Recipe" : "Save Recipe"}
               </button>
             </div>
+
           </form>
         </div>
       </section>
