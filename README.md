@@ -1,4 +1,4 @@
-<img width="1892" height="807" alt="image" src="https://github.com/user-attachments/assets/c61adb38-4c9e-4f7e-ba47-4634f513c79f" /># Plateful
+# Plateful
 
 ## Team Members & ID Numbers (Group: Cookies)
 * Nour Diab – 202302727 
