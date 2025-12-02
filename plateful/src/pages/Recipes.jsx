@@ -25,7 +25,7 @@ const Recipes = () => {
   useEffect(() => {
     async function fetchRecipes() {
       try {
-        const response = await fetch("http://localhost:5001/api/recipes"); // replace with your backend URL
+        const response = await fetch("https://plateful-backend-dn0i.onrender.com/api/recipes"); // replace with your backend URL
         const data = await response.json();
         setRecipes(data);
       } catch (err) {
