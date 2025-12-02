@@ -54,20 +54,24 @@ const RecipeCard = ({ recipe }) => {
         />
       </div>
 
-      {/* TEXT */}
-      <div className="p-4 flex-grow bg-white">
-        <h3
-          className="font-semibold text-lg mb-1"
-          style={{ color: titleColor }}
-        >
-          {recipe.title}
-        </h3>
+  {/* TEXT */}
+  <div
+    className="p-4 flex-grow"
+    style={{ backgroundColor: cardBg }}
+  >
+    <h3
+      className="font-semibold text-lg mb-1"
+      style={{ color: titleColor }}
+    >
+      {recipe.title}
+    </h3>
 
-        <p className="text-sm line-clamp-3" style={{ color: descColor }}>
-          {recipe.description || "No description available."}
-        </p>
-      </div>
-    </div>
+    <p className="text-sm line-clamp-3" style={{ color: descColor }}>
+      {recipe.description || "No description available."}
+    </p>
+  </div>
+  </div>
+
   );
 };
 
