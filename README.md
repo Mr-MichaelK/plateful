@@ -11,9 +11,11 @@ Recipe Collector/Meal Planner
 
 ## Primary Data Entities Chosen
 * Recipes
-* Ingredients
 * Users
 * Meal Plans
+* Favorites
+* Comments
+* Newsletter Subscribers
 
 ## Links to the Deployed Frontend and Backend
 * Link to the deployed frontend: https://plateful-three.vercel.app/
